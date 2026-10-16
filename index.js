@@ -831,6 +831,6 @@ for (const id of ['seeker-stage-grain', 'seeker-stage-vignette', 'seeker-stage-o
         running = false;
     };
     // Only once SillyTavern has loaded the user's settings, or the first run would repeat.
-    if (document.getElementById('preloader')) eventSource.on(eventTypes.APP_READY, install);
-    else install();
+    // APP_READY also fires for listeners added after it.
+    eventSource.on(eventTypes.APP_READY, install);
 }
