@@ -799,3 +799,37 @@ for (const id of ['seeker-stage-grain', 'seeker-stage-vignette', 'seeker-stage-o
     // Characters: the HotSwap row and, with a character open, the back button and name.
     pinToHeader(byId('right-nav-panel'), [byId('CharListButtonAndHotSwaps'), byId('rm_PinAndTabs')]);
 }
+
+// Install: adds the seeker and seeker gilt UI themes through SillyTavern's own theme import,
+// and the first time switches to seeker. After that the choice is yours.
+{
+    const { eventSource, eventTypes, extensionSettings, saveSettingsDebounced } = SillyTavern.getContext();
+    const presets = [['seeker', 'seeker.json'], ['seeker gilt', 'seeker-gilt.json']];
+    let running = false;
+    const install = async () => {
+        const select = document.getElementById('themes');
+        const input = document.getElementById('ui_preset_import_file');
+        if (running || !select || !input || !select.options.length) return;
+        running = true;
+        const has = name => [...select.options].some(option => option.value === name);
+        for (const [name, file] of presets) {
+            if (has(name)) continue;
+            const response = await fetch(new URL(`theme/${file}`, import.meta.url));
+            if (!response.ok) continue;
+            const transfer = new DataTransfer();
+            transfer.items.add(new File([await response.text()], file, { type: 'application/json' }));
+            input.files = transfer.files;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+            for (let i = 0; i < 50 && !has(name); i++) await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        const settings = extensionSettings.seeker ??= {};
+        if (!settings.themeApplied && has('seeker')) {
+            settings.themeApplied = true;
+            saveSettingsDebounced();
+            if (select.value !== 'seeker') $(select).val('seeker').trigger('change');
+        }
+        running = false;
+    };
+    eventSource.on(eventTypes.APP_READY, install);
+    install();
+}
