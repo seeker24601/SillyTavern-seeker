@@ -1,0 +1,119 @@
+/* seeker spacing: one spacing scale for panels and dialogs.
+
+     4px   inside a control group (icon and label)
+     8px   between related controls (a row of buttons, a field and its hint)
+     12px  between fields
+     16px  between groups, and the gap above a subsection heading
+     24px  modal padding, and the gap above a section heading
+     32px  between dialog content and its buttons
+
+   SillyTavern spaces things with 5px gaps and margins almost everywhere, which packs
+   panels tight. Inside panels and dialogs these rules move that onto the scale. */
+
+:root {
+  --seeker-space-1: 4px;
+  --seeker-space-2: 8px;
+  --seeker-space-3: 12px;
+  --seeker-space-4: 16px;
+  --seeker-space-5: 24px;
+  --seeker-space-6: 32px;
+  --seeker-modal-pad: var(--seeker-space-5);
+}
+
+/* ---------- Modal padding ---------- */
+.drawer-content,
+#character_popup,
+.popup,
+#dialogue_popup { padding: var(--seeker-modal-pad) !important; }
+.popup.transparent_dialogue_popup { padding: 0 !important; }
+
+/* The panel header added by index.js bleeds to the panel's edges. */
+.seeker-panel-header {
+  top: calc(-1 * var(--seeker-modal-pad)) !important;
+  margin: calc(-1 * var(--seeker-modal-pad)) calc(-1 * var(--seeker-modal-pad)) var(--seeker-space-1) !important;
+  padding: 18px var(--seeker-space-4) var(--seeker-space-3) var(--seeker-modal-pad) !important;
+}
+
+/* ---------- Rhythm inside panels and dialogs (line heights: typography.css) ---------- */
+/* Headings: room above, a little below. */
+:is(.drawer-content, .popup, #character_popup) :is(h1, h2, h3) {
+  margin: var(--seeker-space-5) 0 var(--seeker-space-2) !important;
+}
+:is(.drawer-content, .popup, #character_popup) :is(h4, h5) {
+  margin: var(--seeker-space-4) 0 var(--seeker-space-2) !important;
+}
+/* Only the panel's very first heading sits flush; SillyTavern wraps every section, so
+   "first child" alone would strip the space above all of them. */
+.seeker-panel-header + :is(h1, h2, h3, h4, h5),
+.popup-content > :is(h1, h2, h3, h4, h5):first-child { margin-top: 0 !important; }
+
+/* Flex rows: SillyTavern's 5px gap becomes 8px. Rows marked "no gap" keep none. */
+:where(.drawer-content, .popup, #character_popup) .flex-container:not(.flexNoGap),
+:where(.drawer-content, .popup, #character_popup) .flexGap5 { gap: var(--seeker-space-2); }
+:where(.drawer-content, .popup, #character_popup) .flexGap10 { gap: var(--seeker-space-3); }
+
+/* Controls: a touch taller, with even space between fields. */
+:where(.drawer-content, .popup, #character_popup) :is(.text_pole, select) {
+  min-height: 34px;
+  padding: 7px 10px !important;
+  margin: var(--seeker-space-1) 0 !important;
+}
+/* Room on the right for a dropdown's chevron. */
+:where(.drawer-content, .popup, #character_popup) select:is(.text_pole, select) { padding-right: 28px !important; }
+:where(.drawer-content, .popup, #character_popup) select { padding-right: 28px !important; }
+:where(.drawer-content, .popup, #character_popup) .menu_button {
+  min-height: 32px;
+  padding: 6px 12px !important;
+  margin: var(--seeker-space-1) 0;
+}
+:where(.drawer-content, .popup, #character_popup) .menu_button[class*="fa-"] { padding: 6px 9px !important; }
+
+/* Checkbox rows: the box and its label, with air between rows. */
+:where(.drawer-content, .popup, #character_popup) label.checkbox_label {
+  display: flex;
+  align-items: center;
+  gap: var(--seeker-space-2);
+  margin: 6px 0;
+}
+
+/* Sliders: each block gets room to breathe. */
+:where(.drawer-content, .popup, #character_popup) .range-block { margin-bottom: var(--seeker-space-3); gap: var(--seeker-space-1); }
+
+/* Collapsible sections: space between headers, padding inside. */
+:where(.drawer-content, .popup, #character_popup) .inline-drawer { margin-bottom: var(--seeker-space-2); }
+:where(.drawer-content, .popup, #character_popup) .inline-drawer-header { padding: 10px var(--seeker-space-3) !important; }
+:where(.drawer-content, .popup, #character_popup) .inline-drawer-content { padding: var(--seeker-space-3) var(--seeker-space-1) var(--seeker-space-2) !important; }
+
+/* Dividers mark a new group. */
+:where(.drawer-content, .popup, #character_popup) hr { margin: var(--seeker-space-4) 0 !important; }
+
+/* ---------- Welcome screen ---------- */
+/* Lined up with the chat messages below it, which have 18px side padding. */
+.welcomePanel { padding: var(--seeker-space-4) 18px !important; gap: var(--seeker-space-3) !important; }
+.welcomePanel :is(.welcomeHeader, .welcomeHeaderTitle) { gap: var(--seeker-space-3) !important; }
+/* The shortcuts and "Recent Chats" no longer fit on one line in the chat column, so the
+   shortcuts take their own row under the title and the heading sits above its list. */
+.welcomePanel .welcomeHeader { flex-wrap: wrap; }
+.welcomePanel .welcomeShortcuts { order: -1; flex: 1 0 100%; justify-content: flex-start !important; }
+.welcomePanel .recentChatsTitle { flex: 1 0 100%; margin-top: var(--seeker-space-2); }
+:is(.welcomePanel, #seeker-welcome-stage) .welcomeShortcuts,
+#chat .mes[type="welcome_prompt"] .custom-flex-container { gap: var(--seeker-space-2) !important; }
+:is(.welcomePanel, #seeker-welcome-stage, #chat .mes[type="welcome_prompt"]) .menu_button:not(.recentChat .menu_button) {
+  min-height: 32px;
+  padding: 6px 12px !important;
+  margin: 0 !important;
+}
+.welcomeRecent .recentChatList { gap: var(--seeker-space-1) !important; }
+.welcomeRecent .recentChatList .recentChat { padding: var(--seeker-space-2) var(--seeker-space-3) !important; gap: var(--seeker-space-3) !important; }
+.welcomeRecent .recentChat .recentChatInfo { gap: var(--seeker-space-1); }
+.welcomeRecent .recentChat :is(.chatNameContainer, .chatMessageContainer, .chatActions) { gap: var(--seeker-space-2) !important; }
+
+/* ---------- Dialogs ---------- */
+.popup .popup-controls {
+  margin-top: var(--seeker-space-5) !important;
+  gap: var(--seeker-space-2) !important;
+  justify-content: flex-end !important;
+}
+.popup .popup-controls .menu_button { min-width: 88px; margin: 0 !important; }
+.popup .popup-input { margin-top: var(--seeker-space-3) !important; }
+.popup .popup-button-close { top: var(--seeker-space-3) !important; right: var(--seeker-space-3) !important; }

@@ -1,0 +1,15 @@
+{
+  "name": "sillytavern-seeker",
+  "version": "0.1.0",
+  "private": true,
+  "description": "seeker, a visual novel theme for SillyTavern.",
+  "author": "seeker",
+  "type": "module",
+  "scripts": {
+    "build:icons": "node scripts/build-icons.mjs"
+  },
+  "devDependencies": {
+    "@fontsource-variable/bodoni-moda": "^5.3.0",
+    "lucide-static": "^1.57.0"
+  }
+}

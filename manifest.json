@@ -1,0 +1,12 @@
+{
+    "display_name": "seeker",
+    "description": "A visual novel layout for SillyTavern: sprite stage on the left, full-height chat on the right.",
+    "loading_order": 10,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "seeker",
+    "version": "0.1.0",
+    "auto_update": false
+}

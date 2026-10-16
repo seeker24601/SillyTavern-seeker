@@ -1,0 +1,190 @@
+/* seeker: the Backgrounds panel. A tidy header, a segmented Global/Chat switch, and a
+   gallery of large rounded tiles: the name on each, a lift and a slow zoom on hover, and
+   an accent ring and badge on the background in use. SillyTavern's own column count
+   (its - and + buttons) still sets how many tiles share a row; index.js starts it at 4. */
+
+/* ---------- Panel ---------- */
+#Backgrounds.openDrawer { display: flex !important; flex-direction: column; }
+#Backgrounds #bg-header-fixed {
+  padding: 0 0 var(--seeker-space-3) !important;
+  background: none !important;
+  border: none !important;
+}
+#Backgrounds :is(.bg-header-row-1, .bg-header-row-2) { align-items: center; gap: var(--seeker-space-2); }
+#Backgrounds .bg-header-row-2 { margin-top: var(--seeker-space-2); }
+#Backgrounds .bg-header-row-1 > h3 { display: none; } /* the panel header has the name */
+#Backgrounds .bg-header-row-1 > :is(.menu_button, select) { margin: 0 !important; }
+#Backgrounds #bg-filter {
+  flex: 1;
+  margin: 0 !important;
+  padding-left: 34px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(237,237,237,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: 11px center !important;
+  background-size: 15px 15px !important;
+}
+#Backgrounds #bg-sort { max-width: none; width: 120px !important; margin: 0 !important; }
+/* The gallery fills the panel down to its bottom edge and scrolls there, fading out. */
+#Backgrounds #bg_tabs {
+  flex: 1 1 0;
+  min-height: 0;
+  height: auto !important;
+  max-height: none !important;
+  margin-bottom: calc(-1 * var(--seeker-modal-pad)) !important;
+  padding: 0 !important;
+}
+
+/* ---------- Global / Chat: a segmented switch ---------- */
+#Backgrounds .bg_tabs_list {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0 0 var(--seeker-space-3) !important;
+  padding: 0 !important;
+  background: none !important;
+  border: none !important;
+}
+#Backgrounds .bg_tab_button {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: var(--seeker-fill) !important;
+  border: none !important;
+}
+#Backgrounds .bg_tab_button:first-child { border-radius: 999px 0 0 999px !important; }
+#Backgrounds .bg_tab_button:nth-child(2) { border-radius: 0 999px 999px 0 !important; }
+#Backgrounds .bg_tab_button a {
+  display: block;
+  padding: 6px 18px !important;
+  color: var(--seeker-text-dim) !important;
+  font-weight: 500 !important;
+  border-radius: inherit;
+  transition: background-color 120ms, color 120ms;
+}
+#Backgrounds .bg_tab_button:hover a { color: var(--seeker-text) !important; }
+#Backgrounds .bg_tab_button:is(.ui-tabs-active, .ui-state-active) { background: var(--seeker-selected) !important; opacity: 1 !important; }
+#Backgrounds .bg_tab_button:is(.ui-tabs-active, .ui-state-active) a { color: var(--seeker-selected-ink) !important; }
+#Backgrounds .heading-controls { right: 0 !important; gap: var(--seeker-space-1) !important; }
+#Backgrounds .heading-controls .menu_button { margin: 0 !important; }
+#Backgrounds .bg_tab_panel {
+  padding: 4px 4px var(--seeker-space-6) !important;
+  background: none !important;
+  border: none !important;
+  mask-image: linear-gradient(to bottom, black calc(100% - 28px), transparent);
+}
+
+/* ---------- Gallery ---------- */
+#Backgrounds :is(#bg_menu_content, #bg_custom_content) { gap: 14px !important; }
+#Backgrounds .bg_folder_grid.bg_list { gap: 14px !important; margin-bottom: 14px !important; }
+
+#Backgrounds .bg_example {
+  aspect-ratio: 16 / 10 !important; /* one shape for every tile, whatever the image */
+  border-radius: 14px !important;
+  outline: none !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35) !important;
+  transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 220ms;
+}
+/* A faint glass rim inside the edge. */
+#Backgrounds .bg_example::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.1), inset 0 1px 0 rgba(var(--seeker-ink-rgb), 0.12);
+  pointer-events: none;
+  transition: box-shadow 220ms;
+}
+#Backgrounds .bg_example.locked-background::after { box-shadow: inset 0 0 0 2px var(--golden); } /* SillyTavern's lock */
+#Backgrounds .bg_example:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5) !important;
+}
+#Backgrounds .bg_example:hover::after { box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.28), inset 0 1px 0 rgba(var(--seeker-ink-rgb), 0.3); }
+#Backgrounds .bg_example .thumbnail-clipper {
+  inset: 0 !important;
+  transition: transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+#Backgrounds .bg_example:hover .thumbnail-clipper { transform: scale(1.06); }
+
+/* The name, small along the bottom; brighter on hover. */
+#Backgrounds .bg_example .BGSampleTitle {
+  opacity: 1 !important;
+  padding: 22px 12px 9px !important;
+  background: linear-gradient(transparent, rgba(var(--seeker-panel-rgb), 0.85)) !important;
+  border-radius: 0 !important;
+  text-align: left !important;
+  color: var(--seeker-text-dim) !important;
+  font-size: var(--seeker-fs-small) !important;
+  font-weight: 500 !important;
+  line-height: var(--seeker-lh-ui) !important;
+  transition: color 200ms;
+}
+#Backgrounds .bg_example:is(:hover, :focus-within) .BGSampleTitle { color: var(--seeker-text) !important; }
+
+/* The background in use: a white ring and a check badge. */
+#Backgrounds .bg_example.selected-background { box-shadow: 0 0 0 2px var(--seeker-selected), 0 10px 26px rgba(0, 0, 0, 0.5) !important; }
+#Backgrounds .bg_example.selected-background::before {
+  content: "\f00c" !important;
+  top: 8px !important;
+  left: 8px !important;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--seeker-selected);
+  color: var(--seeker-selected-ink) !important;
+  font-size: 11px !important;
+  filter: none !important;
+}
+
+/* Lock, edit and delete: a small glass pill. */
+#Backgrounds .bg_example .jg-menu {
+  top: 8px !important;
+  right: 8px !important;
+  padding: 3px !important;
+  gap: 2px;
+  border: 1px solid rgba(var(--seeker-ink-rgb), 0.16) !important;
+  border-radius: 999px !important;
+  background: rgba(var(--seeker-panel-rgb), 0.6) !important;
+  backdrop-filter: blur(8px);
+}
+#Backgrounds .bg_example .jg-button { border-radius: 50% !important; font-size: 13px !important; }
+
+/* Folders: the same rounded, lifted tiles. */
+#Backgrounds .bg_folder_tile {
+  border-radius: 14px !important;
+  outline: none !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.1) !important;
+  transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+#Backgrounds .bg_folder_tile:hover { transform: translateY(-3px); filter: none !important; }
+#Backgrounds .bg_folder_tile_overlay { border-radius: 0 !important; padding: 18px 10px 8px !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  #Backgrounds :is(.bg_example, .bg_example .thumbnail-clipper, .bg_folder_tile) { transition: none; }
+  #Backgrounds :is(.bg_example, .bg_folder_tile):hover { transform: none; }
+  #Backgrounds .bg_example:hover .thumbnail-clipper { transform: none; }
+}
+
+/* ---------- Phones ---------- */
+@media (max-width: 1000px) {
+  #Backgrounds .bg-header-row-1 { flex-wrap: wrap; }
+  /* Two tiles a row, whatever the desktop count. */
+  #Backgrounds :is(#bg_menu_content, #bg_custom_content) { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
+  #Backgrounds .bg_folder_grid.bg_list { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  #Backgrounds :is(.bg_example, .bg_folder_tile) { border-radius: 12px !important; }
+  /* The column buttons do nothing here. */
+  #Backgrounds :is(#bg_thumb_zoom_in, #bg_thumb_zoom_out) { display: none !important; }
+  /* SillyTavern's tap-for-actions button: a small round one in the corner. */
+  #Backgrounds :is(.bg_example, .bg_folder_tile) .mobile-only-menu-toggle {
+    top: 6px !important;
+    right: 6px !important;
+    width: 26px !important;
+    height: 26px !important;
+    border-radius: 50% !important;
+    background-color: rgba(var(--seeker-panel-rgb), 0.55) !important;
+    font-size: 12px;
+  }
+  #Backgrounds .bg_example .BGSampleTitle { padding: 18px 10px 7px !important; }
+}
