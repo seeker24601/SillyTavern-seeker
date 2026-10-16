@@ -1,0 +1,298 @@
+/* seeker: User settings and Formatting as a list of sections beside one section at a time.
+   index.js (sectionPanel) tags each section's elements (data-seeker-section), marks the
+   panel .seeker-sectioned and adds the list (.seeker-settings-nav); SillyTavern's markup
+   stays where it is. User settings' settings are also drawn as rows: the label on the left,
+   the control on the right. */
+
+/* ---------- Layout ---------- */
+.seeker-sectioned.openDrawer {
+  display: grid !important;
+  grid-template-columns: 184px minmax(0, 1fr);
+  column-gap: var(--seeker-space-5);
+  align-content: start;
+}
+/* The header and the rows above the sections run across both columns. */
+.seeker-sectioned > :not(.seeker-settings-nav, .seeker-sectioned-content) { grid-column: 1 / -1; }
+.seeker-sectioned-content {
+  grid-column: 2;
+  display: flex !important;
+  flex-direction: column;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important; /* SillyTavern spaces its columns evenly */
+  align-self: start;
+  gap: 0 !important;
+  margin-top: var(--seeker-space-4);
+}
+#user-settings-block-content { max-width: 680px; }
+/* Formatting: its columns hold the sections; they stack in one column instead. */
+#AdvancedFormatting .seeker-sectioned-content > * { width: 100% !important; max-width: none !important; flex: none !important; }
+#AdvancedFormatting .seeker-sectioned-content { max-width: 760px; }
+/* SillyTavern's three columns hold the sections; the sections stack in one column instead. */
+#user-settings-block-content :is(#UI-Customization, #power-user-options-block, #power-user-option-checkboxes) { display: contents !important; }
+#UI-Theme-Block { width: 100% !important; }
+/* STscript's own heading first, then the autocomplete settings index.js files under it. */
+#user-settings-block-content .inline-drawer[data-seeker-section="stscript"] { order: 1; margin-top: var(--seeker-space-4); }
+
+/* One section at a time; while searching, every section with a match. */
+.seeker-sectioned:not([data-seeker-searching], [data-seeker-sections-off]) [data-seeker-section]:not(.seeker-section-active),
+#user-settings-block[data-seeker-searching] [data-seeker-section]:not(.seeker-section-match) { display: none !important; }
+
+/* ---------- Section list ---------- */
+.seeker-settings-nav {
+  grid-column: 1;
+  align-self: start;
+  position: sticky;
+  top: calc(var(--seeker-header-height, 62px) - var(--seeker-modal-pad) + 16px); /* under the sticky panel header */
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: var(--seeker-space-4);
+}
+.seeker-settings-nav-item {
+  all: unset;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border-radius: var(--seeker-menu-item-radius);
+  font: 500 var(--seeker-fs-body) / var(--seeker-lh-ui) var(--mainFontFamily);
+  color: var(--seeker-text-dim);
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms;
+}
+.seeker-settings-nav-item:hover { background-color: var(--seeker-fill-hover); color: var(--seeker-text); }
+.seeker-settings-nav-item:focus-visible { box-shadow: var(--seeker-focus); }
+.seeker-settings-nav-item[aria-current="true"] { background-color: var(--seeker-selected); color: var(--seeker-selected-ink); }
+/* While searching the list shows no choice: the matches are shown from every section. */
+#user-settings-block[data-seeker-searching] .seeker-settings-nav-item[aria-current="true"] { background-color: transparent; color: var(--seeker-text-dim); }
+
+/* While searching, a section shows its heading and its matching rows (index.js). */
+#user-settings-block[data-seeker-searching] :is([data-seeker-section], [data-seeker-section] *):is(label.checkbox_label, .inline-drawer, #MovingUI-presets-block):not(.seeker-row-match, .seeker-row-match *),
+#user-settings-block[data-seeker-searching] :is([data-seeker-section], [data-seeker-section] *):is(.flex-container, div, .range-block):has(> select, > .neo-range-slider, > .menu_button):not(.seeker-row-match, .seeker-row-match *):not(:has(.seeker-row-match)),
+#user-settings-block[data-seeker-searching] [data-seeker-section] textarea:not(.seeker-row-match *),
+#user-settings-block[data-seeker-searching] [data-seeker-section]:not(.seeker-row-match, h4):not(:has(.seeker-row-match, h4)) { display: none !important; }
+
+/* Search matches (SillyTavern's .highlighted). */
+#user-settings-block-content .highlighted {
+  background-color: var(--seeker-selected-fill) !important;
+  color: var(--seeker-text) !important;
+  border-radius: var(--seeker-radius);
+  outline: none !important;
+}
+
+/* ---------- Rows ---------- */
+#user-settings-block-content {
+  --seeker-row-pad: 10px;
+  --seeker-control-width: min(260px, 48%);
+}
+/* Checkboxes: the label, then a switch at the end of the row. */
+#user-settings-block-content label.checkbox_label {
+  align-items: center;
+  gap: var(--seeker-space-2);
+  margin: 0 !important;
+  padding: var(--seeker-row-pad) 0;
+  border-bottom: 1px solid var(--seeker-divider);
+}
+#user-settings-block-content label.checkbox_label > input[type="checkbox"] {
+  order: 99;
+  margin-left: auto !important;
+}
+/* Paired switches (Swipes and Gestures) are a row each. */
+#user-settings-block-content .checkbox-container { flex-direction: column; align-items: stretch; gap: 0 !important; }
+/* A switch with a button beside it (MovingUI and Reset): the switch row, then the button. */
+#user-settings-block-content .flex-container:has(> label.checkbox_label + .menu_button) {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--seeker-space-3);
+  border-bottom: 1px solid var(--seeker-divider);
+}
+#user-settings-block-content .flex-container:has(> label.checkbox_label + .menu_button) > label.checkbox_label { flex: 1; border-bottom: none; }
+#user-settings-block-content .flex-container:has(> label.checkbox_label + .menu_button) > .menu_button { margin: 0 !important; }
+/* MovingUI preset: its label wraps both the title and the dropdown. */
+#MovingUI-presets-block {
+  flex-wrap: nowrap;
+  gap: var(--seeker-space-2);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--seeker-divider);
+}
+#MovingUI-presets-block > .flex-container { flex: 1; }
+#MovingUI-presets-block label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--seeker-space-3);
+}
+#MovingUI-presets-block label > .flex-container { width: calc(var(--seeker-control-width) - 44px); }
+#MovingUI-presets-block select { width: 100% !important; }
+/* Its dropdown sits in a wrapper of its own, which is not a row: no divider, and the dropdown fills it. */
+#user-settings-block-content #MovingUI-presets-block label > .flex-container { padding: 0 !important; border-bottom: none !important; }
+#user-settings-block-content #MovingUI-presets-block label > .flex-container > select { flex: 1 1 auto !important; width: 100% !important; font-weight: 400 !important; }
+
+/* Dropdowns and their labels: label on the left, a fixed-width control on the right. */
+#user-settings-block-content :is(.flex-container, div):has(> select):not(:has(> select ~ .menu_button, > .menu_button ~ select)) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--seeker-space-3);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--seeker-divider);
+}
+#user-settings-block-content :is(.flex-container, div):has(> select) > select {
+  flex: 0 0 var(--seeker-control-width) !important;
+  width: var(--seeker-control-width) !important;
+  margin: 0 !important;
+}
+/* Sliders: the title on the left; the slider and its number on the right. SillyTavern
+   writes these as a column of title, slider and number (some as .range-block). */
+#user-settings-block-content :is(.flex-container, .range-block):has(> .neo-range-slider) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) calc(var(--seeker-control-width) - 76px) 64px;
+  grid-template-areas: "title slider number";
+  align-items: center;
+  column-gap: var(--seeker-space-3);
+  width: 100% !important;
+  flex: none !important;
+  margin: 0 !important;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--seeker-divider);
+}
+#user-settings-block-content :is(.flex-container, .range-block):has(> .neo-range-slider) > :first-child {
+  grid-area: title;
+  justify-content: flex-start !important;
+  justify-self: start;
+  text-align: left !important;
+}
+#user-settings-block-content :is(.flex-container, .range-block):has(> .neo-range-slider) > .neo-range-slider { grid-area: slider; width: 100% !important; margin: 0 !important; }
+#user-settings-block-content :is(.flex-container, .range-block):has(> .neo-range-slider) > .neo-range-input { grid-area: number; width: 100% !important; margin: 0 !important; }
+/* Rows of sliders stack. */
+#user-settings-block-content .flex-container:has(> :is(.flex-container, .range-block) > .neo-range-slider) {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0 !important;
+}
+/* Dividers between groups: the rows' own lines do that now. */
+#user-settings-block-content hr { display: none; }
+
+/* ---------- Switches ---------- */
+#user-settings-block-content input[type="checkbox"] {
+  position: relative;
+  width: 34px !important;
+  height: 20px !important;
+  border-radius: 10px !important;
+  background-color: var(--seeker-fill-strong) !important;
+  transform: none;
+  transition: background-color 150ms;
+}
+#user-settings-block-content input[type="checkbox"]::before {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  clip-path: none;
+  box-shadow: none;
+  background-color: var(--seeker-text);
+  transform: none;
+  transition: transform 150ms;
+}
+#user-settings-block-content input[type="checkbox"]:checked { background-color: var(--seeker-selected) !important; }
+#user-settings-block-content input[type="checkbox"]:checked::before {
+  transform: translateX(14px);
+  background-color: var(--seeker-selected-ink);
+}
+
+/* ---------- Phones: the list becomes a row of sections above the settings ---------- */
+@media (max-width: 1000px) {
+  .seeker-sectioned.openDrawer { grid-template-columns: minmax(0, 1fr); }
+  .seeker-settings-nav,
+  .seeker-sectioned-content { grid-column: 1; }
+  .seeker-settings-nav {
+    top: calc(var(--seeker-header-height, 62px) - var(--seeker-modal-pad));
+    z-index: 10;
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 6px 0;
+    background: var(--seeker-surface-solid);
+    scrollbar-width: none;
+  }
+  .seeker-settings-nav-item { flex: 0 0 auto; white-space: nowrap; }
+  /* Content scrolling up under the row fades out, as under the header. */
+  .seeker-settings-nav { animation: seeker-sticky-fade linear both; animation-timeline: scroll(nearest); animation-range: 0 28px; }
+  #user-settings-block-content { --seeker-control-width: min(200px, 50%); }
+}
+
+/* ---------- Search ----------
+   SillyTavern's search is a textarea; it is drawn and behaves as a one-line field, with a
+   search icon (index.js keeps Enter from adding a line). */
+#settingsSearch {
+  field-sizing: fixed !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  max-height: 34px !important;
+  resize: none !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  padding: 7px 10px 7px 34px !important;
+  line-height: 20px !important;
+  background-color: var(--seeker-fill) !important; /* SillyTavern darkens it; it matches the other fields */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(237,237,237,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: 11px center !important;
+  background-size: 15px 15px !important;
+}
+
+/* ---------- Language and version ----------
+   SillyTavern spreads this row's three items apart, and the first is an empty title, so
+   the language picker floated in the middle. The version sits on the left as quiet text
+   and the language picker on the right, like a setting row. */
+#user-settings-block :has(> #UI-language-block) { justify-content: flex-start !important; gap: var(--seeker-space-3); }
+/* Its first item is a title SillyTavern leaves empty; it would still take a gap. */
+#user-settings-block :has(> #UI-language-block) > .flex-container:first-child { display: none !important; }
+#version_display { order: 1; color: var(--seeker-text-faint); font-size: var(--seeker-fs-small) !important; }
+#UI-language-block { order: 2; margin-left: auto; align-items: center !important; gap: var(--seeker-space-3); }
+#UI-language-block > span { color: var(--seeker-text-dim); }
+#ui_language_select { flex: 0 0 auto !important; width: 180px !important; }
+#version_display { margin: 0 !important; padding: 0 !important; }
+#UI-language-block { flex-wrap: nowrap !important; }
+@media (max-width: 1000px) {
+  #ui_language_select { width: 130px !important; }
+  #version_display { flex: 1 1 0; min-width: 0; }
+}
+
+
+/* ---------- AI response ----------
+   The panel scrolls inside .scrollableInner, so that box holds the list and the sections.
+   For APIs other than Chat Completion (data-seeker-sections-off) SillyTavern's layout stays. */
+#left-nav-panel .scrollableInner.seeker-sectioned:not([data-seeker-sections-off]) {
+  display: grid !important;
+  grid-template-columns: 184px minmax(0, 1fr);
+  column-gap: var(--seeker-space-5);
+  align-content: start;
+  & .seeker-settings-nav { top: 0; margin-top: 0; }
+  & .seeker-sectioned-content { margin-top: 0; max-width: 760px; }
+  /* The wrappers around the sections step aside so the sections can be ordered: Prompts
+     shows the prompt manager before its two smaller drawers. */
+  & :is(#respective-ranges-and-temps, #range_block_openai, #advanced-ai-config-block, #openai_settings, #openai_settings > div:first-child) { display: contents !important; }
+  & #range_block_openai > .inline-drawer[data-seeker-section="prompts"] { order: 1; }
+  & .seeker-section-heading { margin: var(--seeker-space-5) 0 var(--seeker-space-2) !important; }
+  /* The prompt manager's own "Prompts" label repeats the section heading above it. */
+  & .completion_prompt_manager_header_advanced > span:first-child { display: none; }
+  /* Logit Bias's title is SillyTavern's own; it is drawn like the other sections' headings. */
+  & #logit_bias_openai {
+    margin: var(--seeker-space-5) 0 var(--seeker-space-2) !important;
+    font-family: var(--seeker-heading-font) !important;
+    font-size: var(--seeker-fs-section) !important;
+    font-weight: 600 !important;
+    line-height: var(--seeker-lh-display) !important;
+    color: var(--seeker-text) !important;
+  }
+}
+#left-nav-panel .scrollableInner[data-seeker-sections-off] :is(.seeker-settings-nav, .seeker-section-heading) { display: none !important; }
+@media (max-width: 1000px) {
+  #left-nav-panel .scrollableInner.seeker-sectioned:not([data-seeker-sections-off]) {
+    grid-template-columns: minmax(0, 1fr);
+    & .seeker-settings-nav, & .seeker-sectioned-content { grid-column: 1; }
+    & .seeker-settings-nav { margin-bottom: var(--seeker-space-3); }
+  }
+}

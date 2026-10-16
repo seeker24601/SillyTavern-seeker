@@ -1,0 +1,444 @@
+/* seeker primitives: inputs, dropdowns, buttons, checkboxes, sliders, panels, menus and dialogs.
+   Shapes come from fills, not borders. SillyTavern draws nearly all of its borders in
+   --SmartThemeBorderColor, so making that transparent removes them in one place; the
+   rules below give each control a fill instead and keep a thin accent ring for focus. */
+
+:root {
+  --seeker-fill: rgba(var(--seeker-ink-rgb), 0.06);
+  --seeker-fill-hover: rgba(var(--seeker-ink-rgb), 0.1);
+  --seeker-fill-strong: rgba(var(--seeker-ink-rgb), 0.14);
+  --seeker-accent-fill: color-mix(in srgb, var(--seeker-accent) 16%, transparent);
+  /* Chosen, active and on: solid white with black text, or a white tint where a solid
+     block would be too loud. The accent is kept for the composer's focus sheen, success
+     notices and underlined chat text. */
+  --seeker-selected: #f2f2f2;
+  --seeker-selected-hover: #ffffff;
+  --seeker-selected-ink: #0b0b0b;
+  --seeker-selected-fill: rgba(var(--seeker-ink-rgb), 0.12);
+  /* SillyTavern's own green for on and connected states (linked presets, active worlds,
+     toggled buttons, the group member speaking). */
+  --active: var(--seeker-text);
+  --seeker-divider: rgba(var(--seeker-ink-rgb), 0.08);
+  --seeker-focus: 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.55);
+  --seeker-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  --seeker-surface-solid: #0e0e0e;
+  --seeker-surface-raised: #0b0b0b; /* the composer */
+  /* Rounding: panels and dialogs, menus and dropdowns, and the rows inside menus. */
+  --seeker-modal-radius: 24px;
+  --seeker-menu-radius: 16px;
+  --seeker-menu-item-radius: 10px;
+  /* The glass edge of panels, dialogs and menus: light at the top left, like the round
+     controls' rims. Drawn as the border itself (see below), so it stays one device pixel. */
+  --seeker-glass-edge-panel: linear-gradient(150deg,
+    rgba(var(--seeker-ink-rgb), 0.3), rgba(var(--seeker-ink-rgb), 0.08) 30%,
+    rgba(var(--seeker-ink-rgb), 0.05) 65%, rgba(var(--seeker-ink-rgb), 0.15));
+  /* Panels and dialogs sit over the dark chat column at their top right and the lighter
+     stage at their bottom left, so their edge is brightest at the top right and fades
+     towards the bottom left. */
+  --seeker-glass-edge-modal: linear-gradient(to top right,
+    rgba(var(--seeker-ink-rgb), 0.05), rgba(var(--seeker-ink-rgb), 0.08) 40%,
+    rgba(var(--seeker-ink-rgb), 0.18) 75%, rgba(var(--seeker-ink-rgb), 0.42));
+  /* One large size for every panel and every wide or large dialog. */
+  --seeker-modal-width: min(1000px, calc(100vw - 64px));
+  --seeker-modal-height: min(86dvh, 920px);
+
+  /* SillyTavern sets these inline from the UI theme; !important wins over that. */
+  --SmartThemeBorderColor: transparent !important;
+  --SmartThemeCheckboxTickColor: var(--seeker-selected-ink) !important;
+  --interactable-outline-color: rgba(var(--seeker-ink-rgb), 0.6) !important;
+  --interactable-outline-color-faint: rgba(var(--seeker-ink-rgb), 0.25) !important;
+}
+
+/* ---------- Text inputs and dropdowns ---------- */
+.text_pole,
+select,
+.range-block-counter input,
+.neo-range-input,
+.select2-container .select2-selection {
+  background-color: var(--seeker-fill) !important;
+  color: var(--seeker-text) !important;
+  border-color: transparent !important;
+  border-radius: var(--seeker-radius) !important;
+  box-shadow: none !important;
+  transition: background-color 120ms, box-shadow 120ms;
+}
+.text_pole { padding: 5px 8px; }
+.text_pole:hover,
+select:hover,
+.range-block-counter input:hover,
+.neo-range-input:hover,
+.select2-container .select2-selection:hover { background-color: var(--seeker-fill-hover) !important; }
+.text_pole:focus,
+.text_pole:focus-visible,
+select:focus-visible,
+.range-block-counter input:focus,
+.neo-range-input:focus,
+.select2-container--focus .select2-selection,
+.select2-container--open .select2-selection {
+  outline: none !important;
+  box-shadow: var(--seeker-focus) !important;
+}
+.text_pole::placeholder { color: var(--seeker-text-faint); }
+select {
+  padding-right: 26px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(237,237,237,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 8px center !important;
+  background-size: 12px 12px !important;
+}
+select option,
+select option:not(:checked) { background-color: var(--seeker-surface-solid); color: var(--seeker-text); }
+select option:checked { background-color: color-mix(in srgb, white 14%, var(--seeker-surface-solid)); color: var(--seeker-text); }
+
+/* The open list. A native list's hover highlight is the system's blue and white, which CSS
+   cannot reach; where the browser supports customizable selects (Chrome 135+), dropdowns
+   opt in and the list is drawn like the theme's menus. Elsewhere the native list stays.
+   Multi-select lists are not dropdowns and keep their native look. */
+@supports (appearance: base-select) {
+  select:not([multiple], [size]),
+  select:not([multiple], [size])::picker(select) { appearance: base-select; }
+  select:not([multiple], [size]) { display: inline-flex; align-items: center; }
+  select:not([multiple], [size])::picker-icon { display: none; } /* the chevron above stays */
+  select:not([multiple], [size])::picker(select) {
+    margin-block: 4px;
+    padding: 6px;
+    max-height: min(60vh, 420px);
+    overflow-y: auto;
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--seeker-surface-solid), var(--seeker-surface-solid)) padding-box,
+      var(--seeker-glass-edge-panel) border-box;
+    border-radius: var(--seeker-menu-radius);
+    box-shadow: var(--seeker-shadow);
+    color: var(--seeker-text);
+  }
+  select:not([multiple], [size]) option {
+    padding: 7px 10px;
+    border-radius: var(--seeker-menu-item-radius);
+    background-color: transparent;
+    color: var(--seeker-text-dim);
+    font-size: var(--seeker-fs-body);
+    line-height: var(--seeker-lh-ui);
+  }
+  select:not([multiple], [size]) option:is(:hover, :focus-visible) {
+    background-color: var(--seeker-fill-hover);
+    color: var(--seeker-text);
+    outline: none;
+  }
+  select:not([multiple], [size]) option:checked {
+    background-color: var(--seeker-selected-fill);
+    color: var(--seeker-text);
+  }
+  select:not([multiple], [size]) option::checkmark { color: var(--seeker-text); }
+  select:not([multiple], [size]) optgroup {
+    padding-top: 6px;
+    font-weight: 600;
+    font-size: var(--seeker-fs-small);
+    color: var(--seeker-text-faint);
+  }
+}
+
+/* ---------- Buttons ---------- */
+.menu_button {
+  background-color: var(--seeker-fill) !important;
+  color: var(--seeker-text-dim);
+  border-color: transparent !important;
+  border-radius: var(--seeker-radius) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  padding: 5px 9px;
+  transition: background-color 120ms, color 120ms;
+}
+.menu_button:not(.disabled):not([disabled]):hover {
+  background-color: var(--seeker-fill-strong) !important;
+  color: var(--seeker-text);
+}
+.menu_button:not(.disabled):not([disabled]).active,
+.menu_button.toggleable.toggled {
+  background-color: var(--seeker-selected) !important;
+  color: var(--seeker-selected-ink) !important;
+}
+.menu_button.toggleable.toggled::before { color: var(--seeker-selected-ink) !important; }
+.menu_button.api_button:hover { color: var(--seeker-selected-ink) !important; }
+.menu_button[disabled],
+.menu_button.disabled { opacity: 0.4; }
+.menu_button.menu_button_default { box-shadow: none !important; }
+/* A dialog's main button: solid white, like the send button and the New button. */
+.menu_button.popup-button-ok {
+  background-color: var(--seeker-selected) !important;
+  color: var(--seeker-selected-ink) !important;
+  font-weight: 600;
+}
+.menu_button.popup-button-ok:hover { background-color: var(--seeker-selected-hover) !important; }
+
+/* Icon-only buttons are circles (index.js marks them). */
+.menu_button.seeker-icon-button {
+  width: var(--seeker-icon-button-size, 32px) !important;
+  height: var(--seeker-icon-button-size, 32px) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  flex: 0 0 auto !important;
+  align-items: center;
+  justify-content: center;
+  line-height: var(--seeker-icon-button-size, 32px) !important;
+  text-align: center;
+  border-radius: 50% !important;
+}
+.recentChat .menu_button.seeker-icon-button { --seeker-icon-button-size: 28px; }
+
+/* ---------- Glass edges ----------
+   The round controls (icon buttons, the menu button, send) get a 1px gradient ring, light
+   at the top left like the rim of a pane of glass. It is drawn on ::after (their ::before
+   holds the icon) and cut to a ring with a mask, so it follows the rounding. Focused, the
+   ring brightens and a sheen runs round it. The composer gets the same edge as a real
+   border: style.css. */
+:root {
+  /* The sheen: a bright band and an accent one, opposite each other. The idle stops are the
+     same bands, dimmed and without the accent, for an edge that rests in the sheen's shape. */
+  --seeker-sheen-stops:
+    rgba(var(--seeker-ink-rgb), 0.4), color-mix(in srgb, var(--seeker-accent-bright) 95%, transparent) 10%, rgba(var(--seeker-ink-rgb), 0.4) 22%,
+    rgba(var(--seeker-ink-rgb), 0.55) 50%, rgba(var(--seeker-ink-rgb), 0.95) 60%, rgba(var(--seeker-ink-rgb), 0.4) 72%,
+    rgba(var(--seeker-ink-rgb), 0.4);
+  --seeker-sheen-idle-stops:
+    rgba(var(--seeker-ink-rgb), 0.08), rgba(var(--seeker-ink-rgb), 0.2) 10%, rgba(var(--seeker-ink-rgb), 0.08) 22%,
+    rgba(var(--seeker-ink-rgb), 0.1) 50%, rgba(var(--seeker-ink-rgb), 0.38) 60%, rgba(var(--seeker-ink-rgb), 0.08) 72%,
+    rgba(var(--seeker-ink-rgb), 0.08);
+}
+@property --seeker-sheen-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+/* One turn, starting from --seeker-sheen-start so a resting sheen picks up where it rests. */
+@keyframes seeker-sheen {
+  from { --seeker-sheen-angle: var(--seeker-sheen-start, 0deg); }
+  to { --seeker-sheen-angle: calc(var(--seeker-sheen-start, 0deg) + 360deg); }
+}
+
+/* The ring is placed against its own control; the menu button is already fixed. */
+:is(.menu_button.seeker-icon-button, #rightSendForm > #send_but) { position: relative; }
+/* :where keeps this at zero specificity, so the focused and open states below win. */
+:where(.menu_button.seeker-icon-button, #seeker-menu-button, #rightSendForm > #send_but)::after {
+  content: "";
+  position: absolute;
+  /* Over the 1px border where there is one; just outside the edge of send, which has none. */
+  inset: var(--seeker-ring-inset, -1px);
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(150deg,
+    rgba(var(--seeker-ink-rgb), 0.42), rgba(var(--seeker-ink-rgb), 0.1) 35%,
+    rgba(var(--seeker-ink-rgb), 0.04) 62%, rgba(var(--seeker-ink-rgb), 0.2));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  pointer-events: none;
+}
+
+/* Focused (and the menu button while its menu is open). */
+:is(.menu_button.seeker-icon-button, #seeker-menu-button, #rightSendForm > #send_but):focus-visible { outline: none !important; }
+:is(.menu_button.seeker-icon-button, #seeker-menu-button, #rightSendForm > #send_but):focus-visible::after,
+body.seeker-nav-open #seeker-menu-button::after {
+  background: conic-gradient(from var(--seeker-sheen-angle), var(--seeker-sheen-stops));
+  animation: seeker-sheen 3.2s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.menu_button.seeker-icon-button, #seeker-menu-button, #rightSendForm > #send_but)::after { animation: none !important; }
+}
+
+/* Small icon-only buttons scattered through the panels. */
+.right_menu_button,
+.mes_button,
+.inline-drawer-icon {
+  filter: none !important;
+}
+
+/* ---------- Checkboxes ---------- */
+input[type='checkbox'] {
+  outline: none !important;
+  border: none !important;
+  border-radius: 3px !important;
+  background-color: var(--seeker-fill-strong) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transition: background-color 120ms;
+}
+input[type='checkbox']:hover { background-color: rgba(var(--seeker-ink-rgb), 0.2) !important; }
+input[type='checkbox']:checked { background-color: var(--seeker-selected) !important; }
+input[type='checkbox']:focus-visible { box-shadow: var(--seeker-focus) !important; }
+
+/* ---------- Sliders ---------- */
+/* A plain track; SillyTavern's own fill is a fixed 70% that does not follow the value. */
+body .neo-range-slider {
+  height: 4px !important;
+  border-radius: 2px !important;
+  background: var(--seeker-fill-strong) !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+body .neo-range-slider:hover,
+body input[type='range']:hover { filter: none !important; }
+body .neo-range-input { border-radius: var(--seeker-radius) !important; margin-top: 6px; }
+input[type='range']::-webkit-slider-thumb {
+  width: 14px !important;
+  height: 14px !important;
+  background: var(--seeker-text) !important;
+  border: none !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5) !important;
+}
+input[type='range']::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--seeker-text);
+  border: none;
+}
+
+/* ---------- Section headers inside panels ----------
+   SillyTavern's .standoutHeader is either a collapsible section's toggle, drawn as a soft
+   fill like other controls, or a plain section heading ("Chat Completion Presets" and its
+   buttons), drawn as a heading: no fill, lined up with the content. */
+.standoutHeader:not(.inline-drawer-header) {
+  background: none !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  padding: 6px 0 2px !important;
+}
+.standoutHeader.inline-drawer-header,
+#extensions_settings .inline-drawer-toggle.inline-drawer-header,
+#extensions_settings2 .inline-drawer-toggle.inline-drawer-header {
+  background-image: none !important;
+  background-color: var(--seeker-fill) !important;
+  border-color: transparent !important;
+  border-radius: var(--seeker-radius) !important;
+}
+.standoutHeader.inline-drawer-header:hover,
+#extensions_settings .inline-drawer-toggle.inline-drawer-header:hover,
+#extensions_settings2 .inline-drawer-toggle.inline-drawer-header:hover { filter: none !important; background-color: var(--seeker-fill-hover) !important; }
+.standoutHeader ~ .inline-drawer-content {
+  background-color: transparent !important;
+  border-color: transparent !important;
+  padding: 6px 2px !important;
+}
+/* Section titles in User settings: plain headings, no box. */
+#user-settings-block h4 {
+  background: none !important;
+  border-color: transparent !important;
+  padding: 6px 0 2px !important;
+  color: var(--seeker-text);
+  font-weight: 600;
+}
+hr {
+  background-image: none !important;
+  background-color: var(--seeker-divider) !important;
+  opacity: 1 !important;
+}
+
+/* ---------- Panels, menus and dialogs: solid surfaces with a glass edge and a shadow ----------
+   The edge is the border: the gradient fills the border box and the surface the padding
+   box. Borders snap to whole device pixels, so it is even on every side. */
+.drawer-content,
+.popup,
+#dialogue_popup,
+#character_popup,
+.select2-dropdown,
+.options-content,
+.list-group,
+#extensionsMenu {
+  border: 1px solid transparent !important;
+  background:
+    linear-gradient(var(--seeker-surface-solid), var(--seeker-surface-solid)) padding-box,
+    var(--seeker-glass-edge-panel) border-box !important;
+  border-radius: var(--seeker-menu-radius) !important;
+  box-shadow: var(--seeker-shadow) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  text-shadow: none !important;
+}
+/* Padding for panels and dialogs lives in spacing.css. */
+.drawer-content,
+.popup,
+#dialogue_popup,
+#character_popup {
+  border-radius: var(--seeker-modal-radius) !important;
+  background:
+    linear-gradient(var(--seeker-surface-solid), var(--seeker-surface-solid)) padding-box,
+    var(--seeker-glass-edge-modal) border-box !important;
+}
+.popup.transparent_dialogue_popup { background: none !important; border-color: transparent !important; box-shadow: none !important; }
+
+/* Dialogs: two sizes, centred over a dimmed screen. Prompts and confirmations are
+   compact; every wide, wider and large variant shares one large size. */
+.popup,
+#dialogue_popup {
+  width: min(480px, calc(100vw - 32px)) !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+.popup:is(.wide_dialogue_popup, .wider_dialogue_popup, .large_dialogue_popup) {
+  width: var(--seeker-modal-width) !important;
+  max-height: var(--seeker-modal-height) !important;
+}
+.popup.large_dialogue_popup { height: var(--seeker-modal-height) !important; }
+#shadow_popup {
+  background-color: rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.popup[open]::backdrop {
+  background-color: rgba(0, 0, 0, 0.55) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+.options-content hr { border-top-color: var(--seeker-divider) !important; }
+
+/* Menu rows: dim text that brightens on hover, instead of fading the whole row. */
+#extensionsMenu > .extension_container > div,
+#extensionsMenu > div:not(.extension_container),
+.options-content a,
+.list-group-item {
+  opacity: 1 !important;
+  color: var(--seeker-text-dim) !important;
+  border-radius: var(--seeker-menu-item-radius);
+  padding: 7px 10px !important;
+  transition: background-color 120ms, color 120ms;
+}
+#extensionsMenu > .extension_container > div:hover,
+#extensionsMenu > div:not(.extension_container):hover,
+.options-content a:hover,
+.list-group-item:hover {
+  background-color: var(--seeker-fill-hover);
+  color: var(--seeker-text) !important;
+}
+.select2-results__option--highlighted,
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background-color: var(--seeker-fill-hover) !important;
+  color: var(--seeker-text) !important;
+}
+
+/* ---------- Scrollbars ----------
+   Slim pills on a clear track: a soft grey that brightens on hover and takes the accent
+   while dragged. Chrome and Safari draw them from ::-webkit-scrollbar; Firefox, which has
+   no such pseudo-elements, gets the nearest standard equivalent. (Setting the standard
+   properties in Chrome would switch its ::-webkit-scrollbar styling off, so they are kept
+   to browsers without it.) */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-track:hover,
+::-webkit-scrollbar-corner { background: transparent !important; }
+:is(::-webkit-scrollbar-thumb:vertical, ::-webkit-scrollbar-thumb:horizontal) {
+  background-color: rgba(var(--seeker-ink-rgb), 0.16) !important;
+  background-clip: padding-box !important;
+  border: 3px solid transparent !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+}
+::-webkit-scrollbar-thumb:vertical { min-height: 40px; }
+::-webkit-scrollbar-thumb:horizontal { min-width: 40px; }
+::-webkit-scrollbar-thumb:hover { background-color: rgba(var(--seeker-ink-rgb), 0.32) !important; }
+::-webkit-scrollbar-thumb:active { background-color: rgba(var(--seeker-ink-rgb), 0.5) !important; }
+@supports not selector(::-webkit-scrollbar) {
+  * { scrollbar-width: thin; scrollbar-color: rgba(var(--seeker-ink-rgb), 0.22) transparent; }
+}
+/* Tracks stop short of rounded corners and, in the chat, of the menu button. */
+:is(.drawer-content, .popup, #character_popup, .seeker-popover, .scrollableInner)::-webkit-scrollbar-track { margin-block: 14px; }
+#chat::-webkit-scrollbar-track { margin-top: var(--seeker-below-menu, 54px); }

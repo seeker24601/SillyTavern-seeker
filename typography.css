@@ -1,0 +1,263 @@
+/* seeker typography: one type scale for the whole interface.
+
+   Headings are Bodoni Moda, weight 600, in five sizes:
+     stage    72-150px the character's name, set vertically on the stage; scales with the screen height
+     display     56px  the SillyTavern name on the welcome stage, in the small-caps cut (Bodoni Moda SC)
+     title       22px  panel headers
+     section     18px  h1-h3 inside panels and dialogs
+     subsection  16px  h4-h5, collapsible section headers, speaker names in the chat
+   Meta (timestamps, message numbers, counters, token counts) is Bodoni Moda SC, faint and
+   letter-spaced, at the meta size plus 2px (13px), since small caps run at about x-height.
+   Everything else is Jost in three sizes:
+     chat        16px  message prose and the composer
+     body        14px  panel text, labels, buttons, inputs, menus
+     small       12.5px descriptions and hints, dimmed
+     (meta       11px  the base the small caps are sized from)
+
+   Line heights follow the role, not the size:
+     display  1.2   titles and section headings (Bodoni at 22 and 18px)
+     heading  1.25  subsections and names
+     ui       1.3   single-line UI: labels, buttons, inputs, menus, tabs, counters
+     hint     1.4   small helper text
+     text     1.5   running text and text areas in panels and dialogs
+     chat     1.55  chat prose: about 60 characters a line in the chat column
+
+   SillyTavern sizes text with a dozen multiples of --mainFontSize; inside panels and
+   dialogs these rules pin text to the scale instead. Icons are left alone, since their
+   size is their font-size. */
+
+:root {
+  --seeker-fs-display: 56px;
+  --seeker-fs-stage-name: clamp(72px, 11.5vh, 150px); /* the largest; long names go smaller */
+  --seeker-fs-title: 22px;
+  --seeker-fs-section: 18px;
+  --seeker-fs-subsection: 16px;
+  --seeker-fs-chat: 16px;
+  --seeker-fs-body: 14px;
+  --seeker-fs-small: 12.5px;
+  --seeker-fs-meta: 11px;
+
+  --seeker-lh-display: 1.2;
+  --seeker-lh-heading: 1.25;
+  --seeker-lh-ui: 1.3;
+  --seeker-lh-hint: 1.4;
+  --seeker-lh-text: 1.5;
+  --seeker-lh-chat: 1.55;
+}
+
+/* ---------- Families ---------- */
+body,
+textarea, input, select, button,
+.ui-widget, .ui-widget :is(input, select, textarea, button) { font-family: var(--mainFontFamily) !important; }
+
+h1, h2, h3, h4, h5,
+.seeker-panel-title,
+.inline-drawer-header > :is(b, strong),
+.inline-drawer-header > .flex-container > :is(b, strong),
+.standoutHeader :is(b, strong),
+#chat .mes .name_text,
+.welcomePanel :is(.welcomeHeaderVersionDisplay, .recentChatsTitle, .characterName) {
+  font-family: var(--seeker-heading-font) !important;
+  font-optical-sizing: auto;
+  font-weight: 600 !important;
+  letter-spacing: 0.01em;
+  line-height: var(--seeker-lh-heading) !important;
+}
+
+/* ---------- Headings ---------- */
+.seeker-panel-title { font-size: var(--seeker-fs-title) !important; }
+:is(.drawer-content, .popup, #character_popup) :is(h1, h2, h3, h4, h5) { color: var(--seeker-text) !important; }
+
+:is(.drawer-content, .popup, #character_popup) :is(h1, h2, h3) {
+  font-size: var(--seeker-fs-section) !important;
+}
+:is(.drawer-content, .popup, #character_popup) :is(h4, h5),
+.inline-drawer-header > :is(b, strong),
+.inline-drawer-header > .flex-container > :is(b, strong),
+.standoutHeader :is(b, strong) {
+  font-size: var(--seeker-fs-subsection) !important;
+}
+/* A collapsible under its own label ("Click to expand" in World info) is a control, like
+   the dropdowns beside it; the label above is its name. */
+.range-block-title + .inline-drawer > .inline-drawer-header > :is(b, strong) {
+  font-family: var(--mainFontFamily) !important;
+  font-size: var(--seeker-fs-body) !important;
+  font-weight: 500 !important;
+  letter-spacing: normal;
+  line-height: var(--seeker-lh-ui) !important;
+}
+/* Text and links inside a heading take the heading's size. */
+:is(h1, h2, h3, h4, h5) :not([class*="fa-"]) { font-size: inherit !important; font-family: inherit !important; }
+
+/* ---------- Body text in panels and dialogs ---------- */
+:where(.drawer-content, .popup, #character_popup, .options-content, .list-group, #extensionsMenu)
+  :where(div, span, label, p, a, li, summary, td, th, button, input, select, textarea, option)
+  :not([class*="fa-"], .drawer-icon, .seeker-panel-title, :is(h1, h2, h3, h4, h5, b, strong) *) {
+  font-size: var(--seeker-fs-body) !important;
+}
+:where(.drawer-content, .popup, #character_popup) :where(label, .menu_button, button) { font-weight: 500; }
+:where(.drawer-content, .popup, #character_popup) :where(b, strong) { font-weight: 600; }
+
+/* Small: descriptions, hints and helper text. */
+:where(.drawer-content, .popup, #character_popup)
+  :where(small, .toggle-description, .text_muted, .ch_description, .notes-link, .editor_maximize_hint, small *, .toggle-description *, .text_muted *):not([class*="fa-"]) {
+  font-size: var(--seeker-fs-small) !important;
+  color: var(--seeker-text-dim);
+  font-weight: 400;
+}
+
+/* Labels: SillyTavern wraps many labels in <small> too. A <small> inside a label, or
+   right before the input it names, is a label, not a hint. */
+:where(.drawer-content, .popup, #character_popup)
+  :where(label small, label small *, small:has(+ :is(input, select, textarea, .text_pole)), small:has(+ :is(input, select, textarea, .text_pole)) *, .range-block-title, .range-block-title *):not([class*="fa-"]) {
+  font-size: var(--seeker-fs-body) !important;
+  color: var(--seeker-text) !important;
+}
+:where(.drawer-content, .popup, #character_popup) :where(label.checkbox_label, label.checkbox_label *):not([class*="fa-"]) { font-weight: 400 !important; }
+
+/* Meta: counters and token counts. */
+:where(.drawer-content, .popup, #character_popup)
+  :where(.extension_token_counter, [id$="token_count"], [id$="_tokens"], [id^="result_info"], [id^="result_info"] *, .tokenCounterDisplay, .paginationjs-nav):not([class*="fa-"]) {
+  font-size: var(--seeker-fs-meta) !important;
+  color: var(--seeker-text-faint);
+  font-weight: 500;
+}
+
+/* Names (characters and personas in lists) read like the speaker names in the chat. */
+:where(.drawer-content, .popup, #character_popup) .ch_name {
+  font-family: var(--seeker-heading-font) !important;
+  font-optical-sizing: auto;
+  font-size: var(--seeker-fs-subsection) !important;
+  font-weight: 600 !important;
+}
+
+/* Captions under background thumbnails are small text; tabs are buttons. */
+:where(.drawer-content) .BGSampleTitle { font-size: var(--seeker-fs-small) !important; font-weight: 400 !important; color: var(--seeker-text-dim); }
+:where(.drawer-content) .ui-tabs-anchor { font-weight: 500 !important; }
+
+/* Pagination arrows are plain characters drawn in the Font Awesome font; use the sans. */
+.paginationjs-pages ul li a { font-family: var(--mainFontFamily) !important; }
+
+/* Code stays monospace, at body size. */
+:is(.drawer-content, .popup, #character_popup) :is(code, pre, .monospace) {
+  font-family: "Noto Sans Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important;
+}
+
+/* ---------- Chat ---------- */
+#chat .mes_text { font-size: var(--seeker-fs-chat); line-height: var(--seeker-lh-chat) !important; }
+/* SillyTavern sets chat prose (and the thinking under it) in 500; Jost reads heavy there. */
+#chat :is(.mes_text, .mes_reasoning) { font-weight: 400; }
+#chat .mes .name_text { font-size: var(--seeker-fs-subsection) !important; color: var(--seeker-text); }
+/* The greeting opens on a drop cap: a large Bodoni initial set into the first lines. (An
+   outline like the stage name's is not drawn on ::first-letter.) The welcome screen's
+   assistant message is not a story. */
+body:not(:has(#chat > .welcomePanel)) #chat .mes[mesid="0"]:not([is_user="true"]) .mes_text > p:first-child::first-letter {
+  float: left;
+  margin: 0.085em 0.08em 0 0;
+  font-family: var(--seeker-heading-font);
+  font-optical-sizing: auto;
+  font-size: 5.1em;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 0.74;
+  color: var(--seeker-text);
+}
+#chat .mes :is(.timestamp, .mesIDDisplay, .mes_timer, .tokenCounterDisplay, .swipes-counter) {
+  font-size: var(--seeker-fs-meta) !important;
+  font-weight: 500;
+  color: var(--seeker-text-faint) !important;
+}
+#send_textarea { font-size: var(--seeker-fs-chat) !important; }
+
+/* Meta (dates, numbers, counts, timers) in Bodoni small caps, spaced like a printed folio.
+   Small caps run at about x-height, so they sit 2px above the meta size to read the same. */
+#chat .mes :is(.timestamp, .mesIDDisplay, .mes_timer, .tokenCounterDisplay, .swipes-counter),
+.welcomePanel :is(.chatDate, .chatStats, .chatStats small),
+:where(.drawer-content, .popup, #character_popup)
+  :where(.extension_token_counter, [id$="token_count"], [id$="_tokens"], [id^="result_info"], [id^="result_info"] *, .tokenCounterDisplay, .paginationjs-nav):not([class*="fa-"]) {
+  font-family: var(--seeker-display-font) !important;
+  font-optical-sizing: auto;
+  font-size: calc(var(--seeker-fs-meta) + 2px) !important;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+}
+
+/* ---------- Welcome screen ---------- */
+/* The version line is the title, "Recent Chats" a section heading, and character
+   names read like the speaker names in the chat. */
+.welcomePanel { line-height: var(--seeker-lh-ui); }
+.welcomePanel :is(.welcomeHeaderVersionDisplay, .recentChatsTitle, .characterName) { color: var(--seeker-text); }
+.welcomePanel .welcomeHeaderVersionDisplay { font-size: var(--seeker-fs-title) !important; line-height: var(--seeker-lh-display) !important; }
+.welcomePanel .recentChatsTitle { font-size: var(--seeker-fs-section) !important; line-height: var(--seeker-lh-display) !important; }
+.welcomePanel .characterName { font-size: var(--seeker-fs-subsection) !important; }
+.welcomePanel .chatName { font-size: var(--seeker-fs-body) !important; color: var(--seeker-text-dim); }
+.welcomePanel .chatMessage {
+  font-size: var(--seeker-fs-small) !important;
+  line-height: var(--seeker-lh-hint) !important;
+  color: var(--seeker-text-dim);
+}
+.welcomePanel :is(.chatDate, .chatStats, .chatStats small) {
+  font-size: var(--seeker-fs-meta) !important;
+  font-weight: 500;
+  color: var(--seeker-text-faint);
+}
+/* Welcome stage (desktop): the name is the display heading and the version its subtitle. */
+#seeker-welcome-stage .seeker-welcome-name {
+  font-family: var(--seeker-display-font) !important;
+  font-optical-sizing: auto;
+  font-size: var(--seeker-fs-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: var(--seeker-lh-display);
+  color: var(--seeker-text);
+}
+#seeker-welcome-stage .seeker-welcome-version {
+  font-size: var(--seeker-fs-body);
+  line-height: var(--seeker-lh-ui);
+  color: var(--seeker-text-dim);
+}
+:is(.welcomePanel, #seeker-welcome-stage, #chat .mes[type="welcome_prompt"]) .menu_button:not([class*="fa-"]) {
+  font-size: var(--seeker-fs-body) !important;
+  font-weight: 500;
+  line-height: var(--seeker-lh-ui) !important;
+}
+
+/* ---------- Menus ---------- */
+#top-settings-holder > .drawer > .drawer-toggle .drawer-icon::after { font-size: var(--seeker-fs-body) !important; font-weight: 500 !important; }
+
+/* ---------- Line height ---------- */
+/* Running text in panels and dialogs; everything below narrows it by role. */
+:where(.drawer-content, .popup, #character_popup, .options-content, .list-group, #extensionsMenu) { line-height: var(--seeker-lh-text); }
+:where(.drawer-content, .popup, #character_popup) :where(p, li, textarea, .popup-content) { line-height: var(--seeker-lh-text) !important; }
+
+.seeker-panel-title,
+:is(.drawer-content, .popup, #character_popup) :is(h1, h2, h3) { line-height: var(--seeker-lh-display) !important; }
+
+:where(.drawer-content, .popup, #character_popup, .options-content, .list-group, #extensionsMenu)
+  :where(label, label *, .menu_button, button, select, option, input:not([type="range"]), .range-block-title, .range-block-title *,
+         .ui-tabs-anchor, .list-group-item, .options-content a, .BGSampleTitle):not([class*="fa-"]) {
+  line-height: var(--seeker-lh-ui) !important;
+}
+#top-settings-holder > .drawer > .drawer-toggle .drawer-icon::after { line-height: var(--seeker-lh-ui) !important; }
+
+:where(.drawer-content, .popup, #character_popup)
+  :where(small, small *, .toggle-description, .text_muted, .ch_description, .notes-link):not([class*="fa-"]):not(label *) {
+  line-height: var(--seeker-lh-hint) !important;
+}
+
+/* Labels written as <small> (slider titles, field labels) and sortable list rows are single-line UI. */
+:where(.drawer-content, .popup, #character_popup)
+  :where(small:has(+ :is(input, select, textarea, .text_pole)), small:has(+ :is(input, select, textarea, .text_pole)) *,
+         .range-block-title small, .range-block-title small *, .range-block-range-and-counter > small, .ui-sortable-handle, .ui-sortable-handle *):not([class*="fa-"]) {
+  line-height: var(--seeker-lh-ui) !important;
+}
+:where(.drawer-content, .popup, #character_popup) .ch_name { line-height: var(--seeker-lh-heading) !important; }
+
+/* Counters and token counts: never tighter than the UI line, so they cannot overlap. */
+:where(.drawer-content, .popup, #character_popup)
+  :where(.extension_token_counter, [id$="token_count"], [id$="_tokens"], [id^="result_info"], [id^="result_info"] *, .tokenCounterDisplay, .paginationjs-nav):not([class*="fa-"]),
+#chat .mes :is(.timestamp, .mesIDDisplay, .mes_timer, .tokenCounterDisplay, .swipes-counter) {
+  line-height: var(--seeker-lh-ui) !important;
+}
+
+#send_textarea { line-height: var(--seeker-lh-text) !important; }

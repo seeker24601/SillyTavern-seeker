@@ -1,0 +1,531 @@
+/* seeker: the menu's other panels. API connections, Persona, Characters, Extensions and
+   World info keep SillyTavern's layout and get tidier labels, toolbars and lists. */
+
+/* ---------- API connections ----------
+   Its h4s label single fields (API key, model, endpoint); they read as field labels, and
+   only the h3s (Connection Profile, API) stay section headings. */
+#rm_api_block { --seeker-api-width: 760px; }
+#rm_api_block > * { max-width: var(--seeker-api-width); }
+#rm_api_block > .seeker-panel-header { max-width: none; }
+#rm_api_block h4 {
+  margin: var(--seeker-space-4) 0 var(--seeker-space-1) !important;
+  font-family: var(--mainFontFamily) !important;
+  font-size: var(--seeker-fs-body) !important;
+  font-weight: 500 !important;
+  letter-spacing: normal;
+  line-height: var(--seeker-lh-ui) !important;
+  color: var(--seeker-text-dim) !important;
+}
+#rm_api_block h4 :is(span, small, b, strong) { color: inherit !important; font-weight: inherit !important; }
+#rm_api_block h3 { margin: var(--seeker-space-5) 0 var(--seeker-space-2) !important; }
+#rm_api_block :is(small, .toggle-description) { line-height: var(--seeker-lh-hint) !important; }
+
+/* ---------- Persona ----------
+   A narrower list of personas beside the chosen persona's details, which get the room. */
+#persona-management-block { align-items: flex-start; gap: var(--seeker-space-5) !important; }
+#persona-management-block > .persona_management_left_column { flex: 0 0 340px !important; }
+#persona-management-block > .persona_management_right_column { flex: 1 1 0 !important; min-width: 0; }
+/* The toolbar: Create and the search on one row, sort, pages and grid toggle on the next. */
+.persona_management_left_column > .flex-container:first-child {
+  flex-wrap: wrap !important;
+  gap: var(--seeker-space-2) !important;
+}
+.persona_management_left_column > .flex-container:first-child > div:has(> #persona_search_bar) { flex: 1 1 0; min-width: 0; }
+#persona_sort_order { flex: none !important; width: auto !important; max-width: none !important; }
+#persona_pagination_container { flex: 1 1 auto; min-width: 0; }
+#persona_pagination_container .paginationjs { justify-content: flex-start; gap: var(--seeker-space-1); }
+/* Usage stats, Backup and Restore: a quiet row at the top. */
+#PersonaManagement > .flex-container > .flex-container:first-child { justify-content: flex-end; margin-bottom: var(--seeker-space-3); }
+/* The persona's name and its buttons stay on one line. */
+#persona_controls { flex-wrap: nowrap !important; align-items: center !important; gap: var(--seeker-space-3) !important; }
+#persona_controls .persona_controls_buttons_block { flex-wrap: nowrap !important; gap: var(--seeker-space-1) !important; }
+#persona_controls #your_name {
+  margin: 0 !important;
+  font-family: var(--seeker-heading-font) !important;
+  font-size: var(--seeker-fs-section) !important;
+  font-weight: 600 !important;
+  color: var(--seeker-text) !important;
+  opacity: 1 !important;
+}
+/* Personas in the list: rounded rows with a hover fill; the chosen one in the accent. */
+#user_avatar_block .avatar-container {
+  border: none !important;
+  border-radius: 12px !important;
+  padding: var(--seeker-space-2) !important;
+  transition: background-color 120ms;
+}
+#user_avatar_block .avatar-container:hover { background-color: var(--seeker-fill-hover) !important; }
+#user_avatar_block .avatar-container.selected { background-color: var(--seeker-selected-fill) !important; box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.5) !important; }
+#user_avatar_block .avatar-container .avatar img { border-radius: 8px !important; }
+
+/* ---------- Characters ---------- */
+/* The HotSwap hint sits at the start of its row, after the list button. */
+#HotSwapWrapper { margin: 0 !important; justify-content: flex-start !important; }
+#HotSwapWrapper .hotswap { justify-content: flex-start !important; margin: 0 !important; }
+/* Its first column has nothing visible and would otherwise push the row in by a gap. */
+#CharListButtonAndHotSwaps { gap: 0 !important; }
+#HotSwapWrapper small { color: var(--seeker-text-faint); font-size: var(--seeker-fs-small) !important; }
+/* The toolbar, as in most apps: search, a Filters button (its panel lists the filters
+   with labels and the tags), the sort order, and a New button whose menu holds the create
+   and import actions. index.js builds the buttons and panels around SillyTavern's own. */
+#charListFixedTop {
+  display: flex !important;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--seeker-space-2);
+  padding: 0 0 var(--seeker-space-3) !important;
+}
+#form_character_search_form { order: 0; flex: 1 1 auto; min-width: 0; display: block !important; margin: 0 !important; }
+#character_search_bar {
+  width: 100% !important;
+  margin: 0 !important;
+  padding-left: 34px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(237,237,237,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: 11px center !important;
+  background-size: 15px 15px !important;
+}
+#rm_button_search { display: none !important; }
+#rm_button_bar { order: 1; flex: none; display: flex; flex-wrap: nowrap; align-items: center; gap: var(--seeker-space-2) !important; margin: 0 !important; padding: 0 !important; }
+#character_sort_order { flex: none !important; width: 130px !important; margin: 0 !important; }
+
+/* Toolbar buttons: a label with an icon, the height of the search field. */
+.seeker-toolbar-button {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: var(--seeker-radius);
+  background: var(--seeker-fill);
+  color: var(--seeker-text-dim);
+  font: 500 var(--seeker-fs-body) / 1 var(--mainFontFamily);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms;
+}
+.seeker-toolbar-button svg { width: 15px; height: 15px; flex: none; }
+.seeker-toolbar-button:hover,
+.seeker-toolbar-button[aria-expanded="true"] { background: var(--seeker-fill-hover); color: var(--seeker-text); }
+.seeker-toolbar-button:focus-visible { box-shadow: var(--seeker-focus); }
+.seeker-filters-button.active { color: var(--seeker-text); }
+.seeker-count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  border-radius: 999px;
+  background: var(--seeker-selected);
+  color: var(--seeker-selected-ink);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+.seeker-count[hidden] { display: none; }
+.seeker-new-button { background: var(--seeker-selected); color: var(--seeker-selected-ink); }
+.seeker-new-button:hover,
+.seeker-new-button[aria-expanded="true"] { background: var(--seeker-selected-hover); color: var(--seeker-selected-ink); }
+
+/* Panels under the buttons. */
+.seeker-popover-anchor { position: relative; }
+.seeker-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 50;
+  min-width: 220px;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--seeker-menu-radius);
+  background:
+    linear-gradient(var(--seeker-surface-solid), var(--seeker-surface-solid)) padding-box,
+    var(--seeker-glass-edge-panel) border-box;
+  box-shadow: var(--seeker-shadow);
+}
+.seeker-popover[hidden] { display: none !important; }
+.seeker-popover-title {
+  padding: 6px 10px 4px;
+  color: var(--seeker-text-faint);
+  font-size: var(--seeker-fs-meta) !important;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* New menu: the create and import actions as labelled rows. */
+.seeker-new-panel { display: flex; flex-direction: column; gap: 2px; }
+.seeker-new-panel #rm_buttons_container { display: contents; }
+.seeker-new-panel > .menu_button {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 10px;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: auto !important; /* SillyTavern makes this bar's buttons square */
+  margin: 0 !important;
+  padding: 9px 10px !important;
+  border-radius: var(--seeker-menu-item-radius) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--seeker-text-dim) !important;
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+.seeker-new-panel > .menu_button:hover { background: var(--seeker-fill-hover) !important; color: var(--seeker-text) !important; }
+/* The label, after the icon. These buttons are icon-only, so their ::after is the glass
+   ring; here it becomes text instead. */
+.seeker-new-panel > .menu_button::after {
+  position: static !important;
+  inset: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  font: 500 var(--seeker-fs-body) / 1.3 var(--mainFontFamily);
+  white-space: nowrap;
+}
+#rm_button_create::after { content: "New character" !important; }
+#character_import_button::after { content: "Import from file" !important; }
+#external_import_button::after { content: "Import from URL" !important; }
+#rm_button_group_chats::after { content: "New group" !important; }
+
+/* Filters panel: Favorites, Groups and Folders as rows that cycle Only, Hidden and off; then
+   the tags; then Manage tags and Clear filters along the bottom. */
+.seeker-filters-panel { width: 280px; }
+.seeker-filters-panel .rm_tag_controls { margin: 0 !important; }
+.seeker-filters-panel .rm_tag_filter { display: flex !important; flex-wrap: wrap; align-items: center; gap: 2px 4px !important; margin: 0 !important; }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable {
+  display: flex !important;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: 10px;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  opacity: 1 !important;
+  margin: 0 !important;
+  padding: 8px 10px !important;
+  border: none !important;
+  border-radius: var(--seeker-menu-item-radius) !important;
+  background: transparent !important;
+  color: var(--seeker-text-dim) !important;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms;
+}
+.seeker-filters-panel .rm_tag_filter > .tag.actionable:hover { background: var(--seeker-fill-hover) !important; color: var(--seeker-text) !important; }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable .tag_name { order: 0; }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable::after { order: 1; flex: 1; font: 500 var(--seeker-fs-body) / 1.3 var(--mainFontFamily); }
+.seeker-filters-panel .filterByFavorites::after { content: "Favorites"; }
+.seeker-filters-panel .filterByGroups::after { content: "Groups"; }
+.seeker-filters-panel .filterByFolder::after { content: "Folders"; }
+.seeker-filters-panel .manageTags::after { content: "Manage tags"; }
+.seeker-filters-panel .clearAllFilters::after { content: "Clear filters"; }
+/* The state, on the right: Only or Hidden. */
+.seeker-filters-panel .rm_tag_filter > .tag.actionable::before {
+  order: 2;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font: 600 var(--seeker-fs-meta) / 1.4 var(--mainFontFamily);
+}
+.seeker-filters-panel .rm_tag_filter > .tag.actionable[data-toggle-state="SELECTED"] { color: var(--seeker-text) !important; }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable[data-toggle-state="SELECTED"]::before { content: "Only"; background: var(--seeker-selected); color: var(--seeker-selected-ink); }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable[data-toggle-state="EXCLUDED"] { color: var(--seeker-text) !important; }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable[data-toggle-state="EXCLUDED"]::before { content: "Hidden"; background: rgba(220, 60, 60, 0.35); color: var(--seeker-text); }
+/* Tags: pills after the rows, under a rule. */
+.seeker-filters-panel .rm_tag_filter > .tag:not(.actionable) { order: 10; margin: 0 !important; border-radius: 999px !important; }
+.seeker-filters-panel .rm_tag_filter:has(> .tag:not(.actionable))::after { content: ""; order: 9; flex: 1 1 100%; height: 1px; margin: 4px 0 6px; background: var(--seeker-divider); }
+/* The bottom row. */
+.seeker-filters-panel .rm_tag_filter > .showTagList { order: 5; }
+.seeker-filters-panel .rm_tag_filter > :is(.manageTags, .clearAllFilters) { order: 20; flex: 1 1 40% !important; margin-top: 6px !important; }
+.seeker-filters-panel .rm_tag_filter > :is(.manageTags, .clearAllFilters)::after { font-size: 13px; }
+.seeker-filters-panel .showTagList::after { content: "Show tags"; }
+/* Show tags is a switch: on, the tags appear below (and, with Tags as Folders, in the list). */
+.seeker-filters-panel .rm_tag_filter > .showTagList.selected::before { content: "On"; background: var(--seeker-selected-fill); color: var(--seeker-text); }
+.seeker-filters-panel .rm_tag_bogus_drilldown:empty { display: none; }
+/* Pages and the grid and bulk-edit buttons at the start of their row. */
+#rm_print_characters_pagination { justify-content: flex-start !important; gap: var(--seeker-space-2) !important; margin: var(--seeker-space-2) 0 !important; }
+/* Characters as cards: the portrait on top, the name, a two-line description and tags
+   below, as many to a row as fit. SillyTavern's own grid view (its grid button) keeps its
+   compact layout. Groups and folders are cards too. */
+body:not(.charListGrid) #rm_print_characters_block {
+  display: grid !important;
+  /* Equal columns: long names are cut short, never widening a card. */
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--seeker-card-width), 100%), 1fr));
+  gap: 14px !important;
+  align-content: start;
+  /* Rows as tall as their cards: the list has a fixed height, and the grid would otherwise
+     squeeze the rows to fit it instead of scrolling. */
+  grid-auto-rows: max-content;
+  --seeker-card-width: 210px;
+}
+body:not(.charListGrid) #rm_print_characters_block .entity_block {
+  position: relative;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  width: auto !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: none !important;
+  border-radius: 14px !important;
+  background: var(--seeker-fill) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.06);
+  transition: background-color 150ms, transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 220ms;
+}
+body:not(.charListGrid) #rm_print_characters_block .entity_block:hover {
+  background: var(--seeker-fill-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.14), 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+body:not(.charListGrid) #rm_print_characters_block .entity_block > .avatar {
+  flex: none !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 2 / 3;
+  margin: 0 !important;
+  overflow: hidden;
+}
+body:not(.charListGrid) #rm_print_characters_block .entity_block > .avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  object-position: center top;
+  border: none !important;
+  border-radius: 0 !important;
+  transition: transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+body:not(.charListGrid) #rm_print_characters_block .entity_block:hover > .avatar img { transform: scale(1.04); }
+body:not(.charListGrid) #rm_print_characters_block .entity_block > :is(.character_select_container, .group_select_container) {
+  width: auto !important;
+  min-width: 0;
+  max-width: 100% !important;
+  overflow: hidden;
+  padding: 10px 12px 12px !important;
+  gap: 4px !important;
+  flex-direction: column;
+  flex-wrap: nowrap !important;
+}
+body:not(.charListGrid) #rm_print_characters_block .character_name_block {
+  display: flex;
+  align-items: baseline;
+  gap: var(--seeker-space-2);
+  flex: none !important;
+  min-width: 0;
+  width: 100% !important;
+}
+body:not(.charListGrid) #rm_print_characters_block .ch_name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+body:not(.charListGrid) #rm_print_characters_block .character_version { flex: none; margin-left: auto; color: var(--seeker-text-faint); font-size: var(--seeker-fs-meta) !important; }
+body:not(.charListGrid) #rm_print_characters_block .ch_description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  height: auto !important;
+  max-height: none !important;
+  flex: none !important;
+  margin: 0 !important;
+  white-space: normal !important;
+  font-size: var(--seeker-fs-small) !important;
+  line-height: var(--seeker-lh-hint) !important;
+  color: var(--seeker-text-dim);
+}
+body:not(.charListGrid) #rm_print_characters_block .tags_inline { flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+/* A favourite's star, on the portrait. */
+body:not(.charListGrid) #rm_print_characters_block .ch_fav_icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.7));
+}
+@media (prefers-reduced-motion: reduce) {
+  body:not(.charListGrid) #rm_print_characters_block .entity_block:hover { transform: none; }
+  body:not(.charListGrid) #rm_print_characters_block .entity_block:hover > .avatar img { transform: none; }
+}
+@media (max-width: 1000px) {
+  body:not(.charListGrid) #rm_print_characters_block { --seeker-card-width: 150px; gap: 10px !important; }
+  #charListFixedTop { flex-wrap: wrap; }
+  #form_character_search_form { flex: 1 1 100%; }
+  #rm_button_bar { flex: 1 1 100%; }
+  #character_sort_order { flex: 1 1 auto !important; width: auto !important; }
+  .seeker-popover-anchor:first-child .seeker-popover { left: 0; right: auto; }
+}
+
+/* ---------- Extensions ---------- */
+/* Each extension: a quiet header, in sans like a control, that opens its settings. */
+/* Spaced by margins on the extensions, not a gap: SillyTavern leaves empty containers in
+   these columns, and a gap would count them. */
+:is(#extensions_settings, #extensions_settings2) { gap: 0 !important; }
+:is(#extensions_settings, #extensions_settings2) .inline-drawer-toggle.inline-drawer-header :is(b, strong) {
+  font-family: var(--mainFontFamily) !important;
+  font-size: var(--seeker-fs-body) !important;
+  font-weight: 500 !important;
+  letter-spacing: normal;
+}
+:is(#extensions_settings, #extensions_settings2) .inline-drawer-toggle.inline-drawer-header { min-height: 44px; border-radius: 12px !important; }
+:is(#extensions_settings, #extensions_settings2) .extension_container { margin: 0 !important; }
+:is(#extensions_settings, #extensions_settings2) .extension_container :is(> .inline-drawer, > * > .inline-drawer) { margin: 0 0 var(--seeker-space-2) !important; }
+:is(#extensions_settings, #extensions_settings2) > .extension_container:empty { display: none; }
+/* Buttons inside a header (Summarize's pop-out) stay small so every header is one height. */
+:is(#extensions_settings, #extensions_settings2) .inline-drawer-header .menu_button {
+  --seeker-icon-button-size: 26px;
+  margin: 0 0 0 var(--seeker-space-2) !important;
+  font-size: 13px !important;
+}
+/* The deprecated Extras API: dimmed until used. */
+.extensions_block > hr ~ * { opacity: 0.55; transition: opacity 150ms; }
+.extensions_block > hr ~ :is(:hover, :focus-within) { opacity: 1; }
+.extensions_block > hr ~ .flex-container h4 {
+  font-family: var(--mainFontFamily) !important;
+  font-size: var(--seeker-fs-body) !important;
+  font-weight: 500 !important;
+}
+
+/* ---------- World info ---------- */
+/* Active worlds and the global settings toggle side by side, both a control's height. */
+#WorldInfo .select2-container .select2-selection--multiple { box-sizing: border-box; min-height: 34px !important; padding: 0 8px !important; display: flex; align-items: center; }
+#WorldInfo .select2-selection--multiple .select2-search__field { margin: 0 !important; }
+#WorldInfo .range-block-title + .inline-drawer > .inline-drawer-header {
+  min-height: 34px !important;
+  padding: 0 var(--seeker-space-3) !important;
+  align-items: center;
+}
+#WorldInfo #wi-holder { margin: 0 !important; }
+#WorldInfo #world_popup { margin-top: var(--seeker-space-2); }
+#WorldInfo #world_popup > hr { margin: var(--seeker-space-3) 0 !important; }
+
+/* ---------- Phones ---------- */
+@media (max-width: 1000px) {
+  #persona-management-block { flex-direction: column; }
+  #persona-management-block > :is(.persona_management_left_column, .persona_management_right_column) { flex: 1 1 auto !important; width: 100%; }
+}
+
+/* ---------- Character editor ----------
+   A "Characters" back button and the name as a title across the top; the portrait large on
+   the left with the buttons, More and tags beside it. index.js adds the back button. */
+#rm_button_characters { display: none !important; } /* the back button replaces it */
+#CharListButtonAndHotSwaps:has(#HotSwapWrapper .hotswap:empty) { display: none !important; }
+#right-nav-panel-tabs { align-items: center !important; gap: var(--seeker-space-3); }
+#rm_button_selected_ch { display: flex !important; align-items: center; gap: var(--seeker-space-3); min-width: 0; opacity: 1 !important; }
+#rm_button_selected_ch:not(:has(h2:not(:empty))) { display: none !important; }
+#rm_button_selected_ch h2 {
+  margin: 0 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--seeker-heading-font) !important;
+  font-size: var(--seeker-fs-title) !important;
+  font-weight: 600 !important;
+  color: var(--seeker-text) !important;
+  opacity: 1 !important;
+}
+.seeker-back-button {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px 0 8px;
+  border-radius: 999px;
+  background: var(--seeker-fill);
+  color: var(--seeker-text-dim);
+  font: 500 var(--seeker-fs-body) / 1 var(--mainFontFamily);
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms;
+}
+.seeker-back-button:hover { background: var(--seeker-fill-hover); color: var(--seeker-text); }
+.seeker-back-button:focus-visible { box-shadow: var(--seeker-focus); }
+.seeker-back-button svg { width: 16px; height: 16px; }
+/* Hidden in the list: it only appears with a character open. */
+#right-nav-panel:has(#rm_characters_block:not([style*="display: none"])) .seeker-back-button { display: none; }
+
+#avatar-and-name-block > .expander {
+  display: grid !important;
+  grid-template-columns: 120px minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  column-gap: var(--seeker-space-5) !important;
+  row-gap: var(--seeker-space-2) !important;
+  margin-top: var(--seeker-space-3);
+}
+#avatar-and-name-block #avatar_div { display: contents !important; }
+#avatar-and-name-block #avatar_div_div {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  width: 120px !important;
+  height: 180px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#avatar-and-name-block #avatar_load_preview {
+  width: 120px !important;
+  height: 180px !important;
+  object-fit: cover;
+  object-position: center top;
+  border: none !important;
+  border-radius: 14px !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.1), 0 8px 22px rgba(0, 0, 0, 0.45);
+}
+#avatar-and-name-block #avatar_controls { grid-column: 2; grid-row: 1; flex-direction: column; align-items: stretch !important; gap: var(--seeker-space-2) !important; margin: 0 !important; }
+#avatar-and-name-block .form_create_bottom_buttons_block { justify-content: flex-start !important; flex-wrap: wrap; gap: var(--seeker-space-1) !important; margin: 0 !important; padding: 0 !important; }
+#avatar-and-name-block .form_create_bottom_buttons_block .menu_button { margin: 0 !important; }
+#avatar-and-name-block #avatar_controls > label { height: auto !important; margin: 0 !important; }
+#avatar-and-name-block #tags_div { grid-column: 2; grid-row: 2; margin: 0 !important; }
+@media (max-width: 1000px) {
+  /* The back button is just its arrow, so the name has room. */
+  .seeker-back-button { width: 32px; padding: 0; justify-content: center; }
+  .seeker-back-button span { display: none; }
+  #avatar-and-name-block > .expander { grid-template-columns: 96px minmax(0, 1fr); column-gap: var(--seeker-space-3) !important; }
+  #avatar-and-name-block :is(#avatar_div_div, #avatar_load_preview) { width: 96px !important; height: 144px !important; }
+}
+
+/* ---------- Scrolling inside panels ---------- */
+/* Characters: the open character's name and back button only with a character open. */
+#right-nav-panel:has(#rm_characters_block:not([style*="display: none"])) #rm_PinAndTabs { display: none !important; }
+#right-nav-panel .seeker-panel-shared #rm_PinAndTabs { min-height: 0; }
+
+/* Lists that scroll inside a panel (characters, the character editor, AI response, the
+   backgrounds gallery) fade out at the top once scrolled, as content does under a header. */
+@property --seeker-scroll-fade {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@keyframes seeker-scroll-fade { to { --seeker-scroll-fade: 28px; } }
+:is(#rm_print_characters_block, #world_popup_entries_list, #form_create, #right-nav-panel > .scrollableInner, #left-nav-panel > .scrollableInner) {
+  mask-image: linear-gradient(transparent, black var(--seeker-scroll-fade));
+  animation: seeker-scroll-fade linear both;
+  animation-timeline: scroll(self);
+  animation-range: 0 40px;
+}
+#Backgrounds .bg_tab_panel {
+  mask-image: linear-gradient(transparent, black var(--seeker-scroll-fade), black calc(100% - 28px), transparent) !important;
+  animation: seeker-scroll-fade linear both;
+  animation-timeline: scroll(self);
+  animation-range: 0 40px;
+}
+
+/* Persona: the list of personas stays beside the details as they scroll. */
+@media (min-width: 1001px) {
+  #persona-management-block > .persona_management_left_column {
+    position: sticky;
+    top: calc(var(--seeker-header-height, 62px) - var(--seeker-modal-pad) + 16px);
+    align-self: flex-start;
+  }
+}
+
+/* World info: the open book's entries scroll in their own list, so the book's controls above
+   it stay in view. The book picker keeps room for a name and the buttons wrap after it. */
+#world_popup > .flex-container.alignitemscenter:first-of-type { flex-wrap: wrap; }
+#world_editor_select { flex: 1 1 180px !important; min-width: 0 !important; }
+/* Order, depth and probability are narrow; slimmer padding keeps three digits in view. */
+#world_popup_entries_list input[type="number"] { padding-inline: 6px !important; text-align: center; }
