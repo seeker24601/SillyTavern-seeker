@@ -130,7 +130,13 @@ document.addEventListener('keydown', event => {
         return;
     }
     if (document.querySelector('dialog.popup[open]')) return;
-    // Topmost first: Advanced definitions opens over the Characters panel.
+    // Topmost first: the prompt editor opens over AI response, and Advanced definitions
+    // over the Characters panel.
+    const promptEditor = document.getElementById('completion_prompt_manager_popup');
+    if (promptEditor && getComputedStyle(promptEditor).display !== 'none') {
+        document.getElementById('completion_prompt_manager_popup_entry_form_close')?.click();
+        return;
+    }
     const characterPopup = document.getElementById('character_popup');
     if (characterPopup && characterPopup.style.display === 'flex') {
         document.getElementById('character_cross')?.click();
@@ -833,4 +839,211 @@ for (const id of ['seeker-stage-grain', 'seeker-stage-vignette', 'seeker-stage-o
     // Only once SillyTavern has loaded the user's settings, or the first run would repeat.
     // APP_READY also fires for listeners added after it.
     eventSource.on(eventTypes.APP_READY, install);
+}
+
+// Sprites: the Character Expressions section (the sprite grid and its settings) moves out
+// of Extensions and into the character editor, above the description, next to the
+// character it belongs to. It is SillyTavern's own drawer moved whole, so the extension's
+// handlers keep working; only its title changes, to "Sprites". It goes inside the editor's
+// form only if none of its inputs are named, so a save never picks them up.
+{
+    const place = () => {
+        const list = document.getElementById('image_list');
+        const drawer = list?.closest('.inline-drawer');
+        const anchor = document.getElementById('descriptionWrapper');
+        const form = document.getElementById('form_create');
+        if (!drawer || !anchor || !form || drawer.classList.contains('seeker-sprites')) return false;
+        drawer.classList.add('seeker-sprites');
+        const title = drawer.querySelector('.inline-drawer-header b, .inline-drawer-header strong');
+        if (title) {
+            title.textContent = 'Sprites';
+            title.removeAttribute('data-i18n');
+        }
+        const named = drawer.querySelector('input[name], select[name], textarea[name]');
+        if (named) form.after(drawer); else anchor.before(drawer);
+        return true;
+    };
+    if (!place()) {
+        const { eventSource, eventTypes } = SillyTavern.getContext();
+        eventSource?.on(eventTypes.APP_READY, place);
+    }
+}
+
+// Regenerate and delete on every message's button row. SillyTavern keeps regenerate in the
+// composer's options menu and delete behind edit mode; here they sit beside the pencil.
+// The buttons are added to SillyTavern's message template, so every message cloned from it
+// has them; messages already on screen get them in a pass. style.css shows regenerate on the
+// last reply only, and icons.css paints both with Lucide like the rest of the row.
+{
+    const context = SillyTavern.getContext();
+    const make = (cls, icon, title) => {
+        const button = document.createElement('div');
+        button.className = `mes_button ${cls} fa-solid ${icon} interactable`;
+        button.title = title;
+        button.tabIndex = 0;
+        return button;
+    };
+    const equip = row => {
+        if (!row || row.querySelector('.seeker-mes-delete')) return;
+        const edit = row.querySelector('.mes_edit');
+        const regen = make('seeker-mes-regen', 'fa-arrows-rotate', 'Regenerate');
+        const remove = make('seeker-mes-delete', 'fa-trash-can', 'Delete message');
+        if (edit) edit.before(regen, remove); else row.append(regen, remove);
+    };
+    const equipAll = () => {
+        equip(document.querySelector('#message_template .mes_buttons'));
+        for (const row of document.querySelectorAll('#chat .mes .mes_buttons')) equip(row);
+    };
+    equipAll();
+    for (const event of [context.eventTypes.CHAT_CHANGED, context.eventTypes.MESSAGE_RECEIVED, context.eventTypes.MESSAGE_SENT, context.eventTypes.APP_READY]) {
+        if (event) context.eventSource.on(event, () => setTimeout(equipAll));
+    }
+    document.getElementById('chat')?.addEventListener('click', async event => {
+        const button = event.target instanceof Element ? event.target.closest('.seeker-mes-regen, .seeker-mes-delete') : null;
+        if (!button) return;
+        event.stopPropagation();
+        const mes = button.closest('.mes');
+        const id = Number(mes?.getAttribute('mesid'));
+        if (button.classList.contains('seeker-mes-delete')) {
+            if (Number.isNaN(id)) return;
+            await context.deleteMessage(id, undefined, context.powerUserSettings.confirm_message_delete);
+        } else {
+            await context.executeSlashCommandsWithOptions('/regenerate');
+        }
+    });
+}
+
+// The prompt manager's Edit and Inspect views (opened from AI response) keep their close
+// button at the foot of the form; each gets the panels' ✕ in its heading too, which
+// presses SillyTavern's own close button so the form is cleared the usual way.
+for (const [view, closeId] of [['completion_prompt_manager_popup_edit', 'completion_prompt_manager_popup_entry_form_close'],
+                               ['completion_prompt_manager_popup_inspect', 'completion_prompt_manager_popup_close_button']]) {
+    const heading = document.querySelector(`#${view} > h3`);
+    if (!heading || heading.querySelector('.seeker-panel-close')) continue;
+    const close = document.createElement('div');
+    close.className = 'seeker-panel-close fa-solid fa-xmark interactable';
+    close.setAttribute('role', 'button');
+    close.setAttribute('tabindex', '0');
+    close.setAttribute('title', 'Close');
+    close.addEventListener('click', () => document.getElementById(closeId)?.click());
+    close.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            close.click();
+        }
+    });
+    heading.classList.add('seeker-prompt-heading');
+    heading.append(close);
+}
+
+// Prompt list rows (AI response > Prompts) unfold in place: the chevron at the end of the
+// row's controls (or the prompt's name) shows its text under the row, read-only, so blocks can be skimmed without opening the editor.
+// In SillyTavern the name opens Inspect (what the block sent in the last generation); that
+// stays one click away inside the unfolded row. Markers have no text of their own, so they
+// say what SillyTavern fills them with. The list is re-rendered often, so which rows are
+// open is kept by prompt id and put back after each render.
+{
+    const MARKERS = {
+        chatHistory: 'the conversation so far',
+        charDescription: 'the character card\'s Description',
+        charPersonality: 'the character card\'s Personality',
+        scenario: 'the character card\'s Scenario',
+        personaDescription: 'your persona\'s description',
+        dialogueExamples: 'the character card\'s example messages',
+        worldInfoBefore: 'World Info entries set to go before the character',
+        worldInfoAfter: 'World Info entries set to go after the character',
+    };
+    const open = new Set();
+    const list = () => document.getElementById('completion_prompt_manager_list');
+    const promptById = id => (SillyTavern.getContext().chatCompletionSettings?.prompts ?? []).find(p => p.identifier === id);
+
+    const peekFor = row => {
+        const id = row.dataset.pmIdentifier;
+        const prompt = promptById(id);
+        const peek = document.createElement('div');
+        peek.className = 'seeker-prompt-peek';
+        const body = document.createElement('div');
+        const content = typeof prompt?.content === 'string' ? prompt.content.trim() : '';
+        if (prompt?.marker || MARKERS[id]) {
+            body.className = 'seeker-prompt-peek-note';
+            body.textContent = `Filled in by SillyTavern with ${MARKERS[id] ?? 'content it supplies itself'}.`;
+        } else if (!content) {
+            body.className = 'seeker-prompt-peek-note';
+            body.textContent = 'This block is empty.';
+        } else {
+            body.className = 'seeker-prompt-peek-text';
+            body.textContent = content;
+        }
+        const inspect = document.createElement('a');
+        inspect.className = 'seeker-prompt-peek-inspect interactable';
+        inspect.tabIndex = 0;
+        inspect.textContent = 'Inspect last prompt';
+        inspect.title = 'What this block sent in the last generation';
+        inspect.addEventListener('click', () => {
+            const name = row.querySelector('.prompt-manager-inspect-action');
+            if (!name) return;
+            name.dataset.seekerPass = '1';
+            name.click();
+        });
+        peek.append(body, inspect);
+        return peek;
+    };
+
+    const setOpen = (row, state) => {
+        row.querySelector(':scope > .seeker-prompt-peek')?.remove();
+        row.classList.toggle('seeker-prompt-open', state);
+        const chevron = row.querySelector('.seeker-prompt-chevron');
+        if (chevron) chevron.title = state ? 'Hide prompt' : 'Show prompt';
+        if (state) row.append(peekFor(row));
+    };
+
+    const toggle = row => {
+        const id = row?.dataset.pmIdentifier;
+        if (!id) return;
+        const state = !open.has(id);
+        if (state) open.add(id); else open.delete(id);
+        setOpen(row, state);
+    };
+
+    // A chevron at the end of the row's controls, after the on/off toggle.
+    const chevronFor = row => {
+        const chevron = document.createElement('span');
+        chevron.className = 'seeker-prompt-chevron fa-solid fa-chevron-down fa-xs interactable';
+        chevron.setAttribute('role', 'button');
+        chevron.tabIndex = 0;
+        chevron.title = 'Show prompt';
+        chevron.addEventListener('click', () => toggle(row));
+        chevron.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                toggle(row);
+            }
+        });
+        return chevron;
+    };
+
+    const restore = () => {
+        for (const row of list()?.querySelectorAll(':scope > .completion_prompt_manager_prompt') ?? []) {
+            const controls = row.querySelector('.prompt_manager_prompt_controls');
+            if (controls && !controls.querySelector('.seeker-prompt-chevron')) controls.append(chevronFor(row));
+            if (open.has(row.dataset.pmIdentifier) && !row.classList.contains('seeker-prompt-open')) setOpen(row, true);
+        }
+    };
+
+    document.addEventListener('click', event => {
+        const name = event.target instanceof Element ? event.target.closest('#completion_prompt_manager_list .prompt-manager-inspect-action') : null;
+        if (!name) return;
+        if (name.dataset.seekerPass) {
+            delete name.dataset.seekerPass; // the Inspect link: let SillyTavern have it
+            return;
+        }
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        toggle(name.closest('.completion_prompt_manager_prompt'));
+    }, true);
+
+    // The list element itself is replaced on some renders, so watch its parent too.
+    const holder = document.getElementById('completion_prompt_manager');
+    if (holder) new MutationObserver(restore).observe(holder, { childList: true, subtree: true });
+    restore();
 }
