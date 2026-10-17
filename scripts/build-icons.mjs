@@ -130,6 +130,8 @@ const ALIASES = {
     'square-poll-horizontal': 'chart-bar',
     'star-of-life': 'asterisk',
     'stop': 'square',
+    // Only the prompt manager uses it (in-chat injection); a syringe reads as a pencil there.
+    'syringe': 'between-horizontal-start',
     'table-cells-large': 'layout-grid',
     'thumbtack': 'pin',
     'toggle-off': 'toggle-left',

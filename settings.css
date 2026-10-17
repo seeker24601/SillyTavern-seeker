@@ -296,3 +296,54 @@
     & .seeker-settings-nav { margin-bottom: var(--seeker-space-3); }
   }
 }
+
+/* ---------- Prompt list: rows unfold to show their text (index.js) ----------
+   A chevron after the on/off toggle turns when the row is open; the text spans the whole
+   row under it, in the small size, scrolling past a dozen or so lines. */
+#completion_prompt_manager_list .prompt-manager-inspect-action { cursor: pointer; }
+/* Room for a fourth control: SillyTavern sizes the controls column for three (80px). */
+#completion_prompt_manager #completion_prompt_manager_list li { grid-template-columns: 4fr 108px 45px; }
+#completion_prompt_manager_list .seeker-prompt-chevron {
+  cursor: pointer;
+  opacity: 0.55;
+  transition: transform 160ms ease, opacity 120ms;
+}
+#completion_prompt_manager_list .seeker-prompt-chevron:hover,
+#completion_prompt_manager_list .seeker-prompt-open .seeker-prompt-chevron { opacity: 1; }
+#completion_prompt_manager_list .seeker-prompt-open .seeker-prompt-chevron { transform: rotate(180deg); }
+#completion_prompt_manager_list .seeker-prompt-open { background: var(--seeker-fill) !important; }
+#completion_prompt_manager_list .seeker-prompt-peek {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--seeker-space-2);
+  margin-top: var(--seeker-space-2);
+  padding: var(--seeker-space-3) var(--seeker-space-3) var(--seeker-space-2);
+  border-top: 1px solid rgba(var(--seeker-ink-rgb), 0.08);
+  cursor: auto;
+}
+#completion_prompt_manager_list .seeker-prompt-peek-text {
+  align-self: stretch;
+  max-height: 18em;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: var(--seeker-fs-small);
+  line-height: var(--seeker-lh-text);
+  color: var(--seeker-text-dim);
+  user-select: text;
+}
+#completion_prompt_manager_list .seeker-prompt-peek-note {
+  font-size: var(--seeker-fs-small);
+  font-style: italic;
+  color: var(--seeker-text-faint);
+}
+#completion_prompt_manager_list .seeker-prompt-peek-inspect {
+  font-size: var(--seeker-fs-meta);
+  letter-spacing: 0.04em;
+  color: var(--seeker-text-faint);
+  text-decoration: none;
+  cursor: pointer;
+}
+#completion_prompt_manager_list .seeker-prompt-peek-inspect:hover { color: var(--seeker-text); }
