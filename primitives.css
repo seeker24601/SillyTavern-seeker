@@ -38,9 +38,17 @@
   --seeker-glass-edge-modal: linear-gradient(to top right,
     rgba(var(--seeker-ink-rgb), 0.05), rgba(var(--seeker-ink-rgb), 0.08) 40%,
     rgba(var(--seeker-ink-rgb), 0.18) 75%, rgba(var(--seeker-ink-rgb), 0.42));
-  /* One large size for every panel and every wide or large dialog. */
+  /* One large size for every panel and every large dialog. */
   --seeker-modal-width: min(1000px, calc(100vw - 64px));
   --seeker-modal-height: min(86dvh, 920px);
+  /* Wide dialogs that are not also large: mostly a line of text and an input. */
+  --seeker-dialog-wide-width: min(720px, calc(100vw - 32px));
+  /* Behind every panel and dialog: the screen dimmed and softly blurred, fading in and
+     out. The fade is the theme's own, so it runs even with SillyTavern's Reduced Motion
+     on: a dissolve, not movement. */
+  --seeker-backdrop-dim: rgba(0, 0, 0, 0.45);
+  --seeker-backdrop-blur: blur(8px);
+  --seeker-backdrop-fade: 240ms;
 
   /* SillyTavern sets these inline from the UI theme; !important wins over that. */
   --SmartThemeBorderColor: transparent !important;
@@ -366,28 +374,53 @@ hr {
 }
 .popup.transparent_dialogue_popup { background: none !important; border-color: transparent !important; box-shadow: none !important; }
 
-/* Dialogs: two sizes, centred over a dimmed screen. Prompts and confirmations are
-   compact; every wide, wider and large variant shares one large size. */
+/* Dialogs: three sizes, centred over a dimmed, blurred screen. Prompts and confirmations
+   are compact; wide and wider ones (a name, a URL to import) are a middle width and as
+   tall as their content; large ones take the panels' size. */
 .popup,
 #dialogue_popup {
   width: min(480px, calc(100vw - 32px)) !important;
   min-width: 0 !important;
   max-width: none !important;
 }
-.popup:is(.wide_dialogue_popup, .wider_dialogue_popup, .large_dialogue_popup) {
-  width: var(--seeker-modal-width) !important;
+.popup:is(.wide_dialogue_popup, .wider_dialogue_popup) {
+  width: var(--seeker-dialog-wide-width) !important;
   max-height: var(--seeker-modal-height) !important;
 }
-.popup.large_dialogue_popup { height: var(--seeker-modal-height) !important; }
-#shadow_popup {
-  background-color: rgba(0, 0, 0, 0.55) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+.popup.large_dialogue_popup {
+  width: var(--seeker-modal-width) !important;
+  height: var(--seeker-modal-height) !important;
+  max-height: var(--seeker-modal-height) !important;
 }
+#shadow_popup {
+  background-color: var(--seeker-backdrop-dim) !important;
+  backdrop-filter: var(--seeker-backdrop-blur) !important;
+  -webkit-backdrop-filter: var(--seeker-backdrop-blur) !important;
+}
+/* Not !important: that would also override the fade below (important declarations beat
+   animations). The theme loads after SillyTavern's popup.css, so it wins without. */
 .popup[open]::backdrop {
-  background-color: rgba(0, 0, 0, 0.55) !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  background-color: var(--seeker-backdrop-dim);
+  backdrop-filter: var(--seeker-backdrop-blur);
+  -webkit-backdrop-filter: var(--seeker-backdrop-blur);
+}
+/* Dialogs fade in and out with their backdrop. SillyTavern removes a closing dialog when
+   its animation ends, so it waits for these; its own (pop-in, and none at all with
+   Reduced Motion on) are replaced. */
+.popup[opening] { animation: seeker-dialog-in var(--seeker-backdrop-fade) ease both !important; }
+.popup[opening]::backdrop { animation: seeker-backdrop-in var(--seeker-backdrop-fade) ease both !important; }
+.popup[closing] { animation: seeker-dialog-in var(--seeker-backdrop-fade) ease reverse both !important; }
+.popup[closing]::backdrop { animation: seeker-backdrop-in var(--seeker-backdrop-fade) ease reverse both !important; }
+@keyframes seeker-dialog-in { from { opacity: 0; } }
+@keyframes seeker-backdrop-in {
+  from { background-color: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  to { background-color: var(--seeker-backdrop-dim); backdrop-filter: var(--seeker-backdrop-blur); -webkit-backdrop-filter: var(--seeker-backdrop-blur); }
+}
+/* SillyTavern's "No Blur Effect" (User settings), and the system's reduce transparency:
+   dim only, a little darker to make up for it. */
+body.no-blur { --seeker-backdrop-dim: rgba(0, 0, 0, 0.55); --seeker-backdrop-blur: none; }
+@media (prefers-reduced-transparency: reduce) {
+  body { --seeker-backdrop-dim: rgba(0, 0, 0, 0.55); --seeker-backdrop-blur: none; }
 }
 .options-content hr { border-top-color: var(--seeker-divider) !important; }
 

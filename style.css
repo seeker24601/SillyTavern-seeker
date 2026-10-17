@@ -277,7 +277,7 @@ body.seeker-nav-open #top-settings-holder > .drawer > .drawer-toggle { display: 
 /* Panel locks would keep a dialog open over the chat; index.js releases saved ones. */
 :is(#lm_button_panel_pin_div, #rm_button_panel_pin_div, #WI_panel_pin_div) { display: none !important; }
 .seeker-panel-close:hover { background-color: var(--seeker-fill-hover); color: var(--seeker-text); }
-body:not(.movingUI) :is(#top-settings-holder .drawer-content, #movingDivs > .drawer-content, #character_popup) {
+body:not(.movingUI) :is(#top-settings-holder .drawer-content, #movingDivs > .drawer-content, #character_popup, #completion_prompt_manager_popup) {
   position: fixed !important;
   inset: 0 !important;
   transform: none !important;
@@ -288,26 +288,55 @@ body:not(.movingUI) :is(#top-settings-holder .drawer-content, #movingDivs > .dra
 }
 /* Advanced definitions opens from inside the Characters panel, so it sits above it. */
 body:not(.movingUI) #character_popup { z-index: 4011 !important; }
+/* Likewise the prompt manager's edit/inspect panel, which opens from inside AI response:
+   SillyTavern gives it 3010, under the menu panels (4009), so it opened behind its panel.
+   It also takes the panels' box (the rules above and below), so it covers AI response
+   exactly instead of peeking out above and below it. */
+body:not(.movingUI) #completion_prompt_manager_popup { z-index: 4011 !important; }
+/* Its Edit / Inspect heading carries a ✕ at the right, like the panel headers (index.js). */
+#completion_prompt_manager_popup h3.seeker-prompt-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--seeker-space-3);
+}
 /* AI response and Characters scroll inside their own lists; the rest scroll as a whole. */
 body:not(.movingUI) :is(#top-settings-holder .drawer-content, #movingDivs > .drawer-content, #character_popup):not(.fillLeft):not(.fillRight) { overflow-y: auto !important; }
 @media (min-width: 1001px) {
-  body:not(.movingUI) :is(#top-settings-holder .drawer-content, #movingDivs > .drawer-content, #character_popup) {
+  body:not(.movingUI) :is(#top-settings-holder .drawer-content, #movingDivs > .drawer-content, #character_popup, #completion_prompt_manager_popup) {
     margin: auto !important;
     width: var(--seeker-modal-width) !important;
     height: var(--seeker-modal-height) !important;
   }
-  /* The dimmed backdrop. A click on it lands outside the panel, which SillyTavern
-     already treats as "close the open panel". */
+  /* The dimmed, blurred backdrop (primitives.css has the amounts and the fade). A click
+     on it lands outside the panel, which SillyTavern already treats as "close the open
+     panel". The layer itself is always there (below), so this only changes its look. */
   body:not(.movingUI):has(#top-settings-holder .drawer-content.openDrawer, #movingDivs > .drawer-content.openDrawer, #character_popup[style*="display: flex"])::after {
-    content: "";
-    position: fixed;
-    inset: 0;
     z-index: 3990;
-    background: rgba(0, 0, 0, 0.55);
+    pointer-events: auto;
+    background-color: var(--seeker-backdrop-dim);
+    backdrop-filter: var(--seeker-backdrop-blur);
+    -webkit-backdrop-filter: var(--seeker-backdrop-blur);
   }
 }
+/* The backdrop layer behind panels (above) and a zoomed portrait: always present but clear
+   and click-through, so the dim and blur fade in and out instead of snapping. */
+body:not(.movingUI)::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 3990;
+  pointer-events: none;
+  background-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition:
+    background-color var(--seeker-backdrop-fade) ease,
+    backdrop-filter var(--seeker-backdrop-fade) ease,
+    -webkit-backdrop-filter var(--seeker-backdrop-fade) ease;
+}
 @media (max-width: 1000px) {
-  body:not(.movingUI) :is(#top-settings-holder .drawer-content, #movingDivs > .drawer-content, #character_popup) {
+  body:not(.movingUI) :is(#top-settings-holder .drawer-content, #movingDivs > .drawer-content, #character_popup, #completion_prompt_manager_popup) {
     margin: 0 !important;
     width: 100dvw !important;
     height: 100dvh !important;
@@ -375,8 +404,26 @@ body:not(.movingUI) :is(#top-settings-holder .drawer-content, #movingDivs > .dra
 #chat .mes_text em, #chat .mes_text i { color: var(--SmartThemeEmColor); font-style: normal; }
 #chat .mes_text q, #chat .mes_text q :is(em, i) { color: var(--SmartThemeQuoteColor); }
 #chat .mes_text u { color: var(--SmartThemeUnderlineColor); text-decoration-color: var(--SmartThemeUnderlineColor); }
-#chat .mes .mes_buttons, #chat .mes .extraMesButtons { opacity: 0.55; }
-#chat .mes .mes_buttons:hover { opacity: 1; }
+/* Message actions show when the pointer is over the message (or focus is in it), and are
+   drawn at full strength then: a row of faint icons on every message is noise. Touch screens
+   have no hover, so there they stay visible. */
+#chat .mes .mes_buttons { opacity: 0; transition: opacity 160ms ease; }
+#chat .mes:hover .mes_buttons, #chat .mes:focus-within .mes_buttons,
+#chat .mes .mes_buttons:has(.extraMesButtons[style*="display"]:not([style*="none"])) { opacity: 1; }
+#chat .mes .mes_button, #chat .mes .extraMesButtons > div {
+  opacity: 0.85 !important;
+  color: var(--seeker-text);
+  font-size: 15px;
+  padding: 2px 4px;
+}
+#chat .mes .mes_button:hover, #chat .mes .extraMesButtons > div:hover { opacity: 1 !important; }
+@media (hover: none) { #chat .mes .mes_buttons { opacity: 1; } }
+/* Regenerate and delete, right in the message's button row (index.js adds them). Regenerate
+   shows only on the last reply, which is the only message SillyTavern can regenerate. */
+#chat .mes .seeker-mes-regen, #chat .mes .seeker-mes-delete { display: inline-block; }
+#chat .mes:not(.last_mes) .seeker-mes-regen, #chat .mes[is_user="true"] .seeker-mes-regen,
+body[data-generating] .seeker-mes-regen { display: none !important; }
+#chat .mes .seeker-mes-delete:hover { color: #e5484d !important; }
 #chat .swipe_left, #chat .swipe_right { color: var(--seeker-text-dim) !important; opacity: 0.8; }
 /* Your messages are the quieter voice: your name in Bodoni italic, a little dimmer, and your
    text set off by a hairline, like a stage direction beside the character's lines. */
@@ -492,6 +539,8 @@ body:not(.movingUI) :is(#top-settings-holder .drawer-content, #movingDivs > .dra
 
 /* ---------- Composer: one quiet bar, small icons, white glass send ---------- */
 #form_sheld { padding: 8px 12px 12px !important; }
+/* The welcome screen is a menu, not a conversation: no composer there. */
+body:has(#chat > .welcomePanel) #form_sheld { display: none !important; }
 #send_form {
   /* SillyTavern sizes every composer control from these; scoped here so nothing else moves. */
   --bottomFormIconSize: 18px;
@@ -698,7 +747,8 @@ body:has(#chat > .welcomePanel) {
       transform:
         translate(calc(var(--seeker-bg-x, 0) * var(--seeker-bg-shift)), calc(var(--seeker-bg-y, 0) * var(--seeker-bg-shift)))
         scale(var(--seeker-bg-zoom));
-      transition: transform 1400ms cubic-bezier(0.2, 0.7, 0.2, 1);
+      /* Slow: the picture follows the pointer like something heavy on water. */
+      transition: transform 3600ms cubic-bezier(0.22, 0.61, 0.36, 1);
     }
     /* SillyTavern's background fitting options (Backgrounds panel). */
     & #bg1.contain::before { background-size: contain; }
@@ -814,12 +864,22 @@ body.waifuMode :is(#expression-holder > img.expression, #visual-novel-wrapper .e
     font-weight: 600;
     line-height: 1;
     letter-spacing: 0.02em;
-    /* Outlined: a fine white line around clear letters, lit like silver: bright at the start
-       of the name, dimmer through the middle, catching a little light again at the end. */
+    /* Solid silver: the letters are filled with a metal gradient, bright at the start of the
+       name, cooler and darker through the middle and lit again at the foot, with a glass edge:
+       a soft translucent white line that half overlaps the fill and reads as a frosted rim. */
     color: transparent;
-    -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.95);
-    -webkit-mask-image: linear-gradient(172deg, #000 18%, rgba(0, 0, 0, 0.38) 58%, rgba(0, 0, 0, 0.7) 86%);
-    mask-image: linear-gradient(172deg, #000 18%, rgba(0, 0, 0, 0.38) 58%, rgba(0, 0, 0, 0.7) 86%);
+    background: linear-gradient(172deg,
+      #fbfcfc 0%,
+      #e4e8e7 18%,
+      #b8bfbd 40%,
+      #8e9694 58%,
+      #aeb5b3 76%,
+      #dfe4e2 92%,
+      #f4f6f5 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.28);
+    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.35)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
     pointer-events: none;
     user-select: none;
   }
@@ -1166,14 +1226,8 @@ body:not(.movingUI) .zoomed_avatar[forChar] .dragClose {
   cursor: pointer;
 }
 body:not(.movingUI):has(.zoomed_avatar[forChar])::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
   z-index: 4019;
-  background: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.7);
   pointer-events: none;
 }
 @media (max-width: 1000px) {
