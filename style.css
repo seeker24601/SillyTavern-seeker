@@ -88,6 +88,75 @@
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
+/* DM Mono (OFL, see fonts/OFL-DM-Mono.txt, Google Fonts via Fontsource), the monospace for
+   code, file names and slash commands. A geometric mono by Colophon, drawn on the same circles
+   and squares as Jost and as low in contrast, so Bodoni stays the one high-contrast voice.
+   Static cuts: 300, 400 and 500, and a 400 italic. */
+@font-face {
+  font-family: "DM Mono";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("fonts/dm-mono-latin-300-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "DM Mono";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("fonts/dm-mono-latin-ext-300-normal.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "DM Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/dm-mono-latin-400-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "DM Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/dm-mono-latin-ext-400-normal.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "DM Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("fonts/dm-mono-latin-500-normal.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "DM Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("fonts/dm-mono-latin-ext-500-normal.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "DM Mono";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/dm-mono-latin-400-italic.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "DM Mono";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/dm-mono-latin-ext-400-italic.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 :root {
   /* Colour. Everything is neutral grey except the accent, which is the Underlined Text
      colour in User settings > Theme Colors, so it can be changed there. Fills, rings,
@@ -131,6 +200,8 @@
   --seeker-heading-font: "Bodoni Moda", "Bodoni 72", "Bodoni MT", Didot, serif;
   --seeker-display-font: "Bodoni Moda SC", var(--seeker-heading-font);
   --mainFontFamily: "Jost", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --seeker-mono-font: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --monoFontFamily: var(--seeker-mono-font); /* SillyTavern's own code blocks and monospace text */
 }
 
 body, textarea, input, select, button { font-family: var(--mainFontFamily); }
@@ -172,6 +243,29 @@ body, textarea, input, select, button { font-family: var(--mainFontFamily); }
 }
 #seeker-menu-button:hover,
 body.seeker-nav-open #seeker-menu-button { color: var(--seeker-text); }
+/* New chat (index.js), to the menu button's left, only while a chat is open. */
+#seeker-new-chat {
+  position: fixed;
+  top: var(--seeker-menu-top);
+  right: calc(12px + var(--seeker-menu-size) + 8px);
+  z-index: 4010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--seeker-menu-size);
+  height: var(--seeker-menu-size);
+  font-size: 16px;
+  color: var(--seeker-text-dim);
+  background: var(--seeker-surface);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 120ms;
+}
+#seeker-new-chat:hover { color: var(--seeker-text); }
+body:has(#chat > .welcomePanel) #seeker-new-chat,
+body.seeker-nav-open #seeker-new-chat,
+body[data-generating] #seeker-new-chat { display: none; }
 
 #top-settings-holder {
   position: fixed !important;
@@ -344,7 +438,7 @@ body:not(.movingUI)::after {
     border-width: 0 !important; /* full screen: no edge */
   }
   /* The panel's own close button takes the menu button's corner. */
-  body:has(#top-settings-holder .drawer-content.openDrawer, #movingDivs > .drawer-content.openDrawer, #character_popup[style*="display: flex"]) #seeker-menu-button { display: none; }
+  body:has(#top-settings-holder .drawer-content.openDrawer, #movingDivs > .drawer-content.openDrawer, #character_popup[style*="display: flex"]) :is(#seeker-menu-button, #seeker-new-chat) { display: none; }
 }
 
 /* ---------- Messages: prose on the panel, no cards ---------- */
@@ -419,9 +513,9 @@ body:not(.movingUI)::after {
 #chat .mes .mes_button:hover, #chat .mes .extraMesButtons > div:hover { opacity: 1 !important; }
 @media (hover: none) { #chat .mes .mes_buttons { opacity: 1; } }
 /* Regenerate and delete, right in the message's button row (index.js adds them). Regenerate
-   shows only on the last reply, which is the only message SillyTavern can regenerate. */
+   shows on replies, not on your own messages; on an earlier reply it rewinds to it first. */
 #chat .mes .seeker-mes-regen, #chat .mes .seeker-mes-delete { display: inline-block; }
-#chat .mes:not(.last_mes) .seeker-mes-regen, #chat .mes[is_user="true"] .seeker-mes-regen,
+#chat .mes[is_user="true"] .seeker-mes-regen, #chat .mes[is_system="true"] .seeker-mes-regen,
 body[data-generating] .seeker-mes-regen { display: none !important; }
 #chat .mes .seeker-mes-delete:hover { color: #e5484d !important; }
 #chat .swipe_left, #chat .swipe_right { color: var(--seeker-text-dim) !important; opacity: 0.8; }
@@ -865,8 +959,7 @@ body.waifuMode :is(#expression-holder > img.expression, #visual-novel-wrapper .e
     line-height: 1;
     letter-spacing: 0.02em;
     /* Solid silver: the letters are filled with a metal gradient, bright at the start of the
-       name, cooler and darker through the middle and lit again at the foot, with a glass edge:
-       a soft translucent white line that half overlaps the fill and reads as a frosted rim. */
+       name, cooler and darker through the middle and lit again at the foot. No outline. */
     color: transparent;
     background: linear-gradient(172deg,
       #fbfcfc 0%,
@@ -878,8 +971,7 @@ body.waifuMode :is(#expression-holder > img.expression, #visual-novel-wrapper .e
       #f4f6f5 100%);
     -webkit-background-clip: text;
     background-clip: text;
-    -webkit-text-stroke: 2px rgba(255, 255, 255, 0.28);
-    filter: drop-shadow(0 0 1px rgba(255, 255, 255, 0.35)) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+    filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
     pointer-events: none;
     user-select: none;
   }
@@ -1007,9 +1099,29 @@ body:has(#chat > .welcomePanel) {
         margin: 0 auto !important;
         width: var(--seeker-column-width) !important;
         max-width: var(--seeker-column-width) !important;
-        background: rgba(var(--seeker-panel-rgb), var(--seeker-panel-alpha)) !important;
+        background: rgb(var(--seeker-panel-rgb)) !important;
         border-radius: 0 !important;
       }
+      /* The column is solid, and the background on either side dissolves into it through the
+         same halftone as the stage's edge: the left one as drawn, the right one mirrored. The
+         background stays put under them. */
+      & #bg1::before,
+      & #bg1::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-color: rgb(var(--seeker-panel-rgb));
+        mask-image: url("halftone.webp");
+        mask-mode: luminance;
+        mask-repeat: no-repeat;
+        mask-position: right calc(-1 * var(--seeker-halftone-shift)) top 0;
+        mask-size: auto 100%;
+      }
+      & #bg1::before { left: 0; right: calc(50vw + var(--seeker-column-width) / 2); }
+      & #bg1::after { left: calc(50vw + var(--seeker-column-width) / 2); right: 0; transform: scaleX(-1); }
     }
   }
 }

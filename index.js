@@ -694,6 +694,118 @@ for (const id of ['seeker-stage-grain', 'seeker-stage-vignette', 'seeker-stage-o
     }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src'] });
 }
 
+// Card captions: each character and group card gets its name over the foot of its portrait
+// (the front of the flip card; panels.css), with the version and author on a line beneath it
+// for characters. The back repeats that line under its own name heading. SillyTavern redraws
+// the list on every change, so new cards are captioned as they arrive.
+{
+    const ensure = (parent, className, place = el => parent.append(el)) => {
+        let el = parent.querySelector(`:scope > .${className}`);
+        if (!el) {
+            el = document.createElement('div');
+            el.className = className;
+            place(el);
+        }
+        return el;
+    };
+    const setText = (el, text) => { if (el.textContent !== text) el.textContent = text; };
+    const byline = card => {
+        if (!card.classList.contains('character_select')) return '';
+        const data = SillyTavern.getContext().characters[Number(card.dataset.chid)]?.data;
+        const version = String(data?.character_version ?? '').trim();
+        const author = String(data?.creator ?? '').trim();
+        const parts = [];
+        if (version) parts.push(/^v/i.test(version) ? version : `v${version}`);
+        if (author) parts.push(`by ${author}`);
+        return parts.join(' · ');
+    };
+    const label = card => {
+        const avatar = card.querySelector(':scope > .avatar');
+        const name = card.querySelector('.ch_name')?.textContent?.trim();
+        if (!avatar || !name) return;
+        const caption = ensure(avatar, 'seeker-card-name');
+        caption.setAttribute('aria-hidden', 'true');
+        setText(ensure(caption, 'seeker-card-title'), name);
+        const text = byline(card);
+        const front = caption.querySelector(':scope > .seeker-card-byline');
+        const back = card.querySelector('.seeker-card-meta');
+        if (!text) { front?.remove(); back?.remove(); return; }
+        setText(ensure(caption, 'seeker-card-byline'), text);
+        const container = card.querySelector('.character_select_container');
+        const nameBlock = card.querySelector('.character_name_block');
+        if (container && nameBlock) setText(ensure(container, 'seeker-card-meta', el => nameBlock.after(el)), text);
+    };
+    const scan = root => root.querySelectorAll?.(':is(.character_select, .group_select)').forEach(label);
+    const list = document.getElementById('rm_print_characters_block');
+    if (list) {
+        scan(list);
+        new MutationObserver(() => scan(list)).observe(list, { childList: true, subtree: true, characterData: true });
+    }
+}
+
+// Card actions: the back of each character card has Chat (open the chat and close the menu)
+// and Edit (SillyTavern's own card click: open the chat with the editor in the menu). With a
+// mouse the card turns over on hover; on a touch screen the first tap turns it over and the
+// buttons do the rest, and tapping elsewhere turns it back.
+{
+    const list = document.getElementById('rm_print_characters_block');
+    const CARD = ':is(.character_select, .group_select)';
+    const addActions = card => {
+        if (!card.classList.contains('character_select')) return;
+        const back = card.querySelector('.character_select_container');
+        if (!back || back.querySelector(':scope > .seeker-card-actions')) return;
+        const row = document.createElement('div');
+        row.className = 'seeker-card-actions';
+        for (const [kind, label, icon] of [['edit', 'Edit', 'fa-pen'], ['chat', 'Chat', 'fa-comments']]) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = `seeker-card-action seeker-card-${kind} menu_button`;
+            button.innerHTML = `<i class="fa-solid ${icon}" aria-hidden="true"></i><span>${label}</span>`;
+            row.append(button);
+        }
+        back.append(row);
+    };
+    const unflip = except => list.querySelectorAll(`${CARD}.seeker-flipped`).forEach(card => { if (card !== except) card.classList.remove('seeker-flipped'); });
+    let pointerType = 'mouse';
+    const touch = () => pointerType === 'touch' || pointerType === 'pen' || matchMedia('(hover: none)').matches && pointerType !== 'mouse';
+    if (list) {
+        list.querySelectorAll(CARD).forEach(addActions);
+        new MutationObserver(() => list.querySelectorAll(CARD).forEach(addActions)).observe(list, { childList: true });
+        document.addEventListener('pointerdown', event => { pointerType = event.pointerType || 'mouse'; }, true);
+        list.addEventListener('click', async event => {
+            const card = event.target.closest(CARD);
+            if (!card) return;
+            const chat = event.target.closest('.seeker-card-chat');
+            if (chat) {
+                event.stopPropagation();
+                event.preventDefault();
+                card.classList.remove('seeker-flipped');
+                await SillyTavern.getContext().selectCharacterById(Number(card.dataset.chid));
+                const panel = document.querySelector('#right-nav-panel.openDrawer');
+                panel?.parentElement.querySelector('.drawer-toggle .drawer-icon')?.click();
+                return;
+            }
+            if (event.target.closest('.seeker-card-edit')) {
+                card.classList.remove('seeker-flipped');
+                return; // falls through to SillyTavern's own card click
+            }
+            if (!touch()) return;
+            // Touch: the first tap turns the card over; a tap on the back of a character card
+            // waits for a button. Groups have no buttons, so their second tap opens them.
+            if (!card.classList.contains('seeker-flipped')) {
+                event.stopPropagation();
+                event.preventDefault();
+                unflip(card);
+                card.classList.add('seeker-flipped');
+            } else if (card.classList.contains('character_select')) {
+                event.stopPropagation();
+                event.preventDefault();
+            }
+        }, true);
+        document.addEventListener('click', event => { if (!event.target.closest?.(CARD)) unflip(); });
+    }
+}
+
 // Characters toolbar: search, a Filters button with a labelled panel, the sort order, and a
 // New button whose menu holds New character, Import from file, Import from URL and New
 // group. SillyTavern's own buttons and filter bar move into the panels (they stay inside
@@ -861,19 +973,198 @@ for (const id of ['seeker-stage-grain', 'seeker-stage-vignette', 'seeker-stage-o
         }
         const named = drawer.querySelector('input[name], select[name], textarea[name]');
         if (named) form.after(drawer); else anchor.before(drawer);
+        arrange(drawer);
         return true;
     };
+
+    // The section is laid out around the sprites: a bar with the set's name, how many are
+    // filled, and Upload ZIP; a line on what clicking and dropping do; the grid; then the
+    // folder override, the pack and cleanup buttons, the classifier settings and the naming
+    // help folded under "Folder and settings". The elements are SillyTavern's own, moved,
+    // so its handlers and ids keep working.
+    function arrange(drawer) {
+        const content = drawer.querySelector('.inline-drawer-content');
+        const open = content?.querySelector('#open_chat_expressions');
+        const list = open?.querySelector('#image_list');
+        const header = open?.querySelector('#image_list_header');
+        if (!open || !list || !header || content.querySelector('.seeker-sprites-settings')) return;
+
+        const bar = document.createElement('div');
+        bar.className = 'seeker-sprites-bar';
+        const count = document.createElement('span');
+        count.className = 'seeker-sprites-count';
+        const zip = document.createElement('button');
+        zip.type = 'button';
+        zip.className = 'menu_button seeker-sprites-zip';
+        zip.innerHTML = '<i class="fa-solid fa-file-zipper" aria-hidden="true"></i><span>Upload ZIP</span>';
+        zip.addEventListener('click', () => document.getElementById('expression_upload_pack_button')?.click());
+        const titles = document.createElement('div');
+        titles.className = 'seeker-sprites-titles';
+        titles.append(header, count);
+        bar.append(titles, zip);
+
+        const hint = document.createElement('p');
+        hint.className = 'seeker-sprites-hint';
+        hint.textContent = 'Click a sprite to show it on the stage, or an empty slot to add one. Drop an image on a sprite to replace it, drop several named after their expressions (joy.png, anger.webp) to fill them at once, or drop a ZIP to upload a whole pack.';
+
+        open.prepend(bar, hint);
+        hint.after(list);
+
+        const settings = document.createElement('details');
+        settings.className = 'seeker-sprites-settings';
+        const summary = document.createElement('summary');
+        summary.textContent = 'Folder and settings';
+        settings.append(summary);
+        // Everything in the section that is not the bar, the hint, the grid or the no-chat note.
+        for (const el of [...open.children]) if (![bar, hint, list].includes(el) && !el.classList.contains('offline_mode')) settings.append(el);
+        for (const el of [...content.children]) if (el !== open && el.id !== 'no_chat_expressions') settings.append(el);
+        // The naming help goes last, after the controls it explains.
+        const help = settings.querySelector(':scope > p.hint');
+        if (help) settings.append(help);
+        content.append(settings);
+
+        // Count of filled expressions, kept current as SillyTavern redraws the grid.
+        const recount = () => {
+            const items = [...list.querySelectorAll('.expression_list_item')];
+            const labels = new Set(items.map(i => i.dataset.expression));
+            const missing = new Set(items.filter(i => i.dataset.expressionType === 'failure').map(i => i.dataset.expression));
+            const total = labels.size;
+            const text = !total ? '' : missing.size ? `${total - missing.size} of ${total} filled` : `All ${total} filled`;
+            if (count.textContent !== text) count.textContent = text;
+        };
+        recount();
+        new MutationObserver(recount).observe(list, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-expression-type'] });
+
+        // An empty slot opens the file picker instead of setting a blank expression.
+        list.addEventListener('click', event => {
+            const tile = event.target.closest('.expression_list_item');
+            if (!tile || tile.dataset.expressionType !== 'failure' || event.target.closest('.expression_list_buttons')) return;
+            event.stopPropagation();
+            tile.querySelector('.expression_list_upload')?.click();
+        }, true);
+
+        // Drag and drop. SillyTavern's upload buttons open a file picker by clicking a hidden
+        // input; for a drop, that click is answered with the dropped file instead.
+        const feed = (inputId, file, press) => new Promise(resolve => {
+            const input = document.getElementById(inputId);
+            if (!input) return resolve(false);
+            const done = new MutationObserver(() => { done.disconnect(); clearTimeout(timer); resolve(true); });
+            const timer = setTimeout(() => { done.disconnect(); resolve(true); }, 6000);
+            input.click = function () {
+                delete input.click;
+                const transfer = new DataTransfer();
+                transfer.items.add(file);
+                input.files = transfer.files;
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+                done.observe(list, { childList: true });
+            };
+            press();
+        });
+        const extension = name => (name.match(/\.[^.]+$/) || ['.png'])[0];
+        const toTile = (tile, file) => {
+            const base = tile.dataset.expressionType === 'failure'
+                ? tile.dataset.expression
+                : (tile.dataset.filename || tile.dataset.expression).replace(/\.[^.]+$/, '');
+            const named = new File([file], base + extension(file.name), { type: file.type });
+            return feed('expression_upload', named, () => tile.querySelector('.expression_list_upload')?.click());
+        };
+        const tileFor = file => {
+            const base = file.name.replace(/\.[^.]+$/, '').toLowerCase();
+            const label = base.split(/[.-]/)[0];
+            return list.querySelector(`.expression_list_item[data-expression="${CSS.escape(label)}"]`);
+        };
+        const hasFiles = event => [...(event.dataTransfer?.types || [])].includes('Files');
+        let over = null;
+        const mark = tile => {
+            if (over === tile) return;
+            over?.classList.remove('seeker-drop-target');
+            over = tile;
+            over?.classList.add('seeker-drop-target');
+        };
+        content.addEventListener('dragover', event => {
+            if (!hasFiles(event)) return;
+            event.preventDefault();
+            event.stopPropagation();
+            event.dataTransfer.dropEffect = 'copy';
+            drawer.classList.add('seeker-dropping');
+            mark(event.target.closest?.('.expression_list_item') || null);
+        }, true);
+        content.addEventListener('dragleave', event => {
+            if (content.contains(event.relatedTarget)) return;
+            drawer.classList.remove('seeker-dropping');
+            mark(null);
+        }, true);
+        content.addEventListener('drop', async event => {
+            if (!hasFiles(event)) return;
+            event.preventDefault();
+            event.stopPropagation();
+            const target = event.target.closest?.('.expression_list_item');
+            drawer.classList.remove('seeker-dropping');
+            mark(null);
+            const files = [...event.dataTransfer.files];
+            const zipFile = files.find(f => /\.zip$/i.test(f.name) || f.type.includes('zip'));
+            if (zipFile) {
+                await feed('expression_upload_pack', zipFile, () => document.getElementById('expression_upload_pack_button')?.click());
+                return;
+            }
+            const images = files.filter(f => f.type.startsWith('image/'));
+            if (!images.length) return;
+            if (target && images.length === 1) { await toTile(target, images[0]); return; }
+            const unmatched = [];
+            for (const file of images) {
+                const tile = tileFor(file);
+                if (tile) await toTile(tile, file); else unmatched.push(file.name);
+            }
+            if (unmatched.length) toastr.warning(`No expression matches ${unmatched.join(', ')}. Name files after an expression, like joy.png, or drop one image on a sprite.`, 'Some images were skipped');
+        }, true);
+    }
     if (!place()) {
         const { eventSource, eventTypes } = SillyTavern.getContext();
         eventSource?.on(eventTypes.APP_READY, place);
     }
 }
 
+// Field headers in the character editor: the expand button moves from beside the label to
+// the end of the row, next to the field's other buttons (Ext. Media, Alt. Greetings), so a
+// field's actions sit together. The expanded editor gets the field's name as its title.
+{
+    const tidy = () => document.querySelectorAll('#form_create .title_restorable .editor_maximize').forEach(button => {
+        const row = button.closest('.title_restorable');
+        if (button.parentElement !== row) row.append(button);
+    });
+    const label = id => {
+        const button = document.querySelector(`.editor_maximize[data-for="${CSS.escape(id)}"]`);
+        const row = button?.closest('.title_restorable') || button?.parentElement;
+        return row?.querySelector('span:not([class*="fa-"])')?.textContent?.trim() || '';
+    };
+    const title = dialog => {
+        const area = dialog.querySelector('textarea.maximized_textarea');
+        const content = dialog.querySelector('.popup-content');
+        if (!area || !content || content.querySelector('.seeker-max-title')) return;
+        const text = label(area.dataset.for);
+        if (!text) return;
+        const heading = document.createElement('h3');
+        heading.className = 'seeker-max-title';
+        heading.textContent = text;
+        content.prepend(heading);
+    };
+    tidy();
+    let queued = false;
+    new MutationObserver(records => {
+        if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; tidy(); }); }
+        for (const r of records) for (const node of r.addedNodes) {
+            if (node.nodeType !== Node.ELEMENT_NODE) continue;
+            if (node.matches?.('dialog.popup')) title(node); else node.querySelectorAll?.('dialog.popup').forEach(title);
+        }
+    }).observe(document.body, { childList: true, subtree: true });
+}
+
 // Regenerate and delete on every message's button row. SillyTavern keeps regenerate in the
 // composer's options menu and delete behind edit mode; here they sit beside the pencil.
+// Delete rewinds: the message and everything after it go.
 // The buttons are added to SillyTavern's message template, so every message cloned from it
-// has them; messages already on screen get them in a pass. style.css shows regenerate on the
-// last reply only, and icons.css paints both with Lucide like the rest of the row.
+// has them; messages already on screen get them in a pass. style.css shows regenerate on
+// replies only (not your own messages), and icons.css paints both with Lucide like the rest.
 {
     const context = SillyTavern.getContext();
     const make = (cls, icon, title) => {
@@ -886,8 +1177,8 @@ for (const id of ['seeker-stage-grain', 'seeker-stage-vignette', 'seeker-stage-o
     const equip = row => {
         if (!row || row.querySelector('.seeker-mes-delete')) return;
         const edit = row.querySelector('.mes_edit');
-        const regen = make('seeker-mes-regen', 'fa-arrows-rotate', 'Regenerate');
-        const remove = make('seeker-mes-delete', 'fa-trash-can', 'Delete message');
+        const regen = make('seeker-mes-regen', 'fa-arrows-rotate', 'Regenerate from here');
+        const remove = make('seeker-mes-delete', 'fa-trash-can', 'Delete from here');
         if (edit) edit.before(regen, remove); else row.append(regen, remove);
     };
     const equipAll = () => {
@@ -906,8 +1197,30 @@ for (const id of ['seeker-stage-grain', 'seeker-stage-vignette', 'seeker-stage-o
         const id = Number(mes?.getAttribute('mesid'));
         if (button.classList.contains('seeker-mes-delete')) {
             if (Number.isNaN(id)) return;
-            await context.deleteMessage(id, undefined, context.powerUserSettings.confirm_message_delete);
+            // Deleting a message takes everything after it with it: the chat rewinds to just
+            // before that message, since what followed was a reply to it. Rewinding always
+            // asks; the last message alone follows the "confirm message deletion" setting.
+            const after = context.chat.length - 1 - id;
+            if (after > 0) {
+                const what = after === 1 ? 'the message after it' : `the ${after} messages after it`;
+                const result = await context.callGenericPopup(`Delete this message and ${what}?`, context.POPUP_TYPE.CONFIRM, '', { okButton: 'Delete', cancelButton: 'Cancel' });
+                if (result !== context.POPUP_RESULT.AFFIRMATIVE) return;
+                for (let i = context.chat.length - 1; i >= id; i--) await context.deleteMessage(i, undefined, false);
+            } else {
+                await context.deleteMessage(id, undefined, context.powerUserSettings.confirm_message_delete);
+            }
         } else {
+            // Regenerating an earlier reply rewinds to it first: everything after it was a
+            // response to the old text, so it goes, and then SillyTavern regenerates the
+            // reply as the last message. Rewinding asks; the last message just regenerates.
+            if (Number.isNaN(id)) return;
+            const after = context.chat.length - 1 - id;
+            if (after > 0) {
+                const what = after === 1 ? 'the message after it' : `the ${after} messages after it`;
+                const result = await context.callGenericPopup(`Regenerate this reply? This also deletes ${what}.`, context.POPUP_TYPE.CONFIRM, '', { okButton: 'Regenerate', cancelButton: 'Cancel' });
+                if (result !== context.POPUP_RESULT.AFFIRMATIVE) return;
+                for (let i = context.chat.length - 1; i > id; i--) await context.deleteMessage(i, undefined, false);
+            }
             await context.executeSlashCommandsWithOptions('/regenerate');
         }
     });
@@ -1046,4 +1359,25 @@ for (const [view, closeId] of [['completion_prompt_manager_popup_edit', 'complet
     const holder = document.getElementById('completion_prompt_manager');
     if (holder) new MutationObserver(restore).observe(holder, { childList: true, subtree: true });
     restore();
+}
+
+// New chat: a button beside the menu button, shown while a chat is open. It presses
+// SillyTavern's own "Start new chat" (in the composer's options menu), which asks first and
+// offers to delete the current chat, so a reset is one click away instead of two menus deep.
+{
+    const newChat = document.createElement('div');
+    newChat.id = 'seeker-new-chat';
+    newChat.className = 'fa-solid fa-square-pen interactable';
+    newChat.setAttribute('role', 'button');
+    newChat.setAttribute('tabindex', '0');
+    newChat.setAttribute('title', 'New chat');
+    const start = () => document.getElementById('option_start_new_chat')?.click();
+    newChat.addEventListener('click', start);
+    newChat.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            start();
+        }
+    });
+    document.body.append(newChat);
 }

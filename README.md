@@ -1,6 +1,6 @@
 # seeker
 
-A visual novel theme for SillyTavern: the character's sprite on a stage beside a full-height chat, set in Bodoni and Jost.
+A visual novel theme for SillyTavern: the character's sprite on a stage beside a full-height chat, set in Bodoni and Jost, with DM Mono for code.
 
 ## Install
 
@@ -30,4 +30,4 @@ Requires SillyTavern 1.19 or later.
 
 ## License
 
-Lucide icons are ISC licensed (`LICENSE-lucide`). Bodoni Moda and Jost are under the SIL Open Font License (`fonts/`).
+Lucide icons are ISC licensed (`LICENSE-lucide`). Bodoni Moda, Jost and DM Mono are under the SIL Open Font License (`fonts/`).
