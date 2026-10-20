@@ -164,10 +164,10 @@ pre code { padding: 0 !important; border: none !important; background: none !imp
 /* SillyTavern sets chat prose (and the thinking under it) in 500; Jost reads heavy there. */
 #chat :is(.mes_text, .mes_reasoning) { font-weight: 400; }
 #chat .mes .name_text { font-size: var(--seeker-fs-subsection) !important; color: var(--seeker-text); }
-/* The greeting opens on a drop cap: a large Bodoni initial set into the first lines. (An
+/* The chat opens on a drop cap: a large Bodoni initial set into the first lines. (An
    outline like the stage name's is not drawn on ::first-letter.) The welcome screen's
    assistant message is not a story. */
-body:not(:has(#chat > .welcomePanel)) #chat .mes[mesid="0"]:not([is_user="true"]) .mes_text > p:first-child::first-letter {
+body:not(:has(#chat > .welcomePanel)) #chat .mes[mesid="0"] .mes_text > p:first-child::first-letter {
   float: left;
   margin: 0.085em 0.08em 0 0;
   font-family: var(--seeker-heading-font);
