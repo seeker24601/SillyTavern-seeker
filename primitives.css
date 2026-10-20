@@ -227,7 +227,7 @@ select option:checked { background-color: color-mix(in srgb, white 14%, var(--se
 /* The ring is placed against its own control; the menu button is already fixed. */
 :is(.menu_button.seeker-icon-button, #rightSendForm > #send_but) { position: relative; }
 /* :where keeps this at zero specificity, so the focused and open states below win. */
-:where(.menu_button.seeker-icon-button, #seeker-menu-button, #rightSendForm > #send_but)::after {
+:where(.menu_button.seeker-icon-button, #seeker-menu-button, #seeker-new-chat, #rightSendForm > #send_but)::after {
   content: "";
   position: absolute;
   /* Over the 1px border where there is one; just outside the edge of send, which has none. */
@@ -244,14 +244,14 @@ select option:checked { background-color: color-mix(in srgb, white 14%, var(--se
 }
 
 /* Focused (and the menu button while its menu is open). */
-:is(.menu_button.seeker-icon-button, #seeker-menu-button, #rightSendForm > #send_but):focus-visible { outline: none !important; }
-:is(.menu_button.seeker-icon-button, #seeker-menu-button, #rightSendForm > #send_but):focus-visible::after,
+:is(.menu_button.seeker-icon-button, #seeker-menu-button, #seeker-new-chat, #rightSendForm > #send_but):focus-visible { outline: none !important; }
+:is(.menu_button.seeker-icon-button, #seeker-menu-button, #seeker-new-chat, #rightSendForm > #send_but):focus-visible::after,
 body.seeker-nav-open #seeker-menu-button::after {
   background: conic-gradient(from var(--seeker-sheen-angle), var(--seeker-sheen-stops));
   animation: seeker-sheen 3.2s linear infinite;
 }
 @media (prefers-reduced-motion: reduce) {
-  :is(.menu_button.seeker-icon-button, #seeker-menu-button, #rightSendForm > #send_but)::after { animation: none !important; }
+  :is(.menu_button.seeker-icon-button, #seeker-menu-button, #seeker-new-chat, #rightSendForm > #send_but)::after { animation: none !important; }
 }
 
 /* Small icon-only buttons scattered through the panels. */
