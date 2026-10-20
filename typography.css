@@ -1,49 +1,9 @@
-/* seeker typography: one type scale for the whole interface.
-
-   Headings are Bodoni Moda, weight 600, in five sizes:
-     stage    72-150px the character's name, set vertically on the stage; scales with the screen height
-     display     56px  the SillyTavern name on the welcome stage, in the small-caps cut (Bodoni Moda SC)
-     title       22px  panel headers
-     section     18px  h1-h3 inside panels and dialogs
-     subsection  16px  h4-h5, collapsible section headers, speaker names in the chat
-   Meta (timestamps, message numbers, counters, token counts, versions, authors) is DM Mono
-   at the meta size, faint, with tabular figures. Code is DM Mono too.
-   Everything else is Jost in three sizes:
-     chat        16px  message prose and the composer
-     body        14px  panel text, labels, buttons, inputs, menus
-     small       12.5px descriptions and hints, dimmed
-     (meta       11px  the base the small caps are sized from)
-
-   Line heights follow the role, not the size:
-     display  1.2   titles and section headings (Bodoni at 22 and 18px)
-     heading  1.25  subsections and names
-     ui       1.3   single-line UI: labels, buttons, inputs, menus, tabs, counters
-     hint     1.4   small helper text
-     text     1.5   running text and text areas in panels and dialogs
-     chat     1.55  chat prose: about 60 characters a line in the chat column
+/* seeker typography: one type scale for the whole interface, applied. The sizes, line
+   heights and fonts are in variables.css.
 
    SillyTavern sizes text with a dozen multiples of --mainFontSize; inside panels and
    dialogs these rules pin text to the scale instead. Icons are left alone, since their
    size is their font-size. */
-
-:root {
-  --seeker-fs-display: 56px;
-  --seeker-fs-stage-name: clamp(72px, 11.5vh, 150px); /* the largest; long names go smaller */
-  --seeker-fs-title: 22px;
-  --seeker-fs-section: 18px;
-  --seeker-fs-subsection: 16px;
-  --seeker-fs-chat: 16px;
-  --seeker-fs-body: 14px;
-  --seeker-fs-small: 12.5px;
-  --seeker-fs-meta: 11px;
-
-  --seeker-lh-display: 1.2;
-  --seeker-lh-heading: 1.25;
-  --seeker-lh-ui: 1.3;
-  --seeker-lh-hint: 1.4;
-  --seeker-lh-text: 1.5;
-  --seeker-lh-chat: 1.55;
-}
 
 /* ---------- Families ---------- */
 body,
@@ -153,7 +113,7 @@ pre, pre code { font-size: var(--seeker-fs-small) !important; line-height: 1.55 
 :is(code, kbd, samp):not(pre *) {
   padding: 0.08em 0.38em;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--seeker-radius-xs);
   background: rgba(var(--seeker-ink-rgb), 0.08);
   color: var(--seeker-text);
 }

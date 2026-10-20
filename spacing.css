@@ -1,24 +1,8 @@
-/* seeker spacing: one spacing scale for panels and dialogs.
-
-     4px   inside a control group (icon and label)
-     8px   between related controls (a row of buttons, a field and its hint)
-     12px  between fields
-     16px  between groups, and the gap above a subsection heading
-     24px  modal padding, and the gap above a section heading
-     32px  between dialog content and its buttons
+/* seeker spacing: one spacing scale for panels and dialogs, applied. The scale is in
+   variables.css.
 
    SillyTavern spaces things with 5px gaps and margins almost everywhere, which packs
    panels tight. Inside panels and dialogs these rules move that onto the scale. */
-
-:root {
-  --seeker-space-1: 4px;
-  --seeker-space-2: 8px;
-  --seeker-space-3: 12px;
-  --seeker-space-4: 16px;
-  --seeker-space-5: 24px;
-  --seeker-space-6: 32px;
-  --seeker-modal-pad: var(--seeker-space-5);
-}
 
 /* ---------- Modal padding ---------- */
 .drawer-content,
@@ -58,9 +42,9 @@
   padding: 7px 10px !important;
   margin: var(--seeker-space-1) 0 !important;
 }
-/* Room on the right for a dropdown's chevron. */
+/* Room on the right for a dropdown's chevron. The :is() gives it a class's weight, so it
+   beats the padding above for every select, with or without .text_pole. */
 :where(.drawer-content, .popup, #character_popup) select:is(.text_pole, select) { padding-right: 28px !important; }
-:where(.drawer-content, .popup, #character_popup) select { padding-right: 28px !important; }
 :where(.drawer-content, .popup, #character_popup) .menu_button {
   min-height: 32px;
   padding: 6px 12px !important;
@@ -91,20 +75,9 @@
 /* Lined up with the chat messages below it, which have 18px side padding. */
 .welcomePanel { padding: var(--seeker-space-4) 18px !important; gap: var(--seeker-space-3) !important; }
 .welcomePanel :is(.welcomeHeader, .welcomeHeaderTitle) { gap: var(--seeker-space-3) !important; }
-/* The shortcuts and "Recent Chats" no longer fit on one line in the chat column, so the
-   shortcuts take their own row under the title and the heading sits above its list. */
-.welcomePanel .welcomeHeader { flex-wrap: wrap; }
-.welcomePanel .welcomeShortcuts { order: -1; flex: 1 0 100%; justify-content: flex-start !important; }
-.welcomePanel .recentChatsTitle { flex: 1 0 100%; margin-top: var(--seeker-space-2); }
+.welcomePanel .recentChatsTitle { margin-top: var(--seeker-space-2); }
 :is(.welcomePanel, #seeker-welcome-stage) .welcomeShortcuts,
 #chat .mes[type="welcome_prompt"] .custom-flex-container { gap: var(--seeker-space-2) !important; }
-/* Message HTML renames the prompt's flex-container to custom-flex-container, which nothing
-   styles, so the buttons wrapped as inline text with no space between rows. */
-#chat .mes[type="welcome_prompt"] .custom-flex-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
 :is(.welcomePanel, #seeker-welcome-stage, #chat .mes[type="welcome_prompt"]) .menu_button:not(.recentChat .menu_button) {
   min-height: 32px;
   padding: 6px 12px !important;

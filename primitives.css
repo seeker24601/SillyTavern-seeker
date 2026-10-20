@@ -3,60 +3,6 @@
    --SmartThemeBorderColor, so making that transparent removes them in one place; the
    rules below give each control a fill instead and keep a thin accent ring for focus. */
 
-:root {
-  --seeker-fill: rgba(var(--seeker-ink-rgb), 0.06);
-  --seeker-fill-hover: rgba(var(--seeker-ink-rgb), 0.1);
-  --seeker-fill-strong: rgba(var(--seeker-ink-rgb), 0.14);
-  --seeker-accent-fill: color-mix(in srgb, var(--seeker-accent) 16%, transparent);
-  /* Chosen, active and on: solid white with black text, or a white tint where a solid
-     block would be too loud. The accent is kept for the composer's focus sheen, success
-     notices and underlined chat text. */
-  --seeker-selected: #f2f2f2;
-  --seeker-selected-hover: #ffffff;
-  --seeker-selected-ink: #0b0b0b;
-  --seeker-selected-fill: rgba(var(--seeker-ink-rgb), 0.12);
-  /* SillyTavern's own green for on and connected states (linked presets, active worlds,
-     toggled buttons, the group member speaking). */
-  --active: var(--seeker-text);
-  --seeker-divider: rgba(var(--seeker-ink-rgb), 0.08);
-  --seeker-focus: 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.55);
-  --seeker-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
-  --seeker-surface-solid: #0e0e0e;
-  --seeker-surface-raised: #0b0b0b; /* the composer */
-  /* Rounding: panels and dialogs, menus and dropdowns, and the rows inside menus. */
-  --seeker-modal-radius: 24px;
-  --seeker-menu-radius: 16px;
-  --seeker-menu-item-radius: 10px;
-  /* The glass edge of panels, dialogs and menus: light at the top left, like the round
-     controls' rims. Drawn as the border itself (see below), so it stays one device pixel. */
-  --seeker-glass-edge-panel: linear-gradient(150deg,
-    rgba(var(--seeker-ink-rgb), 0.3), rgba(var(--seeker-ink-rgb), 0.08) 30%,
-    rgba(var(--seeker-ink-rgb), 0.05) 65%, rgba(var(--seeker-ink-rgb), 0.15));
-  /* Panels and dialogs sit over the dark chat column at their top right and the lighter
-     stage at their bottom left, so their edge is brightest at the top right and fades
-     towards the bottom left. */
-  --seeker-glass-edge-modal: linear-gradient(to top right,
-    rgba(var(--seeker-ink-rgb), 0.05), rgba(var(--seeker-ink-rgb), 0.08) 40%,
-    rgba(var(--seeker-ink-rgb), 0.18) 75%, rgba(var(--seeker-ink-rgb), 0.42));
-  /* One large size for every panel and every large dialog. */
-  --seeker-modal-width: min(1000px, calc(100vw - 64px));
-  --seeker-modal-height: min(86dvh, 920px);
-  /* Wide dialogs that are not also large: mostly a line of text and an input. */
-  --seeker-dialog-wide-width: min(720px, calc(100vw - 32px));
-  /* Behind every panel and dialog: the screen dimmed and softly blurred, fading in and
-     out. The fade is the theme's own, so it runs even with SillyTavern's Reduced Motion
-     on: a dissolve, not movement. */
-  --seeker-backdrop-dim: rgba(0, 0, 0, 0.45);
-  --seeker-backdrop-blur: blur(8px);
-  --seeker-backdrop-fade: 240ms;
-
-  /* SillyTavern sets these inline from the UI theme; !important wins over that. */
-  --SmartThemeBorderColor: transparent !important;
-  --SmartThemeCheckboxTickColor: var(--seeker-selected-ink) !important;
-  --interactable-outline-color: rgba(var(--seeker-ink-rgb), 0.6) !important;
-  --interactable-outline-color-faint: rgba(var(--seeker-ink-rgb), 0.25) !important;
-}
-
 /* ---------- Text inputs and dropdowns ---------- */
 .text_pole,
 select,
@@ -66,7 +12,7 @@ select,
   background-color: var(--seeker-fill) !important;
   color: var(--seeker-text) !important;
   border-color: transparent !important;
-  border-radius: var(--seeker-radius) !important;
+  border-radius: var(--seeker-radius-xs) !important;
   box-shadow: none !important;
   transition: background-color 120ms, box-shadow 120ms;
 }
@@ -151,7 +97,7 @@ select option:checked { background-color: color-mix(in srgb, white 14%, var(--se
   background-color: var(--seeker-fill) !important;
   color: var(--seeker-text-dim);
   border-color: transparent !important;
-  border-radius: var(--seeker-radius) !important;
+  border-radius: var(--seeker-radius-xs) !important;
   box-shadow: none !important;
   filter: none !important;
   padding: 5px 9px;
@@ -201,18 +147,6 @@ select option:checked { background-color: color-mix(in srgb, white 14%, var(--se
    holds the icon) and cut to a ring with a mask, so it follows the rounding. Focused, the
    ring brightens and a sheen runs round it. The composer gets the same edge as a real
    border: style.css. */
-:root {
-  /* The sheen: a bright band and an accent one, opposite each other. The idle stops are the
-     same bands, dimmed and without the accent, for an edge that rests in the sheen's shape. */
-  --seeker-sheen-stops:
-    rgba(var(--seeker-ink-rgb), 0.4), color-mix(in srgb, var(--seeker-accent-bright) 95%, transparent) 10%, rgba(var(--seeker-ink-rgb), 0.4) 22%,
-    rgba(var(--seeker-ink-rgb), 0.55) 50%, rgba(var(--seeker-ink-rgb), 0.95) 60%, rgba(var(--seeker-ink-rgb), 0.4) 72%,
-    rgba(var(--seeker-ink-rgb), 0.4);
-  --seeker-sheen-idle-stops:
-    rgba(var(--seeker-ink-rgb), 0.08), rgba(var(--seeker-ink-rgb), 0.2) 10%, rgba(var(--seeker-ink-rgb), 0.08) 22%,
-    rgba(var(--seeker-ink-rgb), 0.1) 50%, rgba(var(--seeker-ink-rgb), 0.38) 60%, rgba(var(--seeker-ink-rgb), 0.08) 72%,
-    rgba(var(--seeker-ink-rgb), 0.08);
-}
 @property --seeker-sheen-angle {
   syntax: "<angle>";
   inherits: false;
@@ -265,7 +199,7 @@ body.seeker-nav-open #seeker-menu-button::after {
 input[type='checkbox'] {
   outline: none !important;
   border: none !important;
-  border-radius: 3px !important;
+  border-radius: var(--seeker-radius-xs) !important;
   background-color: var(--seeker-fill-strong) !important;
   box-shadow: none !important;
   filter: none !important;
@@ -279,14 +213,14 @@ input[type='checkbox']:focus-visible { box-shadow: var(--seeker-focus) !importan
 /* A plain track; SillyTavern's own fill is a fixed 70% that does not follow the value. */
 body .neo-range-slider {
   height: 4px !important;
-  border-radius: 2px !important;
+  border-radius: var(--seeker-radius-pill) !important;
   background: var(--seeker-fill-strong) !important;
   box-shadow: none !important;
   filter: none !important;
 }
 body .neo-range-slider:hover,
 body input[type='range']:hover { filter: none !important; }
-body .neo-range-input { border-radius: var(--seeker-radius) !important; margin-top: 6px; }
+body .neo-range-input { border-radius: var(--seeker-radius-xs) !important; margin-top: 6px; }
 input[type='range']::-webkit-slider-thumb {
   width: 14px !important;
   height: 14px !important;
@@ -317,7 +251,7 @@ input[type='range']::-moz-range-thumb {
   background-image: none !important;
   background-color: var(--seeker-fill) !important;
   border-color: transparent !important;
-  border-radius: var(--seeker-radius) !important;
+  border-radius: var(--seeker-radius-xs) !important;
 }
 .standoutHeader.inline-drawer-header:hover,
 #extensions_settings .inline-drawer-toggle.inline-drawer-header:hover,
@@ -462,7 +396,7 @@ body.no-blur { --seeker-backdrop-dim: rgba(0, 0, 0, 0.55); --seeker-backdrop-blu
   background-color: rgba(var(--seeker-ink-rgb), 0.16) !important;
   background-clip: padding-box !important;
   border: 3px solid transparent !important;
-  border-radius: 999px !important;
+  border-radius: var(--seeker-radius-pill) !important;
   box-shadow: none !important;
 }
 ::-webkit-scrollbar-thumb:vertical { min-height: 40px; }

@@ -1,0 +1,194 @@
+/* seeker variables: every value the theme is built from, in one place.
+
+   To change one, copy it into User settings > Custom CSS inside a :root { } block. That
+   survives updates, which replace this file, and it wins because these values sit in
+   :where(:root), which carries no weight. Two colours are also in User settings > Theme
+   Colors: Underlined Text sets the accent, and Main Text, Italics Text and Quote Text set
+   the chat's narration, actions and dialogue.
+
+   The second block sets SillyTavern's own variables, and changing those changes SillyTavern
+   too. */
+
+:where(:root) {
+  /* ---------- Colour ----------
+     Everything is neutral grey except the accent, which is the Underlined Text colour in
+     User settings > Theme Colors. Fills, rings, the sheen and selected states mix from it. */
+  --seeker-accent: var(--SmartThemeUnderlineColor, #10b981);
+  --seeker-accent-bright: color-mix(in srgb, var(--seeker-accent) 70%, white);
+  --seeker-accent-ink: #0b0b0b; /* text and icons on the accent */
+
+  /* Text, as R, G, B so lines and fills can mix it at any strength. */
+  --seeker-ink-rgb: 237, 237, 237;
+  --seeker-text: rgb(var(--seeker-ink-rgb));
+  --seeker-text-dim: rgba(var(--seeker-ink-rgb), 0.64);
+  --seeker-text-faint: rgba(var(--seeker-ink-rgb), 0.38);
+  --seeker-divider: rgba(var(--seeker-ink-rgb), 0.08);
+
+  /* Surfaces. The chat column is the panel colour; panels, menus and dialogs are solid. */
+  --seeker-panel-rgb: 7, 7, 7;
+  --seeker-panel-alpha: 0.86; /* the chat over the sprite on phones */
+  --seeker-surface: rgba(var(--seeker-panel-rgb), 0.94); /* the round buttons in the corner */
+  --seeker-surface-solid: #0e0e0e; /* panels, menus, dialogs, dropdowns */
+  --seeker-surface-raised: #0b0b0b; /* the composer */
+
+  /* Controls are shaped by fills, not borders. */
+  --seeker-fill: rgba(var(--seeker-ink-rgb), 0.06);
+  --seeker-fill-hover: rgba(var(--seeker-ink-rgb), 0.1);
+  --seeker-fill-strong: rgba(var(--seeker-ink-rgb), 0.14);
+
+  /* Chosen, active and on: solid white with black text, or a white tint where a solid
+     block would be too loud. The accent is kept for the composer's focus sheen, success
+     notices and underlined chat text. */
+  --seeker-selected: #f2f2f2;
+  --seeker-selected-hover: #ffffff;
+  --seeker-selected-ink: #0b0b0b;
+  --seeker-selected-fill: rgba(var(--seeker-ink-rgb), 0.12);
+  --seeker-focus: 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.55); /* a box-shadow ring */
+
+  /* Notices and destructive actions. */
+  --seeker-error: rgb(232, 118, 108);
+  --seeker-warning: rgb(226, 176, 92);
+  --seeker-destructive: #e5484d; /* delete, on hover */
+
+  /* ---------- Type ----------
+     Headings are Bodoni Moda, weight 600. Meta (timestamps, message numbers, counters,
+     token counts, versions, authors) and code are DM Mono, faint, with tabular figures.
+     Everything else is Jost. */
+  --seeker-heading-font: "Bodoni Moda", "Bodoni 72", "Bodoni MT", Didot, serif;
+  --seeker-display-font: "Bodoni Moda SC", var(--seeker-heading-font); /* small caps */
+  --seeker-mono-font: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Sizes. */
+  --seeker-fs-stage-name: clamp(72px, 11.5vh, 150px); /* the character's name on the stage; long names go smaller */
+  --seeker-fs-display: 56px;    /* the SillyTavern name on the welcome stage, in small caps */
+  --seeker-fs-title: 22px;      /* panel headers */
+  --seeker-fs-section: 18px;    /* h1-h3 inside panels and dialogs */
+  --seeker-fs-subsection: 16px; /* h4-h5, collapsible section headers, speaker names */
+  --seeker-fs-chat: 16px;       /* message prose and the composer */
+  --seeker-fs-body: 14px;       /* panel text, labels, buttons, inputs, menus */
+  --seeker-fs-small: 12.5px;    /* descriptions and hints, dimmed */
+  --seeker-fs-meta: 11px;       /* the base the small caps are sized from */
+
+  /* Line heights follow the role, not the size. */
+  --seeker-lh-display: 1.2;  /* titles and section headings */
+  --seeker-lh-heading: 1.25; /* subsections and names */
+  --seeker-lh-ui: 1.3;       /* single-line UI: labels, buttons, inputs, menus, tabs, counters */
+  --seeker-lh-hint: 1.4;     /* small helper text */
+  --seeker-lh-text: 1.5;     /* running text and text areas in panels and dialogs */
+  --seeker-lh-chat: 1.55;    /* chat prose: about 60 characters a line in the chat column */
+
+  /* ---------- Spacing ---------- */
+  --seeker-space-1: 4px;  /* inside a control group (icon and label) */
+  --seeker-space-2: 8px;  /* between related controls (a row of buttons, a field and its hint) */
+  --seeker-space-3: 12px; /* between fields */
+  --seeker-space-4: 16px; /* between groups, and above a subsection heading */
+  --seeker-space-5: 24px; /* modal padding, and above a section heading */
+  --seeker-space-6: 32px; /* between dialog content and its buttons */
+  --seeker-modal-pad: var(--seeker-space-5);
+
+  /* ---------- Rounding ---------- */
+  --seeker-radius-xs: 4px;     /* inputs, buttons, checkboxes, small tiles */
+  --seeker-radius-sm: 10px;    /* menu rows, tooltips, chat portraits, small square buttons */
+  --seeker-radius-md: 12px;    /* list rows, collapsible headers, text editors */
+  --seeker-radius-lg: 14px;    /* cards: characters, backgrounds, the editor's portrait */
+  --seeker-radius-xl: 18px;    /* the enlarged portrait */
+  --seeker-radius-pill: 999px; /* pills and fully rounded ends */
+  --seeker-menu-radius: 16px;  /* menus, dropdowns, notifications */
+  --seeker-modal-radius: 24px; /* panels and dialogs */
+  --seeker-menu-item-radius: var(--seeker-radius-sm);
+
+  /* ---------- Shadows and glass ---------- */
+  --seeker-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  /* The glass edge of panels, dialogs and menus: light at the top left, like the round
+     controls' rims. Drawn as the border itself, so it stays one device pixel. */
+  --seeker-glass-edge-panel: linear-gradient(150deg,
+    rgba(var(--seeker-ink-rgb), 0.3), rgba(var(--seeker-ink-rgb), 0.08) 30%,
+    rgba(var(--seeker-ink-rgb), 0.05) 65%, rgba(var(--seeker-ink-rgb), 0.15));
+  /* Panels and dialogs sit over the dark chat column at their top right and the lighter
+     stage at their bottom left, so their edge is brightest at the top right. */
+  --seeker-glass-edge-modal: linear-gradient(to top right,
+    rgba(var(--seeker-ink-rgb), 0.05), rgba(var(--seeker-ink-rgb), 0.08) 40%,
+    rgba(var(--seeker-ink-rgb), 0.18) 75%, rgba(var(--seeker-ink-rgb), 0.42));
+  /* The sheen that runs round a focused round control or the composer: a bright band and an
+     accent one, opposite each other. The idle stops are the same bands, dimmed and without
+     the accent, for an edge that rests in the sheen's shape. */
+  --seeker-sheen-stops:
+    rgba(var(--seeker-ink-rgb), 0.4), color-mix(in srgb, var(--seeker-accent-bright) 95%, transparent) 10%, rgba(var(--seeker-ink-rgb), 0.4) 22%,
+    rgba(var(--seeker-ink-rgb), 0.55) 50%, rgba(var(--seeker-ink-rgb), 0.95) 60%, rgba(var(--seeker-ink-rgb), 0.4) 72%,
+    rgba(var(--seeker-ink-rgb), 0.4);
+  --seeker-sheen-idle-stops:
+    rgba(var(--seeker-ink-rgb), 0.08), rgba(var(--seeker-ink-rgb), 0.2) 10%, rgba(var(--seeker-ink-rgb), 0.08) 22%,
+    rgba(var(--seeker-ink-rgb), 0.1) 50%, rgba(var(--seeker-ink-rgb), 0.38) 60%, rgba(var(--seeker-ink-rgb), 0.08) 72%,
+    rgba(var(--seeker-ink-rgb), 0.08);
+
+  /* Behind every panel and dialog: the screen dimmed and softly blurred, fading in and out.
+     The fade is the theme's own, so it runs even with SillyTavern's Reduced Motion on: a
+     dissolve, not movement. */
+  --seeker-backdrop-dim: rgba(0, 0, 0, 0.45);
+  --seeker-backdrop-blur: blur(8px);
+  --seeker-backdrop-fade: 240ms;
+
+  /* ---------- Layers ----------
+     SillyTavern's own panels sit in the 3000s. The theme's menu and panels go above them,
+     and the backdrop between the two. */
+  --seeker-z-backdrop: 3990;          /* the dim and blur behind panels */
+  --seeker-z-menu: 4009;              /* the menu's list, and the panels it opens */
+  --seeker-z-menu-button: 4010;       /* the menu and new chat buttons */
+  --seeker-z-over-panel: 4011;        /* panels opened from inside a panel */
+  --seeker-z-portrait-backdrop: 4019; /* the dim behind an enlarged portrait */
+  --seeker-z-portrait: 4020;          /* the enlarged portrait */
+  --seeker-z-tooltip: 1000000;        /* over everything */
+
+  /* ---------- Layout ---------- */
+  --seeker-chat-width: clamp(440px, 40vw, 760px); /* the chat column beside the stage, on desktop */
+  --seeker-portrait-width: 56px; /* the portrait beside each message (2:3) */
+  --seeker-menu-top: 10px;
+  --seeker-menu-size: 36px;
+  --seeker-below-menu: calc(var(--seeker-menu-top) + var(--seeker-menu-size) + 8px);
+  /* One large size for every panel and every large dialog. */
+  --seeker-modal-width: min(1000px, calc(100vw - 64px));
+  --seeker-modal-height: min(86dvh, 920px);
+  /* Wide dialogs that are not also large: mostly a line of text and an input. */
+  --seeker-dialog-wide-width: min(720px, calc(100vw - 32px));
+
+  /* ---------- Stage ---------- */
+  /* The background is drawn this much larger than the stage, and drifts up to
+     --seeker-bg-shift towards the pointer; the shift must stay under (zoom - 1) / 2. */
+  --seeker-bg-zoom: 1.08;
+  --seeker-bg-shift: 3.5%;
+  /* How far halftone.webp hangs past the stage's edge: the last 23% of its width, which
+     is almost but not quite solid. The image is 482 x 1125 and spans the stage's height. */
+  --seeker-halftone-shift: calc(100vh * 482 / 1125 * 0.23);
+  --seeker-ornament-size: clamp(220px, 30vh, 320px); /* scales a little with the screen */
+  --seeker-sprite-fade: 550ms; /* one expression dissolving into the next (index.js reads it) */
+
+  /* ---------- Phones: the chat over the sprite ---------- */
+  --seeker-fade: 300px; /* the panel's eased top edge, from clear to --seeker-panel-alpha */
+  --seeker-chat-reach: 140px; /* how far the chat reaches up into that edge */
+  --seeker-text-fade: 200px; /* the text fades out over this from the chat's top */
+  --seeker-fade-stops:
+    rgba(var(--seeker-panel-rgb), calc(var(--seeker-panel-alpha) * 0)) calc(var(--seeker-fade) * 0),
+    rgba(var(--seeker-panel-rgb), calc(var(--seeker-panel-alpha) * 0.02)) calc(var(--seeker-fade) * 0.12),
+    rgba(var(--seeker-panel-rgb), calc(var(--seeker-panel-alpha) * 0.07)) calc(var(--seeker-fade) * 0.24),
+    rgba(var(--seeker-panel-rgb), calc(var(--seeker-panel-alpha) * 0.16)) calc(var(--seeker-fade) * 0.36),
+    rgba(var(--seeker-panel-rgb), calc(var(--seeker-panel-alpha) * 0.29)) calc(var(--seeker-fade) * 0.47),
+    rgba(var(--seeker-panel-rgb), calc(var(--seeker-panel-alpha) * 0.44)) calc(var(--seeker-fade) * 0.57),
+    rgba(var(--seeker-panel-rgb), calc(var(--seeker-panel-alpha) * 0.59)) calc(var(--seeker-fade) * 0.66),
+    rgba(var(--seeker-panel-rgb), calc(var(--seeker-panel-alpha) * 0.73)) calc(var(--seeker-fade) * 0.75),
+    rgba(var(--seeker-panel-rgb), calc(var(--seeker-panel-alpha) * 0.85)) calc(var(--seeker-fade) * 0.83),
+    rgba(var(--seeker-panel-rgb), calc(var(--seeker-panel-alpha) * 0.94)) calc(var(--seeker-fade) * 0.91),
+    rgba(var(--seeker-panel-rgb), var(--seeker-panel-alpha)) var(--seeker-fade);
+}
+
+/* ---------- SillyTavern's variables ----------
+   SillyTavern sets some of these inline from the UI theme; !important wins over that. */
+:root {
+  --mainFontFamily: "Jost", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --monoFontFamily: var(--seeker-mono-font); /* its code blocks and monospace text */
+  --topBarBlockSize: 0px !important; /* it places the chat and panels under its top bar, which is gone */
+  --SmartThemeBorderColor: transparent !important; /* nearly all its borders: controls get fills instead */
+  --SmartThemeCheckboxTickColor: var(--seeker-selected-ink) !important;
+  --active: var(--seeker-text); /* its green for on and connected states */
+  --interactable-outline-color: rgba(var(--seeker-ink-rgb), 0.6) !important;
+  --interactable-outline-color-faint: rgba(var(--seeker-ink-rgb), 0.25) !important;
+}
