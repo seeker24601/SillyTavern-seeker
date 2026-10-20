@@ -1,0 +1,475 @@
+/* seeker: the Characters panel. A toolbar of search, filters, sort and New, and the
+   characters as cards that turn over to show their details. index.js builds the toolbar's
+   buttons and panels around SillyTavern's own. */
+
+/* The HotSwap hint sits at the start of its row, after the list button. */
+#HotSwapWrapper { margin: 0 !important; justify-content: flex-start !important; }
+#HotSwapWrapper .hotswap { justify-content: flex-start !important; margin: 0 !important; }
+/* Its first column has nothing visible and would otherwise push the row in by a gap. */
+#CharListButtonAndHotSwaps { gap: 0 !important; }
+#HotSwapWrapper small { color: var(--seeker-text-faint); font-size: var(--seeker-fs-small) !important; }
+/* The toolbar, as in most apps: search, a Filters button (its panel lists the filters
+   with labels and the tags), the sort order, and a New button whose menu holds the create
+   and import actions. index.js builds the buttons and panels around SillyTavern's own. */
+#charListFixedTop {
+  display: flex !important;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--seeker-space-2);
+  padding: 0 0 var(--seeker-space-3) !important;
+}
+#form_character_search_form { order: 0; flex: 1 1 auto; min-width: 0; display: block !important; margin: 0 !important; }
+#character_search_bar {
+  width: 100% !important;
+  margin: 0 !important;
+  padding-left: 34px !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='rgba(237,237,237,0.5)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: 11px center !important;
+  background-size: 15px 15px !important;
+}
+#rm_button_search { display: none !important; }
+#rm_button_bar { order: 1; flex: none; display: flex; flex-wrap: nowrap; align-items: center; gap: var(--seeker-space-2) !important; margin: 0 !important; padding: 0 !important; }
+#character_sort_order { flex: none !important; width: 130px !important; margin: 0 !important; }
+
+/* Toolbar buttons: a label with an icon, the height of the search field. */
+.seeker-toolbar-button {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: var(--seeker-radius-xs);
+  background: var(--seeker-fill);
+  color: var(--seeker-text-dim);
+  font: 500 var(--seeker-fs-body) / 1 var(--mainFontFamily);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms;
+}
+.seeker-toolbar-button svg { width: 15px; height: 15px; flex: none; }
+.seeker-toolbar-button:hover,
+.seeker-toolbar-button[aria-expanded="true"] { background: var(--seeker-fill-hover); color: var(--seeker-text); }
+.seeker-toolbar-button:focus-visible { box-shadow: var(--seeker-focus); }
+.seeker-filters-button.active { color: var(--seeker-text); }
+.seeker-count {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  border-radius: var(--seeker-radius-pill);
+  background: var(--seeker-selected);
+  color: var(--seeker-selected-ink);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  text-align: center;
+}
+.seeker-count[hidden] { display: none; }
+.seeker-new-button { background: var(--seeker-selected); color: var(--seeker-selected-ink); }
+.seeker-new-button:hover,
+.seeker-new-button[aria-expanded="true"] { background: var(--seeker-selected-hover); color: var(--seeker-selected-ink); }
+
+/* Panels under the buttons. */
+.seeker-popover-anchor { position: relative; }
+.seeker-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 50;
+  min-width: 220px;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--seeker-menu-radius);
+  background:
+    linear-gradient(var(--seeker-surface-solid), var(--seeker-surface-solid)) padding-box,
+    var(--seeker-glass-edge-panel) border-box;
+  box-shadow: var(--seeker-shadow);
+}
+.seeker-popover[hidden] { display: none !important; }
+.seeker-popover-title {
+  padding: 6px 10px 4px;
+  color: var(--seeker-text-faint);
+  font-size: var(--seeker-fs-meta) !important;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* New menu: the create and import actions as labelled rows. */
+.seeker-new-panel { display: flex; flex-direction: column; gap: 2px; }
+.seeker-new-panel #rm_buttons_container { display: contents; }
+.seeker-new-panel > .menu_button {
+  display: flex !important;
+  align-items: center;
+  justify-content: flex-start !important;
+  gap: 10px;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: auto !important; /* SillyTavern makes this bar's buttons square */
+  margin: 0 !important;
+  padding: 9px 10px !important;
+  border-radius: var(--seeker-menu-item-radius) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--seeker-text-dim) !important;
+  font-size: 15px !important;
+  line-height: 1 !important;
+}
+.seeker-new-panel > .menu_button:hover { background: var(--seeker-fill-hover) !important; color: var(--seeker-text) !important; }
+/* The label, after the icon. These buttons are icon-only, so their ::after is the glass
+   ring; here it becomes text instead. */
+.seeker-new-panel > .menu_button::after {
+  position: static !important;
+  inset: auto !important;
+  padding: 0 !important;
+  background: none !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  font: 500 var(--seeker-fs-body) / 1.3 var(--mainFontFamily);
+  white-space: nowrap;
+}
+#rm_button_create::after { content: "New character" !important; }
+#character_import_button::after { content: "Import from file" !important; }
+#external_import_button::after { content: "Import from URL" !important; }
+#rm_button_group_chats::after { content: "New group" !important; }
+
+/* Filters panel: Favorites, Groups and Folders as rows that cycle Only, Hidden and off; then
+   the tags; then Manage tags and Clear filters along the bottom. */
+.seeker-filters-panel { width: 280px; }
+.seeker-filters-panel .rm_tag_controls { margin: 0 !important; }
+.seeker-filters-panel .rm_tag_filter { display: flex !important; flex-wrap: wrap; align-items: center; gap: 2px 4px !important; margin: 0 !important; }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable {
+  display: flex !important;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: 10px;
+  width: auto !important;
+  height: auto !important;
+  aspect-ratio: auto !important;
+  opacity: 1 !important;
+  margin: 0 !important;
+  padding: 8px 10px !important;
+  border: none !important;
+  border-radius: var(--seeker-menu-item-radius) !important;
+  background: transparent !important;
+  color: var(--seeker-text-dim) !important;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms;
+}
+.seeker-filters-panel .rm_tag_filter > .tag.actionable:hover { background: var(--seeker-fill-hover) !important; color: var(--seeker-text) !important; }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable .tag_name { order: 0; }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable::after { order: 1; flex: 1; font: 500 var(--seeker-fs-body) / 1.3 var(--mainFontFamily); }
+.seeker-filters-panel .filterByFavorites::after { content: "Favorites"; }
+.seeker-filters-panel .filterByGroups::after { content: "Groups"; }
+.seeker-filters-panel .filterByFolder::after { content: "Folders"; }
+.seeker-filters-panel .manageTags::after { content: "Manage tags"; }
+.seeker-filters-panel .clearAllFilters::after { content: "Clear filters"; }
+/* The state, on the right: Only or Hidden. */
+.seeker-filters-panel .rm_tag_filter > .tag.actionable::before {
+  order: 2;
+  padding: 2px 8px;
+  border-radius: var(--seeker-radius-pill);
+  font: 600 var(--seeker-fs-meta) / 1.4 var(--mainFontFamily);
+}
+.seeker-filters-panel .rm_tag_filter > .tag.actionable[data-toggle-state="SELECTED"] { color: var(--seeker-text) !important; }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable[data-toggle-state="SELECTED"]::before { content: "Only"; background: var(--seeker-selected); color: var(--seeker-selected-ink); }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable[data-toggle-state="EXCLUDED"] { color: var(--seeker-text) !important; }
+.seeker-filters-panel .rm_tag_filter > .tag.actionable[data-toggle-state="EXCLUDED"]::before { content: "Hidden"; background: rgba(220, 60, 60, 0.35); color: var(--seeker-text); }
+/* Tags: pills after the rows, under a rule. */
+.seeker-filters-panel .rm_tag_filter > .tag:not(.actionable) { order: 10; margin: 0 !important; border-radius: var(--seeker-radius-pill) !important; }
+.seeker-filters-panel .rm_tag_filter:has(> .tag:not(.actionable))::after { content: ""; order: 9; flex: 1 1 100%; height: 1px; margin: 4px 0 6px; background: var(--seeker-divider); }
+/* The bottom row. */
+.seeker-filters-panel .rm_tag_filter > .showTagList { order: 5; }
+.seeker-filters-panel .rm_tag_filter > :is(.manageTags, .clearAllFilters) { order: 20; flex: 1 1 40% !important; margin-top: 6px !important; }
+.seeker-filters-panel .rm_tag_filter > :is(.manageTags, .clearAllFilters)::after { font-size: 13px; }
+.seeker-filters-panel .showTagList::after { content: "Show tags"; }
+/* Show tags is a switch: on, the tags appear below (and, with Tags as Folders, in the list). */
+.seeker-filters-panel .rm_tag_filter > .showTagList.selected::before { content: "On"; background: var(--seeker-selected-fill); color: var(--seeker-text); }
+.seeker-filters-panel .rm_tag_bogus_drilldown:empty { display: none; }
+/* Pages and the grid and bulk-edit buttons at the start of their row. */
+#rm_print_characters_pagination { justify-content: flex-start !important; gap: var(--seeker-space-2) !important; margin: var(--seeker-space-2) 0 !important; }
+/* Characters as cards: the portrait on top, the name, a two-line description and tags
+   below, as many to a row as fit. SillyTavern's own grid view (its grid button) keeps its
+   compact layout. Groups and folders are cards too. */
+body:not(.charListGrid) #rm_print_characters_block {
+  display: grid !important;
+  /* Equal columns: long names are cut short, never widening a card. */
+  grid-template-columns: repeat(auto-fill, minmax(min(var(--seeker-card-width), 100%), 1fr));
+  gap: 14px !important;
+  align-content: start;
+  /* Rows as tall as their cards: the list has a fixed height, and the grid would otherwise
+     squeeze the rows to fit it instead of scrolling. */
+  grid-auto-rows: max-content;
+  --seeker-card-width: 210px;
+}
+body:not(.charListGrid) #rm_print_characters_block .entity_block {
+  position: relative;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+  width: auto !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: none !important;
+  border-radius: var(--seeker-radius-lg) !important;
+  background: var(--seeker-fill) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.06);
+  transition: background-color 150ms, transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 220ms;
+}
+body:not(.charListGrid) #rm_print_characters_block .entity_block:hover {
+  background: var(--seeker-fill-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.14), 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+body:not(.charListGrid) #rm_print_characters_block .entity_block > .avatar {
+  flex: none !important;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 2 / 3;
+  margin: 0 !important;
+  overflow: hidden;
+}
+body:not(.charListGrid) #rm_print_characters_block .entity_block > .avatar img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  object-position: center top;
+  border: none !important;
+  border-radius: 0 !important;
+  transition: transform 500ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+body:not(.charListGrid) #rm_print_characters_block .entity_block:hover > .avatar img { transform: scale(1.04); }
+body:not(.charListGrid) #rm_print_characters_block .entity_block > :is(.character_select_container, .group_select_container) {
+  width: auto !important;
+  min-width: 0;
+  max-width: 100% !important;
+  overflow: hidden;
+  padding: 10px 12px 12px !important;
+  gap: 4px !important;
+  flex-direction: column;
+  flex-wrap: nowrap !important;
+}
+body:not(.charListGrid) #rm_print_characters_block .character_name_block {
+  display: flex;
+  align-items: baseline;
+  gap: var(--seeker-space-2);
+  flex: none !important;
+  min-width: 0;
+  width: 100% !important;
+}
+body:not(.charListGrid) #rm_print_characters_block .ch_name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+body:not(.charListGrid) #rm_print_characters_block .character_version { flex: none; margin-left: auto; color: var(--seeker-text-faint); font-size: var(--seeker-fs-meta) !important; }
+body:not(.charListGrid) #rm_print_characters_block .ch_description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  height: auto !important;
+  max-height: none !important;
+  flex: none !important;
+  margin: 0 !important;
+  white-space: normal !important;
+  font-size: var(--seeker-fs-small) !important;
+  line-height: var(--seeker-lh-hint) !important;
+  color: var(--seeker-text-dim);
+}
+body:not(.charListGrid) #rm_print_characters_block .tags_inline { flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+/* A favourite's star, on the portrait. */
+body:not(.charListGrid) #rm_print_characters_block .ch_fav_icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.7));
+}
+/* Character and group cards turn over. The front is the portrait with the name set across
+   its foot (index.js adds the name); the back holds the name, the whole description and the
+   tags. Hovering, or focusing the card from the keyboard, flips it. Each face turns on its
+   own and hides its back, so the card needs no shared 3D space and its rounded clip holds.
+   Tag folders keep the plain card above. */
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) {
+  aspect-ratio: 2 / 3;
+  overflow: visible;
+  background: transparent !important;
+  box-shadow: none;
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):hover {
+  background: transparent !important;
+  transform: none;
+  box-shadow: none;
+}
+/* Room for the turn: mid-flip the near edge of a card swells past its box (perspective), so
+   the list keeps a margin inside its scroll edge, and the card being turned rises above its
+   neighbours. */
+body:not(.charListGrid) #rm_print_characters_block { padding: 18px 10px !important; }
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):is(:hover, :focus-visible, :has(:focus-visible), .seeker-flipped) { z-index: 3; }
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) > :is(.avatar, .character_select_container, .group_select_container) {
+  position: absolute !important;
+  inset: 0;
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  aspect-ratio: auto;
+  overflow: hidden;
+  border-radius: var(--seeker-radius-lg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.08);
+  transition: transform 640ms cubic-bezier(0.3, 0.7, 0.2, 1), box-shadow 300ms;
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) > .avatar {
+  transform: perspective(1800px) rotateY(0deg);
+  background: var(--seeker-surface-solid);
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) > :is(.character_select_container, .group_select_container) {
+  transform: perspective(1800px) rotateY(180deg);
+  justify-content: flex-start;
+  padding: 16px 14px 14px !important;
+  gap: 8px !important;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  background:
+    linear-gradient(180deg, rgba(var(--seeker-ink-rgb), 0.07), rgba(var(--seeker-ink-rgb), 0.02) 40%),
+    var(--seeker-surface-solid);
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):is(:hover, :focus-visible, :has(:focus-visible), .seeker-flipped) > .avatar {
+  transform: perspective(1800px) rotateY(-180deg);
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):is(:hover, :focus-visible, :has(:focus-visible), .seeker-flipped) > :is(.character_select_container, .group_select_container) {
+  transform: perspective(1800px) rotateY(0deg);
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.16), 0 14px 30px rgba(0, 0, 0, 0.45);
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):hover > .avatar img { transform: none; }
+/* Front: the name over a dark fade at the foot of the portrait, and a favourite's star. */
+#rm_print_characters_block .seeker-card-name { display: none; }
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-name {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 52px 14px 12px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.55) 45%, rgba(0, 0, 0, 0.82));
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.seeker-card-title, .seeker-card-byline) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-title {
+  font-family: var(--seeker-heading-font);
+  font-size: var(--seeker-fs-title);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-byline {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: var(--seeker-fs-meta);
+  line-height: 1.3;
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select).is_fav > .avatar::before {
+  content: "\f005";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  font: var(--fa-font-solid);
+  color: gold;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.7));
+}
+/* Back: the name as a heading, then the description in full, scrolling if it runs long. */
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) .ch_name {
+  font-family: var(--seeker-heading-font);
+  font-size: var(--seeker-fs-section) !important;
+  white-space: normal;
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) .ch_description {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+  overflow: visible;
+  font-size: var(--seeker-fs-small) !important;
+  line-height: 1.5 !important;
+  color: var(--seeker-text-dim);
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) :is(.ch_fav_icon, .group_fav_icon) { display: none !important; }
+/* Version and author on their own line under the name (index.js); the version beside the
+   name is SillyTavern's and gives way to it. */
+body:not(.charListGrid) #rm_print_characters_block .character_select:has(.seeker-card-meta) .character_name_block .character_version { display: none !important; }
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-meta {
+  flex: none; /* the back scrolls; without this a long description squeezes the line to nothing */
+  margin-top: -4px;
+  color: var(--seeker-text-faint);
+  font-size: var(--seeker-fs-meta);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#rm_print_characters_block .seeker-card-meta { display: none; }
+/* Chat and Edit at the foot of the back, held there while the description scrolls. */
+#rm_print_characters_block .seeker-card-actions { display: none; }
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  position: sticky;
+  bottom: -14px;
+  margin: auto -14px -14px;
+  padding: 12px 14px 14px;
+  background: linear-gradient(180deg, transparent, var(--seeker-surface-solid) 30%);
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-action {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  border-radius: var(--seeker-radius-sm) !important;
+  font-size: var(--seeker-fs-small) !important;
+  white-space: nowrap;
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-chat {
+  background: rgba(var(--seeker-ink-rgb), 0.9) !important;
+  color: var(--seeker-surface-solid) !important;
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-chat:hover { background: rgba(var(--seeker-ink-rgb), 1) !important; }
+@media (hover: none) {
+  body:not(.charListGrid) #rm_print_characters_block .seeker-card-action { min-height: 44px; }
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-meta { display: block; }
+/* Touch screens have no hover: the cards stay face up. */
+@media (hover: none) {
+  body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):is(:hover, :focus-visible):not(.seeker-flipped) > .avatar { transform: perspective(1800px) rotateY(0deg); }
+  body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):is(:hover, :focus-visible):not(.seeker-flipped) > :is(.character_select_container, .group_select_container) { transform: perspective(1800px) rotateY(180deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  body:not(.charListGrid) #rm_print_characters_block .entity_block:hover { transform: none; }
+  body:not(.charListGrid) #rm_print_characters_block .entity_block:hover > .avatar img { transform: none; }
+  body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) > :is(.avatar, .character_select_container, .group_select_container) { transition: none; }
+}
+@media (max-width: 1000px) {
+  body:not(.charListGrid) #rm_print_characters_block { --seeker-card-width: 150px; gap: 10px !important; }
+  #charListFixedTop { flex-wrap: wrap; }
+  #form_character_search_form { flex: 1 1 100%; }
+  #rm_button_bar { flex: 1 1 100%; }
+  #character_sort_order { flex: 1 1 auto !important; width: auto !important; }
+  .seeker-popover-anchor:first-child .seeker-popover { left: 0; right: auto; }
+}
+/* The open character's name and back button only with a character open. */
+#right-nav-panel:has(#rm_characters_block:not([style*="display: none"])) #rm_PinAndTabs { display: none !important; }
+#right-nav-panel .seeker-panel-shared #rm_PinAndTabs { min-height: 0; }

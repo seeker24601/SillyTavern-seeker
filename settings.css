@@ -75,7 +75,7 @@
 #user-settings-block-content .highlighted {
   background-color: var(--seeker-selected-fill) !important;
   color: var(--seeker-text) !important;
-  border-radius: var(--seeker-radius);
+  border-radius: var(--seeker-radius-xs);
   outline: none !important;
 }
 
@@ -178,7 +178,7 @@
   position: relative;
   width: 34px !important;
   height: 20px !important;
-  border-radius: 10px !important;
+  border-radius: var(--seeker-radius-sm) !important;
   background-color: var(--seeker-fill-strong) !important;
   transform: none;
   transition: background-color 150ms;
@@ -259,7 +259,6 @@
   #ui_language_select { width: 130px !important; }
   #version_display { flex: 1 1 0; min-width: 0; }
 }
-
 
 /* ---------- AI response ----------
    The panel scrolls inside .scrollableInner, so that box holds the list and the sections.
