@@ -176,7 +176,11 @@
   --seeker-chat-width: clamp(440px, 40vw, 760px);
   /* Width of the character portrait beside each message (2:3). */
   --seeker-portrait-width: 56px;
-  --seeker-fade: 180px;
+  --seeker-fade: 300px;
+  /* Phones in VN mode: the chat reaches this far up into the panel's fade, and its text
+     fades out over --seeker-text-fade from the chat's top edge. */
+  --seeker-chat-reach: 140px;
+  --seeker-text-fade: 200px;
   /* The stage background is drawn this much larger than the stage, and drifts up to
      --seeker-bg-shift towards the pointer; the shift must stay under (zoom - 1) / 2. */
   --seeker-bg-zoom: 1.08;
@@ -475,19 +479,9 @@ body:not(.movingUI)::after {
   object-position: center top;
   border: none !important;
   border-radius: 10px !important;
-  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.1), 0 6px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 #chat .mes .mesAvatarWrapper > :not(.avatar) { width: 100%; margin: 0 !important; text-align: center; }
-/* Matted, like a print in a mount: a fine light line inset from the portrait's edge. */
-#chat .mes .avatar { position: relative; }
-#chat .mes .avatar::after {
-  content: "";
-  position: absolute;
-  inset: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.38);
-  border-radius: 7px;
-  pointer-events: none;
-}
 /* Small system messages (the welcome screen's buttons) have no portrait. */
 #chat .mes.smallSysMes .mesAvatarWrapper { display: none; }
 /* Chat colours follow the UI theme's Theme Colors (User settings), so the pickers work:
@@ -519,13 +513,6 @@ body:not(.movingUI)::after {
 body[data-generating] .seeker-mes-regen { display: none !important; }
 #chat .mes .seeker-mes-delete:hover { color: #e5484d !important; }
 #chat .swipe_left, #chat .swipe_right { color: var(--seeker-text-dim) !important; opacity: 0.8; }
-/* Your messages are the quieter voice: your name in Bodoni italic, a little dimmer, and your
-   text set off by a hairline, like a stage direction beside the character's lines. */
-#chat .mes[is_user="true"] .name_text { font-style: italic; font-weight: 500; color: var(--seeker-text-dim) !important; }
-#chat .mes[is_user="true"] .mes_text {
-  padding-left: var(--seeker-space-3);
-  border-left: 1px solid rgba(var(--seeker-ink-rgb), 0.18);
-}
 /* Editing a message: the box uses the chat's own type, so the text keeps its shape. */
 #chat #curEditTextarea {
   font-size: var(--seeker-fs-chat) !important;
@@ -806,6 +793,26 @@ body:has(#chat > .welcomePanel) {
         mask-image: none !important;
         -webkit-mask-image: none !important;
         background: linear-gradient(to bottom, var(--seeker-fade-stops)) !important;
+      }
+      /* The text runs up into the fade and dissolves on an eased curve rather than being
+         cut off at the panel's edge. The padding lets the first message scroll clear of it. */
+      & #chat {
+        margin-top: calc(-1 * var(--seeker-chat-reach)) !important;
+        padding-top: var(--seeker-text-fade) !important;
+        --seeker-text-mask: linear-gradient(to bottom,
+          transparent 0,
+          rgba(0, 0, 0, 0.03) calc(var(--seeker-text-fade) * 0.1),
+          rgba(0, 0, 0, 0.1) calc(var(--seeker-text-fade) * 0.2),
+          rgba(0, 0, 0, 0.22) calc(var(--seeker-text-fade) * 0.3),
+          rgba(0, 0, 0, 0.35) calc(var(--seeker-text-fade) * 0.4),
+          rgba(0, 0, 0, 0.5) calc(var(--seeker-text-fade) * 0.5),
+          rgba(0, 0, 0, 0.65) calc(var(--seeker-text-fade) * 0.6),
+          rgba(0, 0, 0, 0.78) calc(var(--seeker-text-fade) * 0.7),
+          rgba(0, 0, 0, 0.9) calc(var(--seeker-text-fade) * 0.8),
+          rgba(0, 0, 0, 0.97) calc(var(--seeker-text-fade) * 0.9),
+          #000 var(--seeker-text-fade));
+        -webkit-mask-image: var(--seeker-text-mask) !important;
+        mask-image: var(--seeker-text-mask) !important;
       }
     }
   }
