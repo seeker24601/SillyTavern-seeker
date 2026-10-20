@@ -1,0 +1,281 @@
+/* seeker: the character editor, opened from the Characters panel, and its sprites. */
+
+/* ---------- Character editor ----------
+   A "Characters" back button and the name as a title across the top; the portrait large on
+   the left with the buttons, More and tags beside it. index.js adds the back button. */
+#rm_button_characters { display: none !important; } /* the back button replaces it */
+#CharListButtonAndHotSwaps:has(#HotSwapWrapper .hotswap:empty) { display: none !important; }
+#right-nav-panel-tabs { align-items: center !important; gap: var(--seeker-space-3); }
+#rm_button_selected_ch { display: flex !important; align-items: center; gap: var(--seeker-space-3); min-width: 0; opacity: 1 !important; }
+#rm_button_selected_ch:not(:has(h2:not(:empty))) { display: none !important; }
+#rm_button_selected_ch h2 {
+  margin: 0 !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--seeker-heading-font) !important;
+  font-size: var(--seeker-fs-title) !important;
+  font-weight: 600 !important;
+  color: var(--seeker-text) !important;
+  opacity: 1 !important;
+}
+.seeker-back-button {
+  all: unset;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px 0 8px;
+  border-radius: var(--seeker-radius-pill);
+  background: var(--seeker-fill);
+  color: var(--seeker-text-dim);
+  font: 500 var(--seeker-fs-body) / 1 var(--mainFontFamily);
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms;
+}
+.seeker-back-button:hover { background: var(--seeker-fill-hover); color: var(--seeker-text); }
+.seeker-back-button:focus-visible { box-shadow: var(--seeker-focus); }
+.seeker-back-button svg { width: 16px; height: 16px; }
+/* Hidden in the list: it only appears with a character open. */
+#right-nav-panel:has(#rm_characters_block:not([style*="display: none"])) .seeker-back-button { display: none; }
+
+#avatar-and-name-block > .expander {
+  display: grid !important;
+  grid-template-columns: 120px minmax(0, 1fr);
+  grid-template-rows: auto auto 1fr;
+  column-gap: var(--seeker-space-5) !important;
+  row-gap: var(--seeker-space-2) !important;
+  margin-top: var(--seeker-space-3);
+}
+#avatar-and-name-block #avatar_div { display: contents !important; }
+#avatar-and-name-block #avatar_div_div {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  width: 120px !important;
+  height: 180px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#avatar-and-name-block #avatar_load_preview {
+  width: 120px !important;
+  height: 180px !important;
+  object-fit: cover;
+  object-position: center top;
+  border: none !important;
+  border-radius: var(--seeker-radius-lg) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.1), 0 8px 22px rgba(0, 0, 0, 0.45);
+}
+#avatar-and-name-block #avatar_controls { grid-column: 2; grid-row: 1; flex-direction: column; align-items: stretch !important; gap: var(--seeker-space-2) !important; margin: 0 !important; }
+#avatar-and-name-block .form_create_bottom_buttons_block { justify-content: flex-start !important; flex-wrap: wrap; gap: var(--seeker-space-1) !important; margin: 0 !important; padding: 0 !important; }
+#avatar-and-name-block .form_create_bottom_buttons_block .menu_button { margin: 0 !important; }
+#avatar-and-name-block #avatar_controls > label { height: auto !important; margin: 0 !important; }
+#avatar-and-name-block #tags_div { grid-column: 2; grid-row: 2; margin: 0 !important; }
+@media (max-width: 1000px) {
+  /* The back button is just its arrow, so the name has room. */
+  .seeker-back-button { width: 32px; padding: 0; justify-content: center; }
+  .seeker-back-button span { display: none; }
+  #avatar-and-name-block > .expander { grid-template-columns: 96px minmax(0, 1fr); column-gap: var(--seeker-space-3) !important; }
+  #avatar-and-name-block :is(#avatar_div_div, #avatar_load_preview) { width: 96px !important; height: 144px !important; }
+}
+
+/* ---------- Character editor: fields ---------- */
+/* Room between the portrait row and Creator's Notes. */
+#form_create #spoiler_free_desc { margin-top: var(--seeker-space-4) !important; }
+/* The first message opens tall enough to read a greeting without expanding it. */
+#firstmessage_textarea { min-height: 15em !important; }
+/* Field headers: the label and its help on the left; the field's buttons, ending with
+   expand, on the right (index.js moves expand there). */
+#form_create .title_restorable {
+  display: flex !important;
+  align-items: center;
+  gap: var(--seeker-space-2);
+  min-height: 32px;
+}
+#form_create .title_restorable > .flex-container:first-child { flex: 1 1 auto; gap: 6px; }
+#form_create .title_restorable > .menu_button { flex: none; margin: 0 !important; }
+/* Expand, everywhere: a small square button in the same family as the theme's other icon
+   buttons, instead of a bare glyph. */
+.editor_maximize {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: var(--seeker-radius-sm);
+  background: var(--seeker-fill);
+  color: var(--seeker-text-dim) !important;
+  font-size: 13px !important;
+  opacity: 1 !important;
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms;
+}
+.editor_maximize:hover { background: var(--seeker-fill-hover); color: var(--seeker-text) !important; }
+.editor_maximize:focus-visible { outline: none; box-shadow: var(--seeker-focus); }
+
+/* The expanded editor: titled with the field's name, the text in a framed field with an even
+   border on all four sides (an inset ring, so the popup's clipping cannot cut it), roomier
+   padding and the chat's type size. */
+.popup:has(.maximized_textarea) .popup-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--seeker-space-3);
+  padding: 2px !important;
+}
+.popup:has(.maximized_textarea) .popup-content > div:has(> .maximized_textarea) { flex: 1 1 auto; min-height: 0; }
+:is(.popup, #character_popup) .popup-content > h3.seeker-max-title {
+  margin: 0 !important;
+  font-family: var(--seeker-heading-font) !important;
+  font-size: var(--seeker-fs-title) !important;
+  font-weight: 600;
+  text-align: left;
+}
+.popup .maximized_textarea {
+  box-sizing: border-box;
+  padding: 16px 18px !important;
+  border: none !important;
+  border-radius: var(--seeker-radius-md) !important;
+  background: var(--seeker-fill) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.12) !important;
+  outline: none !important;
+  color: var(--seeker-text) !important;
+  font-size: var(--seeker-fs-chat) !important;
+  line-height: var(--seeker-lh-text) !important;
+  resize: none !important;
+  transition: box-shadow 120ms;
+}
+.popup .maximized_textarea:focus { box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.45) !important; }
+
+/* ---------- Sprites ----------
+   The Character Expressions drawer, moved into the editor by index.js: a bar with the set's
+   name and Upload ZIP, a grid of tiles, and the folder and settings folded below. */
+#form_create .seeker-sprites,
+#form_create + .seeker-sprites { margin: var(--seeker-space-4) 0 !important; }
+.seeker-sprites > .inline-drawer-toggle.inline-drawer-header { min-height: 44px; border-radius: var(--seeker-radius-md) !important; }
+.seeker-sprites > .inline-drawer-toggle.inline-drawer-header :is(b, strong) { font-family: var(--seeker-heading-font) !important; font-size: var(--seeker-fs-subsection) !important; font-weight: 600 !important; }
+/* The grid: small tiles, the name along the bottom of each. A sprite fills its tile; a slot
+   with no sprite is a quiet dark square with just the name (the "no image" placeholder is hidden). */
+.seeker-sprites #image_list { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--seeker-space-2); margin: var(--seeker-space-2) 0 0 !important; padding: 0 !important; }
+.seeker-sprites .expression_list_item {
+  position: relative; width: auto !important; height: auto !important; aspect-ratio: 3 / 4; margin: 0 !important; padding: 0 !important;
+  border: none !important; border-radius: var(--seeker-radius-xs); background: var(--seeker-fill) !important; overflow: hidden;
+}
+.seeker-sprites .expression_list_image_container { position: absolute; inset: 0; width: auto !important; height: auto !important; }
+.seeker-sprites .expression_list_image_container img { width: 100% !important; height: 100% !important; object-fit: contain; object-position: center bottom; display: block; }
+.seeker-sprites .expression_list_item[data-expression-type="failure"] .expression_list_image_container { display: none; }
+.seeker-sprites .expression_list_title {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: block !important; width: auto !important;
+  height: auto !important; min-height: 0 !important; max-height: none !important; margin: 0 !important; box-sizing: border-box;
+  padding: 16px 6px 8px !important; font-size: var(--seeker-fs-small) !important; line-height: 1.3 !important; text-align: center;
+  color: var(--seeker-text) !important; background: linear-gradient(to top, rgba(4, 7, 6, 0.9), rgba(4, 7, 6, 0));
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.seeker-sprites .expression_list_item[data-expression-type="failure"] .expression_list_title { background: none; color: var(--seeker-text-faint) !important; }
+.seeker-sprites .expression_list_buttons { position: absolute; top: 4px; right: 4px; z-index: 2; display: flex; gap: 2px; opacity: 0; transition: opacity 120ms; }
+.seeker-sprites .expression_list_item:hover .expression_list_buttons,
+.seeker-sprites .expression_list_item:focus-within .expression_list_buttons { opacity: 1; }
+.seeker-sprites .expression_list_buttons .menu_button { width: 26px !important; height: 26px !important; min-height: 0 !important; padding: 0 !important; font-size: 12px !important; background: var(--seeker-surface-solid) !important; }
+.seeker-sprites .seeker-sprites-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--seeker-space-3);
+  margin: var(--seeker-space-2) 0 0;
+}
+.seeker-sprites .seeker-sprites-titles { display: flex; align-items: baseline; gap: var(--seeker-space-3); min-width: 0; flex-wrap: wrap; }
+.seeker-sprites #image_list_header {
+  margin: 0 !important;
+  font-family: var(--seeker-heading-font) !important;
+  font-size: var(--seeker-fs-section) !important;
+  font-weight: 600;
+}
+.seeker-sprites #image_list_header strong { font-weight: 400; color: var(--seeker-text-dim); }
+.seeker-sprites .seeker-sprites-count { color: var(--seeker-text-faint); font-size: var(--seeker-fs-small); }
+.seeker-sprites .seeker-sprites-zip {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  margin: 0 !important;
+  min-height: 32px;
+  white-space: nowrap;
+}
+.seeker-sprites .seeker-sprites-hint {
+  margin: var(--seeker-space-1) 0 var(--seeker-space-2) !important;
+  color: var(--seeker-text-faint);
+  font-size: var(--seeker-fs-small) !important;
+  line-height: var(--seeker-lh-hint) !important;
+}
+.seeker-sprites .offline_mode { display: none !important; }
+/* Empty slots: a dashed outline and a plus, inviting an upload. */
+.seeker-sprites .expression_list_item[data-expression-type="failure"] {
+  background: transparent !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.18) !important;
+  outline: 1px dashed rgba(var(--seeker-ink-rgb), 0.22);
+  outline-offset: -1px;
+  cursor: copy;
+}
+.seeker-sprites .expression_list_item[data-expression-type="failure"]::before {
+  content: "+";
+  position: absolute;
+  inset: 0 0 24px;
+  display: grid;
+  place-items: center;
+  color: var(--seeker-text-faint);
+  font-size: 28px;
+  font-weight: 300;
+}
+.seeker-sprites .expression_list_item[data-expression-type="failure"]:hover { background: var(--seeker-fill) !important; }
+/* Dropping: the section outlines itself, and the sprite under the pointer lights up. */
+.seeker-sprites.seeker-dropping > .inline-drawer-content {
+  border-radius: var(--seeker-radius-md);
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.35);
+  background: rgba(var(--seeker-ink-rgb), 0.03);
+}
+.seeker-sprites .expression_list_item.seeker-drop-target {
+  box-shadow: inset 0 0 0 2px rgba(var(--seeker-ink-rgb), 0.85) !important;
+  transform: scale(1.03);
+}
+.seeker-sprites .expression_list_item { transition: transform 150ms, box-shadow 150ms, background-color 150ms; }
+/* Folder and settings, folded below the grid. */
+.seeker-sprites .seeker-sprites-settings {
+  margin-top: var(--seeker-space-4);
+  border-top: 1px solid rgba(var(--seeker-ink-rgb), 0.08);
+  padding-top: var(--seeker-space-2);
+}
+.seeker-sprites .seeker-sprites-settings > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--seeker-text-dim);
+  font-size: var(--seeker-fs-body);
+}
+.seeker-sprites .seeker-sprites-settings > summary::-webkit-details-marker { display: none; }
+.seeker-sprites .seeker-sprites-settings > summary::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 150ms;
+}
+.seeker-sprites .seeker-sprites-settings[open] > summary::before { transform: rotate(45deg); }
+.seeker-sprites .seeker-sprites-settings > summary:hover { color: var(--seeker-text); }
+.seeker-sprites .seeker-sprites-settings[open] > :not(summary) { margin-top: var(--seeker-space-2); }
+/* Upload ZIP lives in the bar now; its original stays in the panel for SillyTavern. */
+.seeker-sprites .seeker-sprites-settings #expression_upload_pack_button { display: none !important; }
+.seeker-sprites .seeker-sprites-settings .expression_buttons { justify-content: flex-start !important; }
+@media (max-width: 1000px) {
+  .seeker-sprites .seeker-sprites-bar { align-items: flex-start; }
+  .seeker-sprites .seeker-sprites-zip { min-height: 44px; }
+}
+/* SillyTavern sets the label and its note side by side with no space between them. */
+.seeker-sprites .seeker-sprites-settings > label[for="expression_override"] { margin-right: 6px; }

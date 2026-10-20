@@ -50,8 +50,8 @@
   background: var(--seeker-fill) !important;
   border: none !important;
 }
-#Backgrounds .bg_tab_button:first-child { border-radius: 999px 0 0 999px !important; }
-#Backgrounds .bg_tab_button:nth-child(2) { border-radius: 0 999px 999px 0 !important; }
+#Backgrounds .bg_tab_button:first-child { border-radius: var(--seeker-radius-pill) 0 0 var(--seeker-radius-pill) !important; }
+#Backgrounds .bg_tab_button:nth-child(2) { border-radius: 0 var(--seeker-radius-pill) var(--seeker-radius-pill) 0 !important; }
 #Backgrounds .bg_tab_button a {
   display: block;
   padding: 6px 18px !important;
@@ -78,7 +78,7 @@
 
 #Backgrounds .bg_example {
   aspect-ratio: 16 / 10 !important; /* one shape for every tile, whatever the image */
-  border-radius: 14px !important;
+  border-radius: var(--seeker-radius-lg) !important;
   outline: none !important;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35) !important;
   transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 220ms;
@@ -145,7 +145,7 @@
   padding: 3px !important;
   gap: 2px;
   border: 1px solid rgba(var(--seeker-ink-rgb), 0.16) !important;
-  border-radius: 999px !important;
+  border-radius: var(--seeker-radius-pill) !important;
   background: rgba(var(--seeker-panel-rgb), 0.6) !important;
   backdrop-filter: blur(8px);
 }
@@ -153,7 +153,7 @@
 
 /* Folders: the same rounded, lifted tiles. */
 #Backgrounds .bg_folder_tile {
-  border-radius: 14px !important;
+  border-radius: var(--seeker-radius-lg) !important;
   outline: none !important;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.1) !important;
   transition: transform 220ms cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -173,7 +173,7 @@
   /* Two tiles a row, whatever the desktop count. */
   #Backgrounds :is(#bg_menu_content, #bg_custom_content) { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 10px !important; }
   #Backgrounds .bg_folder_grid.bg_list { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
-  #Backgrounds :is(.bg_example, .bg_folder_tile) { border-radius: 12px !important; }
+  #Backgrounds :is(.bg_example, .bg_folder_tile) { border-radius: var(--seeker-radius-md) !important; }
   /* The column buttons do nothing here. */
   #Backgrounds :is(#bg_thumb_zoom_in, #bg_thumb_zoom_out) { display: none !important; }
   /* SillyTavern's tap-for-actions button: a small round one in the corner. */
