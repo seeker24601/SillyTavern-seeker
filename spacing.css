@@ -98,6 +98,13 @@
 .welcomePanel .recentChatsTitle { flex: 1 0 100%; margin-top: var(--seeker-space-2); }
 :is(.welcomePanel, #seeker-welcome-stage) .welcomeShortcuts,
 #chat .mes[type="welcome_prompt"] .custom-flex-container { gap: var(--seeker-space-2) !important; }
+/* Message HTML renames the prompt's flex-container to custom-flex-container, which nothing
+   styles, so the buttons wrapped as inline text with no space between rows. */
+#chat .mes[type="welcome_prompt"] .custom-flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 :is(.welcomePanel, #seeker-welcome-stage, #chat .mes[type="welcome_prompt"]) .menu_button:not(.recentChat .menu_button) {
   min-height: 32px;
   padding: 6px 12px !important;
