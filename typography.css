@@ -6,8 +6,8 @@
      title       22px  panel headers
      section     18px  h1-h3 inside panels and dialogs
      subsection  16px  h4-h5, collapsible section headers, speaker names in the chat
-   Meta (timestamps, message numbers, counters, token counts) is Bodoni Moda SC, faint and
-   letter-spaced, at the meta size plus 2px (13px), since small caps run at about x-height.
+   Meta (timestamps, message numbers, counters, token counts, versions, authors) is DM Mono
+   at the meta size, faint, with tabular figures. Code is DM Mono too.
    Everything else is Jost in three sizes:
      chat        16px  message prose and the composer
      body        14px  panel text, labels, buttons, inputs, menus
@@ -138,10 +138,26 @@ h1, h2, h3, h4, h5,
 /* Pagination arrows are plain characters drawn in the Font Awesome font; use the sans. */
 .paginationjs-pages ul li a { font-family: var(--mainFontFamily) !important; }
 
-/* Code stays monospace, at body size. */
-:is(.drawer-content, .popup, #character_popup) :is(code, pre, .monospace) {
-  font-family: "Noto Sans Mono", ui-monospace, SFMono-Regular, Menlo, monospace !important;
+/* Monospace: DM Mono for code, file names, keys and slash commands, in panels, dialogs and the
+   chat. Its letters stand a little taller than Jost's, so inline it is set a touch smaller
+   to sit level with the text around it; blocks of code keep the full size. */
+:is(code, pre, kbd, samp, tt, .monospace) {
+  font-family: var(--seeker-mono-font) !important;
+  font-weight: 400;
+  font-variant-ligatures: none;
+  letter-spacing: 0;
 }
+:is(code, kbd, samp, tt):not(pre *) { font-size: 0.92em; }
+pre, pre code { font-size: var(--seeker-fs-small) !important; line-height: 1.55 !important; }
+/* Inline code as a soft chip in the theme's fill; inside a block, no chip per line. */
+:is(code, kbd, samp):not(pre *) {
+  padding: 0.08em 0.38em;
+  border: none;
+  border-radius: 6px;
+  background: rgba(var(--seeker-ink-rgb), 0.08);
+  color: var(--seeker-text);
+}
+pre code { padding: 0 !important; border: none !important; background: none !important; }
 
 /* ---------- Chat ---------- */
 #chat .mes_text { font-size: var(--seeker-fs-chat); line-height: var(--seeker-lh-chat) !important; }
@@ -169,18 +185,31 @@ body:not(:has(#chat > .welcomePanel)) #chat .mes[mesid="0"]:not([is_user="true"]
 }
 #send_textarea { font-size: var(--seeker-fs-chat) !important; }
 
-/* Meta (dates, numbers, counts, timers) in Bodoni small caps, spaced like a printed folio.
-   Small caps run at about x-height, so they sit 2px above the meta size to read the same. */
+/* Meta everywhere (dates, message numbers, timers, token counts, counters, versions and
+   authors) in DM Mono at the meta size: figures line up from row to row, and it reads as data
+   beside the Jost text and the Bodoni names. Tabular figures keep columns steady as numbers
+   change. Covers the chat, the welcome screen's recent chats, token counts in panels and
+   dialogs, pagination, the character cards' version and author, the sprite count, and the
+   creator and version along the stage spine. */
 #chat .mes :is(.timestamp, .mesIDDisplay, .mes_timer, .tokenCounterDisplay, .swipes-counter),
 .welcomePanel :is(.chatDate, .chatStats, .chatStats small),
 :where(.drawer-content, .popup, #character_popup)
-  :where(.extension_token_counter, [id$="token_count"], [id$="_tokens"], [id^="result_info"], [id^="result_info"] *, .tokenCounterDisplay, .paginationjs-nav):not([class*="fa-"]) {
-  font-family: var(--seeker-display-font) !important;
-  font-optical-sizing: auto;
-  font-size: calc(var(--seeker-fs-meta) + 2px) !important;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  :where(.extension_token_counter, [id$="token_count"], [id$="_tokens"], [id^="result_info"], [id^="result_info"] *, .tokenCounterDisplay, .paginationjs-nav):not([class*="fa-"]),
+#rm_print_characters_block :is(.seeker-card-byline, .seeker-card-meta, .character_version),
+.seeker-sprites .seeker-sprites-count,
+#seeker-stage-spine > span {
+  font-family: var(--seeker-mono-font) !important;
+  font-size: var(--seeker-fs-meta) !important;
+  font-style: normal !important;
+  font-weight: 400;
+  font-variant-caps: normal !important;
+  font-variant-numeric: tabular-nums;
+  font-variant-ligatures: none;
+  letter-spacing: 0.01em;
 }
+
+/* The stage spine reads like a book spine: capitals, opened up. */
+#seeker-stage-spine > span { text-transform: uppercase; letter-spacing: 0.14em; }
 
 /* ---------- Welcome screen ---------- */
 /* The version line is the title, "Recent Chats" a section heading, and character

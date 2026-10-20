@@ -346,9 +346,178 @@ body:not(.charListGrid) #rm_print_characters_block .ch_fav_icon {
   z-index: 1;
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.7));
 }
+/* Character and group cards turn over. The front is the portrait with the name set across
+   its foot (index.js adds the name); the back holds the name, the whole description and the
+   tags. Hovering, or focusing the card from the keyboard, flips it. Each face turns on its
+   own and hides its back, so the card needs no shared 3D space and its rounded clip holds.
+   Tag folders keep the plain card above. */
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) {
+  aspect-ratio: 2 / 3;
+  overflow: visible;
+  background: transparent !important;
+  box-shadow: none;
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):hover {
+  background: transparent !important;
+  transform: none;
+  box-shadow: none;
+}
+/* Room for the turn: mid-flip the near edge of a card swells past its box (perspective), so
+   the list keeps a margin inside its scroll edge, and the card being turned rises above its
+   neighbours. */
+body:not(.charListGrid) #rm_print_characters_block { padding: 18px 10px !important; }
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):is(:hover, :focus-visible, :has(:focus-visible), .seeker-flipped) { z-index: 3; }
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) > :is(.avatar, .character_select_container, .group_select_container) {
+  position: absolute !important;
+  inset: 0;
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  aspect-ratio: auto;
+  overflow: hidden;
+  border-radius: 14px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.08);
+  transition: transform 640ms cubic-bezier(0.3, 0.7, 0.2, 1), box-shadow 300ms;
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) > .avatar {
+  transform: perspective(1800px) rotateY(0deg);
+  background: var(--seeker-surface-solid);
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) > :is(.character_select_container, .group_select_container) {
+  transform: perspective(1800px) rotateY(180deg);
+  justify-content: flex-start;
+  padding: 16px 14px 14px !important;
+  gap: 8px !important;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  background:
+    linear-gradient(180deg, rgba(var(--seeker-ink-rgb), 0.07), rgba(var(--seeker-ink-rgb), 0.02) 40%),
+    var(--seeker-surface-solid);
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):is(:hover, :focus-visible, :has(:focus-visible), .seeker-flipped) > .avatar {
+  transform: perspective(1800px) rotateY(-180deg);
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):is(:hover, :focus-visible, :has(:focus-visible), .seeker-flipped) > :is(.character_select_container, .group_select_container) {
+  transform: perspective(1800px) rotateY(0deg);
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.16), 0 14px 30px rgba(0, 0, 0, 0.45);
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):hover > .avatar img { transform: none; }
+/* Front: the name over a dark fade at the foot of the portrait, and a favourite's star. */
+#rm_print_characters_block .seeker-card-name { display: none; }
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-name {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 52px 14px 12px;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.55) 45%, rgba(0, 0, 0, 0.82));
+  color: #fff;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.seeker-card-title, .seeker-card-byline) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-title {
+  font-family: var(--seeker-heading-font);
+  font-size: var(--seeker-fs-title);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-byline {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: var(--seeker-fs-meta);
+  line-height: 1.3;
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select).is_fav > .avatar::before {
+  content: "\f005";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  font: var(--fa-font-solid);
+  color: gold;
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.7));
+}
+/* Back: the name as a heading, then the description in full, scrolling if it runs long. */
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) .ch_name {
+  font-family: var(--seeker-heading-font);
+  font-size: var(--seeker-fs-section) !important;
+  white-space: normal;
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) .ch_description {
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: none;
+  overflow: visible;
+  font-size: var(--seeker-fs-small) !important;
+  line-height: 1.5 !important;
+  color: var(--seeker-text-dim);
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) :is(.ch_fav_icon, .group_fav_icon) { display: none !important; }
+/* Version and author on their own line under the name (index.js); the version beside the
+   name is SillyTavern's and gives way to it. */
+body:not(.charListGrid) #rm_print_characters_block .character_select:has(.seeker-card-meta) .character_name_block .character_version { display: none !important; }
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-meta {
+  flex: none; /* the back scrolls; without this a long description squeezes the line to nothing */
+  margin-top: -4px;
+  color: var(--seeker-text-faint);
+  font-size: var(--seeker-fs-meta);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#rm_print_characters_block .seeker-card-meta { display: none; }
+/* Chat and Edit at the foot of the back, held there while the description scrolls. */
+#rm_print_characters_block .seeker-card-actions { display: none; }
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-actions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+  position: sticky;
+  bottom: -14px;
+  margin: auto -14px -14px;
+  padding: 12px 14px 14px;
+  background: linear-gradient(180deg, transparent, var(--seeker-surface-solid) 30%);
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-action {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  border-radius: 10px !important;
+  font-size: var(--seeker-fs-small) !important;
+  white-space: nowrap;
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-chat {
+  background: rgba(var(--seeker-ink-rgb), 0.9) !important;
+  color: var(--seeker-surface-solid) !important;
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-chat:hover { background: rgba(var(--seeker-ink-rgb), 1) !important; }
+@media (hover: none) {
+  body:not(.charListGrid) #rm_print_characters_block .seeker-card-action { min-height: 44px; }
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-meta { display: block; }
+/* Touch screens have no hover: the cards stay face up. */
+@media (hover: none) {
+  body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):is(:hover, :focus-visible):not(.seeker-flipped) > .avatar { transform: perspective(1800px) rotateY(0deg); }
+  body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select):is(:hover, :focus-visible):not(.seeker-flipped) > :is(.character_select_container, .group_select_container) { transform: perspective(1800px) rotateY(180deg); }
+}
 @media (prefers-reduced-motion: reduce) {
   body:not(.charListGrid) #rm_print_characters_block .entity_block:hover { transform: none; }
   body:not(.charListGrid) #rm_print_characters_block .entity_block:hover > .avatar img { transform: none; }
+  body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) > :is(.avatar, .character_select_container, .group_select_container) { transition: none; }
 }
 @media (max-width: 1000px) {
   body:not(.charListGrid) #rm_print_characters_block { --seeker-card-width: 150px; gap: 10px !important; }
@@ -537,7 +706,7 @@ body:not(.charListGrid) #rm_print_characters_block .ch_fav_icon {
 .seeker-sprites > .inline-drawer-toggle.inline-drawer-header :is(b, strong) { font-family: var(--seeker-heading-font) !important; font-size: var(--seeker-fs-subsection) !important; font-weight: 600 !important; }
 /* The grid: small tiles, the name along the bottom of each. A sprite fills its tile; a slot
    with no sprite is a quiet dark square with just the name (the "no image" placeholder is hidden). */
-.seeker-sprites #image_list { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--seeker-space-2); margin-top: var(--seeker-space-2); }
+.seeker-sprites #image_list { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--seeker-space-2); margin: var(--seeker-space-2) 0 0 !important; padding: 0 !important; }
 .seeker-sprites .expression_list_item {
   position: relative; width: auto !important; height: auto !important; aspect-ratio: 3 / 4; margin: 0 !important; padding: 0 !important;
   border: none !important; border-radius: var(--seeker-radius); background: var(--seeker-fill) !important; overflow: hidden;
@@ -557,3 +726,175 @@ body:not(.charListGrid) #rm_print_characters_block .ch_fav_icon {
 .seeker-sprites .expression_list_item:hover .expression_list_buttons,
 .seeker-sprites .expression_list_item:focus-within .expression_list_buttons { opacity: 1; }
 .seeker-sprites .expression_list_buttons .menu_button { width: 26px !important; height: 26px !important; min-height: 0 !important; padding: 0 !important; font-size: 12px !important; background: var(--seeker-surface-solid) !important; }
+
+/* ---------- Character editor: fields ---------- */
+/* Room between the portrait row and Creator's Notes. */
+#form_create #spoiler_free_desc { margin-top: var(--seeker-space-4) !important; }
+/* The first message opens tall enough to read a greeting without expanding it. */
+#firstmessage_textarea { min-height: 15em !important; }
+/* Field headers: the label and its help on the left; the field's buttons, ending with
+   expand, on the right (index.js moves expand there). */
+#form_create .title_restorable {
+  display: flex !important;
+  align-items: center;
+  gap: var(--seeker-space-2);
+  min-height: 32px;
+}
+#form_create .title_restorable > .flex-container:first-child { flex: 1 1 auto; gap: 6px; }
+#form_create .title_restorable > .menu_button { flex: none; margin: 0 !important; }
+/* Expand, everywhere: a small square button in the same family as the theme's other icon
+   buttons, instead of a bare glyph. */
+.editor_maximize {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 10px;
+  background: var(--seeker-fill);
+  color: var(--seeker-text-dim) !important;
+  font-size: 13px !important;
+  opacity: 1 !important;
+  cursor: pointer;
+  transition: background-color 120ms, color 120ms;
+}
+.editor_maximize:hover { background: var(--seeker-fill-hover); color: var(--seeker-text) !important; }
+.editor_maximize:focus-visible { outline: none; box-shadow: var(--seeker-focus); }
+
+/* The expanded editor: titled with the field's name, the text in a framed field with an even
+   border on all four sides (an inset ring, so the popup's clipping cannot cut it), roomier
+   padding and the chat's type size. */
+.popup:has(.maximized_textarea) .popup-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--seeker-space-3);
+  padding: 2px !important;
+}
+.popup:has(.maximized_textarea) .popup-content > div:has(> .maximized_textarea) { flex: 1 1 auto; min-height: 0; }
+:is(.popup, #character_popup) .popup-content > h3.seeker-max-title {
+  margin: 0 !important;
+  font-family: var(--seeker-heading-font) !important;
+  font-size: var(--seeker-fs-title) !important;
+  font-weight: 600;
+  text-align: left;
+}
+.popup .maximized_textarea {
+  box-sizing: border-box;
+  padding: 16px 18px !important;
+  border: none !important;
+  border-radius: 12px !important;
+  background: var(--seeker-fill) !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.12) !important;
+  outline: none !important;
+  color: var(--seeker-text) !important;
+  font-size: var(--seeker-fs-chat) !important;
+  line-height: var(--seeker-lh-text) !important;
+  resize: none !important;
+  transition: box-shadow 120ms;
+}
+.popup .maximized_textarea:focus { box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.45) !important; }
+
+/* ---------- Sprites workspace ---------- */
+.seeker-sprites .seeker-sprites-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--seeker-space-3);
+  margin: var(--seeker-space-2) 0 0;
+}
+.seeker-sprites .seeker-sprites-titles { display: flex; align-items: baseline; gap: var(--seeker-space-3); min-width: 0; flex-wrap: wrap; }
+.seeker-sprites #image_list_header {
+  margin: 0 !important;
+  font-family: var(--seeker-heading-font) !important;
+  font-size: var(--seeker-fs-section) !important;
+  font-weight: 600;
+}
+.seeker-sprites #image_list_header strong { font-weight: 400; color: var(--seeker-text-dim); }
+.seeker-sprites .seeker-sprites-count { color: var(--seeker-text-faint); font-size: var(--seeker-fs-small); }
+.seeker-sprites .seeker-sprites-zip {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  margin: 0 !important;
+  min-height: 32px;
+  white-space: nowrap;
+}
+.seeker-sprites .seeker-sprites-hint {
+  margin: var(--seeker-space-1) 0 var(--seeker-space-2) !important;
+  color: var(--seeker-text-faint);
+  font-size: var(--seeker-fs-small) !important;
+  line-height: var(--seeker-lh-hint) !important;
+}
+.seeker-sprites .offline_mode { display: none !important; }
+/* Empty slots: a dashed outline and a plus, inviting an upload. */
+.seeker-sprites .expression_list_item[data-expression-type="failure"] {
+  background: transparent !important;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.18) !important;
+  outline: 1px dashed rgba(var(--seeker-ink-rgb), 0.22);
+  outline-offset: -1px;
+  cursor: copy;
+}
+.seeker-sprites .expression_list_item[data-expression-type="failure"]::before {
+  content: "+";
+  position: absolute;
+  inset: 0 0 24px;
+  display: grid;
+  place-items: center;
+  color: var(--seeker-text-faint);
+  font-size: 28px;
+  font-weight: 300;
+}
+.seeker-sprites .expression_list_item[data-expression-type="failure"]:hover { background: var(--seeker-fill) !important; }
+/* Dropping: the section outlines itself, and the sprite under the pointer lights up. */
+.seeker-sprites.seeker-dropping > .inline-drawer-content {
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.35);
+  background: rgba(var(--seeker-ink-rgb), 0.03);
+}
+.seeker-sprites .expression_list_item.seeker-drop-target {
+  box-shadow: inset 0 0 0 2px rgba(var(--seeker-ink-rgb), 0.85) !important;
+  transform: scale(1.03);
+}
+.seeker-sprites .expression_list_item { transition: transform 150ms, box-shadow 150ms, background-color 150ms; }
+/* Folder and settings, folded below the grid. */
+.seeker-sprites .seeker-sprites-settings {
+  margin-top: var(--seeker-space-4);
+  border-top: 1px solid rgba(var(--seeker-ink-rgb), 0.08);
+  padding-top: var(--seeker-space-2);
+}
+.seeker-sprites .seeker-sprites-settings > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  cursor: pointer;
+  list-style: none;
+  color: var(--seeker-text-dim);
+  font-size: var(--seeker-fs-body);
+}
+.seeker-sprites .seeker-sprites-settings > summary::-webkit-details-marker { display: none; }
+.seeker-sprites .seeker-sprites-settings > summary::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 150ms;
+}
+.seeker-sprites .seeker-sprites-settings[open] > summary::before { transform: rotate(45deg); }
+.seeker-sprites .seeker-sprites-settings > summary:hover { color: var(--seeker-text); }
+.seeker-sprites .seeker-sprites-settings[open] > :not(summary) { margin-top: var(--seeker-space-2); }
+/* Upload ZIP lives in the bar now; its original stays in the panel for SillyTavern. */
+.seeker-sprites .seeker-sprites-settings #expression_upload_pack_button { display: none !important; }
+.seeker-sprites .seeker-sprites-settings .expression_buttons { justify-content: flex-start !important; }
+@media (max-width: 1000px) {
+  .seeker-sprites .seeker-sprites-bar { align-items: flex-start; }
+  .seeker-sprites .seeker-sprites-zip { min-height: 44px; }
+}
+/* SillyTavern sets the label and its note side by side with no space between them. */
+.seeker-sprites .seeker-sprites-settings > label[for="expression_override"] { margin-right: 6px; }
