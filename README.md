@@ -4,15 +4,20 @@ A visual novel theme for SillyTavern: the character's sprite on a stage beside a
 
 ## Install
 
-In SillyTavern, open Extensions, choose Install extension and paste:
+Needs SillyTavern 1.19 or later.
 
-```
-https://github.com/seeker24601/SillyTavern-seeker
-```
+1. Open Extensions (the cubes icon in the top bar) and click **Install extension**.
+2. Paste this link and install:
+
+   ```
+   https://github.com/seeker24601/SillyTavern-seeker
+   ```
 
 The theme switches itself on. A gold variant, seeker gilt, is in User settings > UI Theme.
 
 The stage shows a character's expression sprites. Characters without sprites get a single centred column.
+
+SillyTavern tells you when an update is out. To remove the theme, delete it in Extensions > Manage extensions, then pick another UI Theme in User settings.
 
 ## What it does
 
@@ -25,8 +30,6 @@ The stage shows a character's expression sprites. Characters without sprites get
 ## Develop
 
 `scripts/link.sh [path-to-SillyTavern]` links this folder into a local SillyTavern. Edit the CSS and reload the tab. `npm run build:icons` rebuilds `icons.css`, and `node scripts/ornament.cjs ornament.svg` redraws the stage ornament.
-
-Requires SillyTavern 1.19 or later.
 
 ## License
 

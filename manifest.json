@@ -8,5 +8,5 @@
     "css": "style.css",
     "author": "seeker",
     "version": "0.1.0",
-    "auto_update": false
+    "auto_update": true
 }
