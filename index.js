@@ -969,7 +969,9 @@ for (const id of ['seeker-stage-grain', 'seeker-stage-vignette', 'seeker-stage-o
         const title = drawer.querySelector('.inline-drawer-header b, .inline-drawer-header strong');
         if (title) {
             title.textContent = 'Sprites';
-            title.removeAttribute('data-i18n');
+            // Retarget the translation key rather than removing it: SillyTavern translates
+            // every data-i18n change, and a removed key makes it throw.
+            title.dataset.i18n = 'Sprites';
         }
         const named = drawer.querySelector('input[name], select[name], textarea[name]');
         if (named) form.after(drawer); else anchor.before(drawer);
