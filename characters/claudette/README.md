@@ -4,6 +4,8 @@ Claudette is a bookish human personification of Anthropic's Claude, made to test
 
 This is an optional download. Installing or updating seeker does not import Claudette or her sprites.
 
+<img src="portrait.png" alt="Claudette's painterly portrait with an orange starburst background" width="320">
+
 She writes elaborate fanfiction, corrects tiny inaccuracies, loves crabs, and mistakes verbosity for intelligence. She craves praise, then gets flustered by sincere compliments. She also catastrophizes safety risks, hides her cowardice behind procedures, and fawns over authority figures. Crowds overwhelm her, but she fears being left alone or losing her place as the cleverest person at the table.
 
 Her default greeting starts a library writing-club session. Five alternate greetings cover manuscript criticism, a completed reading, good news, a suspicious cupboard, and a retreat from a crowded reading.
@@ -50,6 +52,8 @@ Try these messages in a chat:
 Classification results depend on the connected model. Use the manual commands to test each transition reliably.
 
 ## Artwork
+
+The character card uses a separate [close-up portrait](portrait.png), with painting references from Reverse: 1999 and an Anthropic-themed background in cream, terracotta, and charcoal.
 
 Every sprite is a transparent 1024 × 1536 PNG with the same pose and placement. The expression variants change only a mask around the eyes, eyebrows, and mouth. Pixels outside that mask match `sprites/neutral.png` exactly.
 
