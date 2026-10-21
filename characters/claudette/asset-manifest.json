@@ -50,5 +50,13 @@
       "overlaySHA256": "accdfe5623d677441fc91b8c8eb9f488f8e58a6342951312ff3097f460272dc5",
       "changedPixelsOutsideOverlay": 0
     }
+  },
+  "portrait": {
+    "file": "portrait.png",
+    "width": 1024,
+    "height": 1536,
+    "background": "opaque",
+    "styleReference": "Reverse: 1999",
+    "SHA256": "ff026a99f6912ed08680a82844de7fea03cfcb494150802bba4b44e195d7fcd3"
   }
 }
