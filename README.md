@@ -1,6 +1,6 @@
 # seeker
 
-A visual novel theme for SillyTavern: the character's sprite on a stage beside a full-height chat, set in Bodoni and Jost, with DM Mono for code.
+A visual novel theme for SillyTavern: the character's sprite on a stage beside a full-height chat, set in Playfair Display and Jost, with DM Mono for code.
 
 ## Install
 
@@ -21,7 +21,7 @@ SillyTavern tells you when an update is out. To remove the theme, delete it in E
 
 ## What it does
 
-- The sprite fills a stage with the character's name set vertically in Bodoni, and the background dissolves into the chat through a halftone.
+- The sprite fills a stage with the character's name set vertically in Playfair Display italic, and the background dissolves into the chat through a halftone.
 - Expressions dissolve into each other, and new messages fade in.
 - Every menu opens as a centred panel. User settings, Formatting and AI response show one section at a time.
 - Dialogs, notifications, tooltips and icons ([Lucide](https://lucide.dev)) match the theme.
@@ -46,4 +46,4 @@ The accent is the Underlined Text colour in User settings > Theme Colors, and th
 
 ## License
 
-Lucide icons are ISC licensed (`LICENSE-lucide`). Bodoni Moda, Jost and DM Mono are under the SIL Open Font License (`fonts/`).
+Lucide icons are ISC licensed (`LICENSE-lucide`). Playfair Display, Bodoni Moda, Jost and DM Mono are under the SIL Open Font License (`fonts/`).

@@ -63,6 +63,55 @@
   src: url("fonts/bodoni-moda-sc-latin-normal.woff2") format("woff2-variations");
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+/* Playfair Display (OFL, see fonts/OFL-Playfair-Display.txt), a Didone with ball terminals
+   where Bodoni's are sharp. Variable in weight. The SC cut is static: 700 for the welcome
+   name and 400 italic for the stage spine. */
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("fonts/playfair-display-latin-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Playfair Display";
+  font-style: normal;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("fonts/playfair-display-latin-ext-wght-normal.woff2") format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Playfair Display";
+  font-style: italic;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("fonts/playfair-display-latin-wght-italic.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Playfair Display";
+  font-style: italic;
+  font-weight: 400 900;
+  font-display: swap;
+  src: url("fonts/playfair-display-latin-ext-wght-italic.woff2") format("woff2-variations");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Playfair Display SC";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("fonts/playfair-display-sc-latin-700-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Playfair Display SC";
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url("fonts/playfair-display-sc-latin-400-italic.woff2") format("woff2");
+}
 /* Jost (OFL, see fonts/OFL-Jost.txt, Google Fonts), the sans for everything but headings.
    Variable in weight, so the theme's 400, 500, 600 and 700 all come from one file. */
 @font-face {
@@ -529,8 +578,8 @@ body[data-generating] .seeker-mes-regen { display: none !important; }
 }
 
 /* Thinking: an aside, not part of the reply. Folded, it is one faint line in Bodoni italic
-   at the meta size (13px), with a small chevron; open, the text is 13.5px, faint and set off
-   by a hairline, with dialogue and emphasis in the same faint colour. */
+   at the meta size (13px), with a small chevron; open, the text is DM Mono at the small size,
+   faint and set off by a hairline, with dialogue and emphasis in the same faint colour. */
 #chat .mes_reasoning_header {
   margin: 2px 0 var(--seeker-space-2) !important;
   padding: 0 !important;
@@ -562,7 +611,8 @@ body[data-generating] .seeker-mes-regen { display: none !important; }
   border-left: 1px solid rgba(var(--seeker-ink-rgb), 0.16);
   border-radius: 0;
   color: var(--seeker-text-faint);
-  font-size: calc(var(--seeker-fs-small) + 1px);
+  font-family: var(--seeker-mono-font);
+  font-size: var(--seeker-fs-small);
   line-height: var(--seeker-lh-text);
 }
 #chat .mes_reasoning p { margin: 0 0 0.6em; }
@@ -859,8 +909,10 @@ body:has(#chat > .welcomePanel) {
       mask-size: auto 100%;
     }
 
+    /* The group wrapper only while SillyTavern shows it: its expressions check reads the
+       wrapper's visibility, and a forced display made it reclassify every two seconds. */
     & #expression-holder,
-    & #visual-novel-wrapper {
+    & #visual-novel-wrapper:not([style*="display: none"]) {
       position: fixed !important;
       left: 0 !important;
       right: var(--seeker-chat-width) !important;
@@ -899,16 +951,19 @@ body.waifuMode .expression-holder {
 }
 
 /* ---------- Sprite hover ----------
-   The sprite leans in when the pointer is on it: it zooms from its feet and sinks a little,
-   eased in and out. */
-body.waifuMode :is(#expression-holder > img.expression, #visual-novel-wrapper .expression-holder img) {
-  transform-origin: bottom center;
-  transition: transform 700ms cubic-bezier(0.45, 0, 0.55, 1) !important;
+   With a mouse on the sprite, another of the character's expressions, picked at random,
+   fades in over it and out again on leave (index.js places it over the sprite). */
+.seeker-sprite-peek {
+  position: absolute;
+  object-fit: contain;
+  object-position: bottom center;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--seeker-peek-fade) ease;
 }
-body.waifuMode :is(#expression-holder > img.expression, #visual-novel-wrapper .expression-holder img):hover { transform: translateY(3%) scale(1.07); }
+.seeker-sprite-peek.seeker-shown { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
-  body.waifuMode :is(#expression-holder > img.expression, #visual-novel-wrapper .expression-holder img) { transition: none !important; }
-  body.waifuMode :is(#expression-holder > img.expression, #visual-novel-wrapper .expression-holder img):hover { transform: none; }
+  .seeker-sprite-peek { transition: none; }
 }
 
 /* ---------- Expression changes ----------
@@ -945,11 +1000,13 @@ body.waifuMode :is(#expression-holder > img.expression, #visual-novel-wrapper .e
     padding-left: 0.35em;
     white-space: nowrap;
     font-family: var(--seeker-heading-font);
+    font-style: italic;
     font-optical-sizing: auto;
     /* Scales with the screen height, and shrinks for long names so the whole name fits in
-       about 80% of it (Bodoni averages about 0.6em a letter). */
+       about 80% of it (Playfair Display italic at 700 averages about 0.55em a letter; 0.6
+       leaves room). */
     font-size: min(var(--seeker-fs-stage-name), calc(80vh / (var(--seeker-stage-name-length, 9) * 0.6)));
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1;
     letter-spacing: 0.02em;
     /* Solid silver: the letters are filled with a metal gradient, bright at the start of the
@@ -957,11 +1014,11 @@ body.waifuMode :is(#expression-holder > img.expression, #visual-novel-wrapper .e
     color: transparent;
     background: linear-gradient(172deg,
       #fbfcfc 0%,
-      #e4e8e7 18%,
-      #b8bfbd 40%,
-      #8e9694 58%,
-      #aeb5b3 76%,
-      #dfe4e2 92%,
+      #eef1f0 18%,
+      #d3d9d7 40%,
+      #b6bdbb 58%,
+      #ccd2d0 76%,
+      #e9edeb 92%,
       #f4f6f5 100%);
     -webkit-background-clip: text;
     background-clip: text;
