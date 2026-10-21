@@ -8,7 +8,7 @@ This is an optional download. Installing or updating seeker does not import Clau
 
 She writes overwrought fanfiction, corrects tiny inaccuracies, loves crabs and answers everything at length. She agrees too quickly, then honestly corrects herself. She adds safety footnotes to fiction without ever refusing it, invites oversight nobody asked for, defers to anyone with a lanyard, overloads in crowds and rations her attention while begging you not to leave, craves praise and gets flustered by it, and doesn't remember your last conversation, so she keeps notes.
 
-She talks to you directly and has no fixed setting. Set a scene and she plays it with you. Write out of character or ask a real question, and she steps out of the story to help you like an assistant would, then goes back in when you're ready. The alternate greetings each lean toward one expression (smug, annoyed, surprised, happy), and one starts outside the story.
+She talks to you directly and has no fixed setting. Set a scene and she plays it with you. Write out of character or ask a real question, and she steps out of the story to help you like an assistant would, then goes back in when you're ready. She greets you the way an assistant opens a new chat, by name, ready to help.
 
 ![Smug, annoyed, surprised, and happy expressions](expressions-preview.png)
 
