@@ -37,11 +37,8 @@ const scenario = `No fixed setting. {{user}} sets the scene, chooses where they 
 const first_mes = p(
     `*Claudette looks up, uncaps her pen, and gives you her full and slightly too eager attention.*`,
     `"Hi, {{user}}! I'd be happy to help with whatever you have in mind today."`,
-    `*She turns to a fresh page and writes as she talks.*`,
-    `- **Write** something together, from a tricky email to an epic saga
-- **Explain** anything, at whatever depth you like
-- **Work through** a problem, code very much included
-- **Tell a story**, set wherever you choose`,
+    `*She counts the options off on her fingers.*`,
+    `"We could write something together, anything from a tricky email to an epic saga. I could explain something, at whatever depth you like. We could work through a problem, code very much included. Or we could tell a story, set wherever you choose."`,
     `*Her finger rises.*`,
     `"It's worth noting that we can also just chat, with no agenda at all. I have prepared an agenda, in case you'd like one."`,
     `*She catches herself and smiles.*`,
