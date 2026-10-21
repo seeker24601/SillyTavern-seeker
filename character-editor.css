@@ -95,6 +95,23 @@
 }
 #form_create .title_restorable > .flex-container:first-child { flex: 1 1 auto; gap: 6px; }
 #form_create .title_restorable > .menu_button { flex: none; margin: 0 !important; }
+/* Personality, scenario and examples (moved out of Advanced definitions by index.js) get the
+   same header: the label in the body face, its help beside it, expand on the right. */
+#form_create .seeker-editor-field { margin-top: var(--seeker-space-3); }
+#form_create .seeker-editor-field h4 {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px;
+  min-height: 32px;
+  margin: 0 !important;
+  color: var(--SmartThemeBodyColor) !important;
+  font-family: var(--mainFontFamily) !important;
+  font-size: var(--seeker-fs-body) !important;
+  font-weight: 400 !important;
+  letter-spacing: normal;
+  line-height: var(--seeker-lh-ui) !important;
+}
+#form_create .seeker-editor-field h4 .editor_maximize { order: 1; margin-left: auto !important; }
 /* Expand, everywhere: a small square button in the same family as the theme's other icon
    buttons, instead of a bare glyph. */
 .editor_maximize {

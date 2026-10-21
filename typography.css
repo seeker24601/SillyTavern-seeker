@@ -195,8 +195,9 @@ body:not(:has(#chat > .welcomePanel)) #chat .mes[mesid="0"] .mes_text > p:first-
   font-family: var(--seeker-display-font) !important;
   font-optical-sizing: auto;
   font-size: var(--seeker-fs-display);
-  font-weight: 600;
-  letter-spacing: 0.01em;
+  font-weight: 700;
+  letter-spacing: 0.12em; /* small caps read better tracked out */
+  margin-right: -0.12em; /* the last letter's tracking would push the name off centre */
   line-height: var(--seeker-lh-display);
   color: var(--seeker-text);
 }

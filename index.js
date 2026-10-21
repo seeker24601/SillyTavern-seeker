@@ -491,7 +491,6 @@ if (settingsBlock && settingsContent) {
                 ghost.removeAttribute('id');
                 ghost.className = 'seeker-sprite-ghost';
                 ghost.style.opacity = '1';
-                ghost.style.transform = getComputedStyle(successor).transform; // keeps a hover zoom
                 record.target.append(ghost);
                 ghost.getBoundingClientRect(); // start the fade from fully visible
                 ghost.style.opacity = '0';
@@ -509,6 +508,86 @@ if (settingsBlock && settingsContent) {
     };
     watch();
     eventSource.on(eventTypes.CHAT_CHANGED, watch);
+}
+
+// Sprite hover: with a mouse on the sprite, another of the character's expressions, picked
+// at random, fades in over it and fades out again on leave. Only the picture changes:
+// SillyTavern's expression, and what its classifier chose, stay as they are.
+{
+    const { eventSource, eventTypes } = SillyTavern.getContext();
+    const SPRITE = ':is(#expression-holder > img.expression, #visual-novel-wrapper .expression-holder img)';
+    const lists = new Map(); // sprite folder -> promise of [{ label, path }]
+    const spritesOf = folder => {
+        if (!lists.has(folder)) {
+            const { getRequestHeaders } = SillyTavern.getContext();
+            lists.set(folder, fetch(`/api/sprites/get?name=${encodeURIComponent(folder)}`, { headers: getRequestHeaders() })
+                .then(response => response.ok ? response.json() : [])
+                .catch(() => []));
+        }
+        return lists.get(folder);
+    };
+    // Sprites added or removed in the editor show up on the next hover.
+    eventSource.on(eventTypes.CHAT_CHANGED, () => lists.clear());
+    eventSource.on(eventTypes.CHARACTER_EDITED, () => lists.clear());
+
+    let current = null; // { base, peek }
+    const leave = () => {
+        if (!current) return;
+        const { peek } = current;
+        current = null;
+        if (!peek) return;
+        peek.classList.remove('seeker-shown');
+        const remove = () => peek.remove();
+        peek.addEventListener('transitionend', remove, { once: true });
+        setTimeout(remove, 1000);
+    };
+
+    document.addEventListener('pointerover', async event => {
+        const base = event.target;
+        if (event.pointerType !== 'mouse' || !(base instanceof HTMLImageElement) || !base.matches(SPRITE)) return;
+        if (current?.base === base) return;
+        leave();
+        const folder = base.dataset.spriteFolderName;
+        if (!folder) return;
+        const entry = { base, peek: null };
+        current = entry;
+        const showing = base.dataset.spriteFilename;
+        const others = (await spritesOf(folder)).filter(sprite => !sprite.path.split('?')[0].endsWith(`/${showing}`));
+        if (current !== entry || !others.length) return;
+        const peek = new Image();
+        peek.className = 'seeker-sprite-peek';
+        peek.alt = '';
+        peek.src = others[Math.floor(Math.random() * others.length)].path;
+        try { await peek.decode(); } catch { return; }
+        // Laid exactly over the sprite, in the same box.
+        const parent = base.offsetParent;
+        if (current !== entry || !base.isConnected || !parent) return;
+        Object.assign(peek.style, {
+            left: `${base.offsetLeft}px`,
+            top: `${base.offsetTop}px`,
+            width: `${base.offsetWidth}px`,
+            height: `${base.offsetHeight}px`,
+        });
+        parent.append(peek);
+        entry.peek = peek;
+        peek.getBoundingClientRect(); // start the fade from clear
+        peek.classList.add('seeker-shown');
+    });
+    document.addEventListener('pointerout', event => {
+        if (current && event.target === current.base && event.relatedTarget !== current.base) leave();
+    });
+    // SillyTavern swapping the expression replaces the sprite under the pointer.
+    const observer = new MutationObserver(() => {
+        if (current && !current.base.isConnected) leave();
+    });
+    const watch = () => {
+        for (const id of ['expression-holder', 'visual-novel-wrapper']) {
+            const holder = document.getElementById(id);
+            if (holder) observer.observe(holder, { childList: true, subtree: true });
+        }
+    };
+    watch();
+    eventSource.on(eventTypes.CHAT_CHANGED, () => { leave(); watch(); });
 }
 
 // Tooltips: SillyTavern uses the browser's title tooltips, which CSS cannot reach. With a
@@ -951,6 +1030,23 @@ for (const id of ['seeker-stage-grain', 'seeker-stage-vignette', 'seeker-stage-o
     // Only once SillyTavern has loaded the user's settings, or the first run would repeat.
     // APP_READY also fires for listeners added after it.
     eventSource.on(eventTypes.APP_READY, install);
+}
+
+// Character editor: personality and scenario sit under the description, and the example
+// messages under the first message, instead of behind Advanced definitions. They carry most
+// of a card's prompt. SillyTavern's own blocks move whole: their textareas belong to the
+// form through form="form_create" and keep their save and token-count listeners.
+{
+    const description = document.getElementById('descriptionWrapper');
+    const firstMessage = document.getElementById('firstMessageWrapper');
+    const personality = document.getElementById('personality_div');
+    const scenario = document.getElementById('scenario_div');
+    const examples = document.getElementById('mes_example_div');
+    if (description && firstMessage && personality && scenario && examples) {
+        for (const block of [personality, scenario, examples]) block.classList.add('seeker-editor-field');
+        description.after(personality, scenario);
+        firstMessage.after(examples);
+    }
 }
 
 // Sprites: the Character Expressions section (the sprite grid and its settings) moves out
