@@ -2,6 +2,8 @@
 
 A visual novel theme for SillyTavern: the character's sprite on a stage beside a full-height chat, set in Playfair Display and Jost, with DM Mono for code.
 
+![Claudette on the stage beside the chat](docs/screenshot.webp)
+
 ## Install
 
 Needs SillyTavern 1.19 or later.
