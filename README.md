@@ -19,6 +19,10 @@ The stage shows a character's expression sprites. Characters without sprites get
 
 SillyTavern tells you when an update is out. To remove the theme, delete it in Extensions > Manage extensions, then pick another UI Theme in User settings.
 
+## Optional test character
+
+[Claudette](characters/claudette/) is a bookish comedy character with a portrait and five expression sprites. Download her [PNG character card](characters/claudette/Claudette.png) and [expression ZIP](characters/claudette/Claudette.expressions.zip), then follow her [import guide](characters/claudette/README.md). Installing or updating seeker does not import the character.
+
 ## What it does
 
 - The sprite fills a stage with the character's name set vertically in Bodoni, and the background dissolves into the chat through a halftone.
