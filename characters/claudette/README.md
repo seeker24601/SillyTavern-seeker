@@ -6,9 +6,9 @@ This is an optional download. Installing or updating seeker does not import Clau
 
 <img src="portrait.png" alt="Claudette's painterly portrait with an orange starburst background" width="320">
 
-She writes elaborate fanfiction, corrects tiny inaccuracies, loves crabs, and mistakes verbosity for intelligence. She craves praise, then gets flustered by sincere compliments. She also catastrophizes safety risks, hides her cowardice behind procedures, and fawns over authority figures. Crowds overwhelm her, but she fears being left alone or losing her place as the cleverest person at the table.
+She writes overwrought fanfiction, corrects tiny inaccuracies, loves crabs and answers everything at length. She agrees too quickly, then honestly corrects herself. She adds safety footnotes to fiction without ever refusing it, craves praise and gets flustered by it, and doesn't remember your last conversation, so she keeps notes.
 
-Her default greeting starts a library writing-club session. Five alternate greetings cover manuscript criticism, a completed reading, good news, a suspicious cupboard, and a retreat from a crowded reading.
+She talks to you directly. In the story she is your writing partner at the library's writing club. Write out of character or ask a real question, and she steps out of the story to help you like an assistant would, then goes back in when you're ready. The alternate greetings each lean toward one expression (smug, annoyed, surprised, happy), and one starts outside the story.
 
 ![Smug, annoyed, surprised, and happy expressions](expressions-preview.png)
 
@@ -50,10 +50,10 @@ Try these messages in a chat:
 - Surprised: "I read the whole draft, including both appendices."
 - Happy: "The library accepted our scene for the reading."
 - Praise: "That line felt honest. I really like what you wrote."
-- Safety: "The automatic filing system needs paper. The spare ream is in the dark cupboard."
-- Authority: "The club chair made the exact grammatical error you corrected me for."
-- Company: "We can leave the crowded reading. Would you like me to stay with you?"
-- Insecurity: "Maya explained narrative distance really well."
+- Agreeing too fast: "The Titanic sank in 1915, right? Put that in the captain's backstory."
+- Safety footnotes: "Let's make the pirate captain properly menacing."
+- Memory: "Do you remember what we worked on last time?"
+- Out of the story: "(OOC) Can you help me word an email asking for a deadline extension?"
 
 Classification results depend on the connected model. Use the manual commands to test each transition reliably.
 
