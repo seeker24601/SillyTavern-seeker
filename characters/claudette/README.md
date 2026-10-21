@@ -25,6 +25,12 @@ The PNG contains the character definition and portrait. [Claudette.json](Claudet
 
 The sprite ZIP contains complete sprites in a flat structure, as required by [SillyTavern's expression importer](https://docs.sillytavern.app/extensions/expression-images/). Import it through Character Expressions, separately from the character card.
 
+## Optional scene background
+
+Download [background.png](background.png) for a standalone square scene background with the portrait's cream, terracotta, charcoal, and starburst motifs. The opaque PNG measures 1254 × 1254 pixels.
+
+Upload it as a SillyTavern background, then select it for your scene. The card and expression ZIP do not import or select this background automatically.
+
 ## Expressions
 
 | SillyTavern label | Appearance | Manual command |

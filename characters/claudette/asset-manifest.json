@@ -58,5 +58,13 @@
     "background": "opaque",
     "styleReference": "Reverse: 1999",
     "SHA256": "3c5f4cae4e76e624e5a40f7f66ae6e3c80da24e6358aa8a6a932cc26f3761736"
+  },
+  "sceneBackground": {
+    "file": "background.png",
+    "width": 1254,
+    "height": 1254,
+    "aspectRatio": "1:1",
+    "background": "opaque",
+    "SHA256": "2072f7803138a6fa3254b5f3c8fb2ece08cfae3de0b2163fbdb60a814b5ea847"
   }
 }

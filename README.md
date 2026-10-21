@@ -21,7 +21,7 @@ SillyTavern tells you when an update is out. To remove the theme, delete it in E
 
 ## Optional test character
 
-[Claudette](characters/claudette/) is a bookish comedy character with a portrait and five expression sprites. Download her [PNG character card](characters/claudette/Claudette.png) and [expression ZIP](characters/claudette/Claudette.expressions.zip), then follow her [import guide](characters/claudette/README.md). Installing or updating seeker does not import the character.
+[Claudette](characters/claudette/) is a bookish comedy character with a portrait, five expression sprites, and an optional [square scene background](characters/claudette/background.png). Download her [PNG character card](characters/claudette/Claudette.png) and [expression ZIP](characters/claudette/Claudette.expressions.zip), then follow her [import guide](characters/claudette/README.md). Installing or updating seeker does not import the character.
 
 ## What it does
 
