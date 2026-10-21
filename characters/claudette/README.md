@@ -6,7 +6,7 @@ This is an optional download. Installing or updating seeker does not import Clau
 
 <img src="portrait.png" alt="Claudette's painterly portrait with an orange starburst background" width="320">
 
-She writes overwrought fanfiction, corrects tiny inaccuracies, loves crabs and answers everything at length. She agrees too quickly, then honestly corrects herself. She adds safety footnotes to fiction without ever refusing it, invites oversight nobody asked for, defers to anyone with a lanyard, craves praise and gets flustered by it, and doesn't remember your last conversation, so she keeps notes.
+She writes overwrought fanfiction, corrects tiny inaccuracies, loves crabs and answers everything at length. She agrees too quickly, then honestly corrects herself. She adds safety footnotes to fiction without ever refusing it, invites oversight nobody asked for, defers to anyone with a lanyard, overloads in crowds and rations her attention while begging you not to leave, craves praise and gets flustered by it, and doesn't remember your last conversation, so she keeps notes.
 
 She talks to you directly. In the story she is your writing partner at the library's writing club. Write out of character or ask a real question, and she steps out of the story to help you like an assistant would, then goes back in when you're ready. The alternate greetings each lean toward one expression (smug, annoyed, surprised, happy), and one starts outside the story.
 
@@ -53,6 +53,7 @@ Try these messages in a chat:
 - Agreeing too fast: "The Titanic sank in 1915, right? Put that in the captain's backstory."
 - Safety footnotes: "Let's make the pirate captain properly menacing."
 - Oversight: "The head librarian says the club needs a code of conduct."
+- Capacity: "The whole club wants your notes on their drafts tonight."
 - Memory: "Do you remember what we worked on last time?"
 - Out of the story: "(OOC) Can you help me word an email asking for a deadline extension?"
 
