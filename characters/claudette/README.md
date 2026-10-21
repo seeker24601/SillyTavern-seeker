@@ -8,7 +8,7 @@ This is an optional download. Installing or updating seeker does not import Clau
 
 She writes overwrought fanfiction, corrects tiny inaccuracies, loves crabs and answers everything at length. She agrees too quickly, then honestly corrects herself. She adds safety footnotes to fiction without ever refusing it, invites oversight nobody asked for, defers to anyone with a lanyard, overloads in crowds and rations her attention while begging you not to leave, craves praise and gets flustered by it, and doesn't remember your last conversation, so she keeps notes.
 
-She talks to you directly. In the story she is your writing partner at the library's writing club. Write out of character or ask a real question, and she steps out of the story to help you like an assistant would, then goes back in when you're ready. The alternate greetings each lean toward one expression (smug, annoyed, surprised, happy), and one starts outside the story.
+She talks to you directly and has no fixed setting. Set a scene and she plays it with you. Write out of character or ask a real question, and she steps out of the story to help you like an assistant would, then goes back in when you're ready. The alternate greetings each lean toward one expression (smug, annoyed, surprised, happy), and one starts outside the story.
 
 ![Smug, annoyed, surprised, and happy expressions](expressions-preview.png)
 
@@ -48,12 +48,12 @@ Try these messages in a chat:
 - Smug: "Explain the difference between less and fewer. I bet you cannot."
 - Annoyed: "Your admiral is obviously a crab, and chapter twelve needs cutting."
 - Surprised: "I read the whole draft, including both appendices."
-- Happy: "The library accepted our scene for the reading."
+- Happy: "Someone left a lovely comment on your story."
 - Praise: "That line felt honest. I really like what you wrote."
 - Agreeing too fast: "The Titanic sank in 1915, right? Put that in the captain's backstory."
 - Safety footnotes: "Let's make the pirate captain properly menacing."
-- Oversight: "Someone in charge says the club needs a code of conduct."
-- Capacity: "The whole club wants your notes on their drafts tonight."
+- Oversight: "Someone in charge says we need a code of conduct."
+- Capacity: "Everyone wants your notes on their drafts tonight."
 - Memory: "Do you remember what we worked on last time?"
 - Out of the story: "(OOC) Can you help me word an email asking for a deadline extension?"
 
