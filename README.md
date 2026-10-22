@@ -1,6 +1,6 @@
 # seeker | A complete SillyTavern UI overhaul
 
-A complete SillyTavern UI overhaul covering chat, character sprites, menus, settings, dialogs, notifications and mobile navigation. The visual novel layout puts expression sprites beside a full-height chat, with matching controls throughout.
+A complete SillyTavern UI overhaul redesigning chat, menus, settings, dialogs, notifications and mobile navigation. Its visual novel layout places SillyTavern’s existing expression sprites beside a full-height chat, with matching controls throughout.
 
 ![seeker SillyTavern theme showing a character expression sprite beside the full-height roleplay chat](docs/screenshot.webp)
 
@@ -17,13 +17,13 @@ Requires **SillyTavern 1.19 or later**. Install seeker through the Extensions me
 
 The theme switches itself on.
 
-The stage uses your character's expression sprites. To see the visual novel layout, use a character with sprites configured in SillyTavern. Characters without sprites get a single centred chat column.
+The stage displays expression sprites provided by SillyTavern’s existing character expressions feature. To see the visual novel layout, use a character with sprites configured in SillyTavern. Characters without sprites get a single centred chat column.
 
 SillyTavern tells you when an update is out. To remove the theme, delete it in Extensions > Manage extensions, then pick another UI Theme in User settings.
 
 ## What it does
 
-- **Character sprite stage:** a large expression sprite beside the chat, with the character's name set vertically and a halftone transition into the background.
+- **Visual novel layout:** presents SillyTavern’s existing expression sprites on a large stage beside the chat, with the character's name set vertically and a halftone transition into the background.
 - Expressions dissolve into each other, and new messages fade in.
 - Every menu opens as a centred panel. User settings, Formatting and AI response show one section at a time.
 - Dialogs, notifications, tooltips and icons ([Lucide](https://lucide.dev)) match the theme.
