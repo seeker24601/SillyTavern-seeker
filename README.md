@@ -43,6 +43,16 @@ and the UI is applied. If you cannot access the browser, tell me exactly
 what I need to click and what remains unverified.
 ```
 
+## Download Claudette
+
+Claudette is an optional custom character for trying the visual novel layout.
+
+- [Download the Claudette character card (PNG)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claudette/Claudette.png)
+- [Download her expression pack (ZIP)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claudette/Claudette.expressions.zip)
+- [Import guide and optional background](https://github.com/seeker24601/SillyTavern-seeker/blob/codex/claudette-test-character/characters/claudette/README.md)
+
+Import the PNG through SillyTavern’s character importer, then upload the ZIP in Character Expressions. Installing seeker does not import Claudette automatically.
+
 ## What it does
 
 - **Visual novel layout:** presents SillyTavern’s existing expression sprites on a large stage beside the chat, with the character's name set vertically and a halftone transition into the background.
