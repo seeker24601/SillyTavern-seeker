@@ -1,12 +1,12 @@
 # seeker | A complete SillyTavern UI overhaul
 
-A complete SillyTavern UI overhaul covering chat, character sprites, menus, settings, dialogs, notifications and mobile navigation. The visual novel layout puts expression sprites beside a full-height chat, with matching controls throughout and an optional gold variant.
+A complete SillyTavern UI overhaul covering chat, character sprites, menus, settings, dialogs, notifications and mobile navigation. The visual novel layout puts expression sprites beside a full-height chat, with matching controls throughout.
 
 ![seeker SillyTavern theme showing a character expression sprite beside the full-height roleplay chat](docs/screenshot.webp)
 
 ## Install the SillyTavern theme
 
-Requires **SillyTavern 1.19 or later**. Install seeker through the Extensions menu; it includes the UI theme presets.
+Requires **SillyTavern 1.19 or later**. Install seeker through the Extensions menu.
 
 1. Open Extensions (the cubes icon in the top bar) and click **Install extension**.
 2. Paste this link and install:
@@ -15,7 +15,7 @@ Requires **SillyTavern 1.19 or later**. Install seeker through the Extensions me
    https://github.com/seeker24601/SillyTavern-seeker
    ```
 
-The theme switches itself on. A gold variant, seeker gilt, is in User settings > UI Theme.
+The theme switches itself on.
 
 The stage uses your character's expression sprites. To see the visual novel layout, use a character with sprites configured in SillyTavern. Characters without sprites get a single centred chat column.
 
@@ -28,7 +28,6 @@ SillyTavern tells you when an update is out. To remove the theme, delete it in E
 - Every menu opens as a centred panel. User settings, Formatting and AI response show one section at a time.
 - Dialogs, notifications, tooltips and icons ([Lucide](https://lucide.dev)) match the theme.
 - **Mobile layout:** the top bar folds into a menu button and the chat fades up over the sprite.
-- **Two UI theme presets:** seeker and the gold-accented seeker gilt.
 
 ## Customize
 
