@@ -1,6 +1,6 @@
-# seeker | A visual novel theme for SillyTavern
+# seeker | A complete SillyTavern UI overhaul
 
-A SillyTavern theme that puts character expression sprites beside a full-height chat. Turn roleplay conversations into a visual novel layout, with a mobile layout and an optional gold variant.
+A complete SillyTavern UI overhaul covering chat, character sprites, menus, settings, dialogs, notifications and mobile navigation. The visual novel layout puts expression sprites beside a full-height chat, with matching controls throughout and an optional gold variant.
 
 ![seeker SillyTavern theme showing a character expression sprite beside the full-height roleplay chat](docs/screenshot.webp)
 
