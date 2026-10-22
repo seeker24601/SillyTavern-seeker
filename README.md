@@ -21,6 +21,28 @@ The stage displays expression sprites provided by SillyTavern’s existing chara
 
 SillyTavern tells you when an update is out. To remove the theme, delete it in Extensions > Manage extensions, then pick another UI Theme in User settings.
 
+### Install with an agent
+
+Give your coding agent this prompt:
+
+```text
+Install seeker, a complete SillyTavern UI overhaul, from
+https://github.com/seeker24601/SillyTavern-seeker
+
+Read the repository’s current README and installation requirements first.
+Find my existing SillyTavern installation and active user profile; ask me
+for the location if you cannot identify them. Check compatibility before
+making changes, and use SillyTavern’s extension installation workflow
+where available. If seeker is already installed, update that installation
+instead of creating a duplicate.
+
+Preserve my chats, characters, API connections, other extensions and
+custom CSS. Back up any settings you need to change, then install and
+activate seeker. Reload SillyTavern and verify that the extension loads
+and the UI is applied. If you cannot access the browser, tell me exactly
+what I need to click and what remains unverified.
+```
+
 ## What it does
 
 - **Visual novel layout:** presents SillyTavern’s existing expression sprites on a large stage beside the chat, with the character's name set vertically and a halftone transition into the background.
