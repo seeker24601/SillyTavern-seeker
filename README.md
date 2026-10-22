@@ -1,12 +1,12 @@
-# seeker
+# seeker | A visual novel theme for SillyTavern
 
-A visual novel theme for SillyTavern: the character's sprite on a stage beside a full-height chat, set in Playfair Display and Jost, with DM Mono for code.
+A SillyTavern theme that puts character expression sprites beside a full-height chat. Turn roleplay conversations into a visual novel layout, with a mobile layout and an optional gold variant.
 
-![Claudette on the stage beside the chat](docs/screenshot.webp)
+![seeker SillyTavern theme showing a character expression sprite beside the full-height roleplay chat](docs/screenshot.webp)
 
-## Install
+## Install the SillyTavern theme
 
-Needs SillyTavern 1.19 or later.
+Requires **SillyTavern 1.19 or later**. Install seeker through the Extensions menu; it includes the UI theme presets.
 
 1. Open Extensions (the cubes icon in the top bar) and click **Install extension**.
 2. Paste this link and install:
@@ -17,17 +17,18 @@ Needs SillyTavern 1.19 or later.
 
 The theme switches itself on. A gold variant, seeker gilt, is in User settings > UI Theme.
 
-The stage shows a character's expression sprites. Characters without sprites get a single centred column.
+The stage uses your character's expression sprites. To see the visual novel layout, use a character with sprites configured in SillyTavern. Characters without sprites get a single centred chat column.
 
 SillyTavern tells you when an update is out. To remove the theme, delete it in Extensions > Manage extensions, then pick another UI Theme in User settings.
 
 ## What it does
 
-- The sprite fills a stage with the character's name set vertically in Playfair Display italic, and the background dissolves into the chat through a halftone.
+- **Character sprite stage:** a large expression sprite beside the chat, with the character's name set vertically and a halftone transition into the background.
 - Expressions dissolve into each other, and new messages fade in.
 - Every menu opens as a centred panel. User settings, Formatting and AI response show one section at a time.
 - Dialogs, notifications, tooltips and icons ([Lucide](https://lucide.dev)) match the theme.
-- On phones the top bar folds into a menu button and the chat fades up over the sprite.
+- **Mobile layout:** the top bar folds into a menu button and the chat fades up over the sprite.
+- **Two UI theme presets:** seeker and the gold-accented seeker gilt.
 
 ## Customize
 
@@ -41,6 +42,10 @@ Every colour, font, size, spacing step, corner radius and layer is a variable in
 ```
 
 The accent is the Underlined Text colour in User settings > Theme Colors, and the chat's narration, actions and dialogue follow Main Text, Italics Text and Quote Text.
+
+## Feedback
+
+[Report a bug or request a change](https://github.com/seeker24601/SillyTavern-seeker/issues). For layout problems, include your SillyTavern version, browser, screen size and a screenshot with private chats or API keys hidden.
 
 ## Develop
 
