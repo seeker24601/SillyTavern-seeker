@@ -21,6 +21,10 @@ The stage uses your character's expression sprites. To see the visual novel layo
 
 SillyTavern tells you when an update is out. To remove the theme, delete it in Extensions > Manage extensions, then pick another UI Theme in User settings.
 
+## Optional test character
+
+[Claudette](characters/claudette/) is a bookish comedy character with a portrait, five expression sprites, and an optional [square scene background](characters/claudette/background.png). Download her [PNG character card](characters/claudette/Claudette.png) and [expression ZIP](characters/claudette/Claudette.expressions.zip), then follow her [import guide](characters/claudette/README.md). Installing or updating seeker does not import the character.
+
 ## What it does
 
 - **Character sprite stage:** a large expression sprite beside the chat, with the character's name set vertically and a halftone transition into the background.

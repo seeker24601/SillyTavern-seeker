@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "master": "sprites/neutral.png",
+  "masterSHA256": "b4c613e856e9fd80f4fece812d875a0e3eb38ea2e93e16f86b989c7283f47e84",
+  "overlayPlacement": {
+    "x": 0,
+    "y": 0,
+    "blend": "normal source-over",
+    "visibleLayers": 1
+  },
+  "expressions": {
+    "neutral": {
+      "appearance": "original",
+      "sprite": "sprites/neutral.png",
+      "spriteSHA256": "b4c613e856e9fd80f4fece812d875a0e3eb38ea2e93e16f86b989c7283f47e84"
+    },
+    "pride": {
+      "appearance": "smug",
+      "sprite": "sprites/pride.png",
+      "spriteSHA256": "1c0b881fda14eb533d2e111b02877b740951da6fca40e3a1a6dccb1ee8ba4b7c",
+      "overlay": "overlays/pride.png",
+      "overlaySHA256": "a541bb70e04f0de0966ef1b3f5e042749fcc351a53cbb61d6c75bca4b15bdfde",
+      "changedPixelsOutsideOverlay": 0
+    },
+    "annoyance": {
+      "appearance": "annoyed",
+      "sprite": "sprites/annoyance.png",
+      "spriteSHA256": "ca9c86ef7a331bd75b6f578636b9b45fdac8471b2c34fdc8dc61bfebc5fc96b2",
+      "overlay": "overlays/annoyance.png",
+      "overlaySHA256": "7663778ae5613807fa3e152e53a3b53917c3658a35471d5b4fdd04bbab9c7598",
+      "changedPixelsOutsideOverlay": 0
+    },
+    "surprise": {
+      "appearance": "surprised",
+      "sprite": "sprites/surprise.png",
+      "spriteSHA256": "ca4b4ecc45c80ade642fca3ae4f96349092c026caa65c58987262f4fbb598e3f",
+      "overlay": "overlays/surprise.png",
+      "overlaySHA256": "8e7bd916a6741900e799cfd9d1bf8b5bbcf632797351c49c5eebed7b711f2a73",
+      "changedPixelsOutsideOverlay": 0
+    },
+    "joy": {
+      "appearance": "happy",
+      "sprite": "sprites/joy.png",
+      "spriteSHA256": "4f951212e33baa6f52758f45cfd8645e3c6c32815edfaccf51a1161f84b530b0",
+      "overlay": "overlays/joy.png",
+      "overlaySHA256": "accdfe5623d677441fc91b8c8eb9f488f8e58a6342951312ff3097f460272dc5",
+      "changedPixelsOutsideOverlay": 0
+    }
+  },
+  "portrait": {
+    "file": "portrait.png",
+    "width": 1024,
+    "height": 1536,
+    "background": "opaque",
+    "styleReference": "Reverse: 1999",
+    "SHA256": "3c5f4cae4e76e624e5a40f7f66ae6e3c80da24e6358aa8a6a932cc26f3761736"
+  },
+  "sceneBackground": {
+    "file": "background.png",
+    "width": 1254,
+    "height": 1254,
+    "aspectRatio": "1:1",
+    "background": "opaque",
+    "SHA256": "2072f7803138a6fa3254b5f3c8fb2ece08cfae3de0b2163fbdb60a814b5ea847"
+  }
+}
