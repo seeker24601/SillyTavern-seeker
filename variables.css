@@ -54,9 +54,8 @@
      Headings are Bodoni Moda, weight 600. Meta (timestamps, message numbers, counters,
      token counts, versions, authors) and code are DM Mono, faint, with tabular figures.
      Everything else is Jost. */
-  /* For the sharper Bodoni, use "Bodoni Moda" and "Bodoni Moda SC", which are bundled too. */
-  --seeker-heading-font: "Playfair Display", Didot, serif;
-  --seeker-display-font: "Playfair Display SC", var(--seeker-heading-font); /* small caps */
+  --seeker-heading-font: "Bodoni Moda", "Bodoni 72", "Bodoni MT", Didot, serif;
+  --seeker-display-font: "Bodoni Moda SC", var(--seeker-heading-font); /* small caps */
   --seeker-mono-font: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   /* Sizes. */
