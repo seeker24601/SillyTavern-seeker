@@ -84,4 +84,4 @@ The accent is the Underlined Text colour in User settings > Theme Colors, and th
 
 ## License
 
-Lucide icons are ISC licensed (`LICENSE-lucide`). Playfair Display, Bodoni Moda, Jost and DM Mono are under the SIL Open Font License (`fonts/`).
+Lucide icons are ISC licensed (`LICENSE-lucide`). Bodoni Moda, Jost and DM Mono are under the SIL Open Font License (`fonts/`).
