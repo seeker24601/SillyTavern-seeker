@@ -661,9 +661,9 @@ if (settingsBlock && settingsContent) {
     }
 }
 
-// Desktop stage: fine grain, a soft vignette, and a thin-line ornament in its bottom-left
+// Desktop stage: a soft vignette and a thin-line ornament in its bottom-left
 // corner. style.css draws them and shows them with the stage.
-for (const id of ['seeker-stage-grain', 'seeker-stage-vignette', 'seeker-stage-ornament']) {
+for (const id of ['seeker-stage-vignette', 'seeker-stage-ornament']) {
     const element = document.createElement('div');
     element.id = id;
     element.setAttribute('aria-hidden', 'true');
@@ -1478,4 +1478,128 @@ for (const [view, closeId] of [['completion_prompt_manager_popup_edit', 'complet
         }
     });
     document.body.append(newChat);
+}
+
+// Chats: a button beside New chat that lists the other chats with the same character (or
+// group) and switches to one. The list is fetched fresh each time it opens, from the same
+// endpoints SillyTavern's "Manage chat files" uses; the current chat is marked, and a row at
+// the foot opens that manager for renaming, deleting and importing.
+{
+    const button = document.createElement('div');
+    button.id = 'seeker-chats';
+    button.className = 'fa-solid fa-comments interactable';
+    button.setAttribute('role', 'button');
+    button.setAttribute('tabindex', '0');
+    button.setAttribute('title', 'Chats with this character');
+    button.setAttribute('aria-expanded', 'false');
+
+    const panel = document.createElement('div');
+    panel.id = 'seeker-chats-panel';
+    panel.hidden = true;
+    document.body.append(button, panel);
+
+    const dateOf = value => {
+        const d = new Date(typeof value === 'string' && /^\d+$/.test(value) ? Number(value) : value);
+        if (Number.isNaN(d.getTime())) return '';
+        const sameYear = d.getFullYear() === new Date().getFullYear();
+        return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', ...(sameYear ? {} : { year: 'numeric' }) });
+    };
+
+    const fetchChats = async context => {
+        const headers = context.getRequestHeaders();
+        if (context.groupId) {
+            const group = context.groups?.find(g => g.id === context.groupId);
+            const ids = group?.chats ?? [];
+            const infos = await Promise.all(ids.map(id => fetch('/api/chats/group/info', { method: 'POST', headers, body: JSON.stringify({ id }) })
+                .then(r => r.ok ? r.json() : null).catch(() => null)));
+            return infos.map((info, i) => ({ file_id: ids[i], ...(info ?? {}) }));
+        }
+        const character = context.characters?.[context.characterId];
+        if (!character) return [];
+        const response = await fetch('/api/characters/chats', { method: 'POST', headers, body: JSON.stringify({ avatar_url: character.avatar }) });
+        if (!response.ok) return [];
+        const data = await response.json();
+        if (!Array.isArray(data) && !(data && typeof data === 'object')) return [];
+        return Object.values(data).filter(c => c && c.file_id);
+    };
+
+    const render = async () => {
+        const context = SillyTavern.getContext();
+        const current = context.getCurrentChatId();
+        const name = context.groupId ? (context.groups?.find(g => g.id === context.groupId)?.name ?? 'this group') : (context.characters?.[context.characterId]?.name ?? 'this character');
+        panel.innerHTML = `<div class="seeker-popover-title">Chats with ${name.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c])}</div><div class="seeker-chats-list"><div class="seeker-chats-empty">Loading…</div></div>`;
+        const list = panel.querySelector('.seeker-chats-list');
+        let chats = [];
+        try { chats = await fetchChats(context); } catch { chats = []; }
+        if (panel.hidden) return;
+        // Newest first, by when the chat was created: SillyTavern's chat names carry that
+        // (2026-10-28@18h27m27s683ms). last_mes is the file's save time, which opening a chat
+        // bumps, so it only orders chats that were renamed.
+        const when = chat => {
+            const m = /(\d{4}-\d{2}-\d{2})@(\d{2})h(\d{2})m(\d{2})s(\d{3})ms/.exec(String(chat.file_id ?? ''));
+            if (m) return Date.parse(`${m[1]}T${m[2]}:${m[3]}:${m[4]}.${m[5]}`);
+            const v = chat.last_mes;
+            const t = typeof v === 'number' ? v : Date.parse(/^\d+$/.test(String(v ?? '')) ? Number(v) : v);
+            return Number.isNaN(t) ? 0 : t;
+        };
+        chats.sort((a, b) => (when(b) - when(a)) || String(b.file_id).localeCompare(String(a.file_id)));
+        list.innerHTML = '';
+        if (!chats.length) {
+            list.innerHTML = '<div class="seeker-chats-empty">No chats yet</div>';
+        }
+        for (const chat of chats) {
+            const row = document.createElement('div');
+            row.className = 'seeker-chats-row interactable';
+            row.setAttribute('role', 'button');
+            row.setAttribute('tabindex', '0');
+            if (chat.file_id === current) row.classList.add('seeker-current');
+            const count = Number(chat.chat_items ?? chat.message_count ?? 0);
+            const preview = String(chat.mes ?? chat.preview_message ?? '').replace(/\s+/g, ' ').trim();
+            row.innerHTML = '<div class="seeker-chats-name"></div><div class="seeker-chats-meta"></div><div class="seeker-chats-preview"></div>';
+            row.querySelector('.seeker-chats-name').textContent = chat.file_id;
+            row.querySelector('.seeker-chats-meta').textContent = [dateOf(chat.last_mes), count ? `${count} message${count === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ');
+            row.querySelector('.seeker-chats-preview').textContent = preview;
+            const open = async () => {
+                close();
+                if (chat.file_id === current) return;
+                const ctx = SillyTavern.getContext();
+                if (ctx.groupId) await ctx.openGroupChat(ctx.groupId, chat.file_id);
+                else await ctx.openCharacterChat(chat.file_id);
+            };
+            row.addEventListener('click', open);
+            row.addEventListener('keydown', event => {
+                if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); }
+            });
+            list.append(row);
+        }
+        const manage = document.createElement('div');
+        manage.className = 'seeker-chats-manage interactable';
+        manage.setAttribute('role', 'button');
+        manage.setAttribute('tabindex', '0');
+        manage.textContent = 'Manage chat files…';
+        const openManager = () => { close(); document.getElementById('option_select_chat')?.click(); };
+        manage.addEventListener('click', openManager);
+        manage.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openManager(); }
+        });
+        panel.append(manage);
+    };
+
+    const close = () => { panel.hidden = true; button.setAttribute('aria-expanded', 'false'); };
+    const toggle = () => {
+        if (!panel.hidden) return close();
+        panel.hidden = false;
+        button.setAttribute('aria-expanded', 'true');
+        render();
+    };
+    button.addEventListener('click', event => { event.stopPropagation(); toggle(); });
+    button.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); }
+    });
+    document.addEventListener('click', event => {
+        if (!panel.hidden && !event.target.closest('#seeker-chats, #seeker-chats-panel')) close();
+    });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) close(); }, true);
+    const { eventSource, eventTypes } = SillyTavern.getContext();
+    eventSource?.on(eventTypes.CHAT_CHANGED, close);
 }

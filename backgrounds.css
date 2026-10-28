@@ -69,6 +69,7 @@
   padding: 4px 4px var(--seeker-space-6) !important;
   background: none !important;
   border: none !important;
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 28px), transparent);
   mask-image: linear-gradient(to bottom, black calc(100% - 28px), transparent);
 }
 

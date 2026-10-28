@@ -156,9 +156,10 @@
      --seeker-bg-shift towards the pointer; the shift must stay under (zoom - 1) / 2. */
   --seeker-bg-zoom: 1.08;
   --seeker-bg-shift: 3.5%;
-  /* How far halftone.webp hangs past the stage's edge: the last 23% of its width, which
-     is almost but not quite solid. The image is 482 x 1125 and spans the stage's height. */
-  --seeker-halftone-shift: calc(100vh * 482 / 1125 * 0.23);
+  /* How far halftone.webp hangs past the stage's edge to cut off the edge artifact.
+     The image is 482 x 1125 and spans the stage's height. */
+  --seeker-halftone-width: calc(100vh * 482 / 1125);
+  --seeker-halftone-shift: calc(var(--seeker-halftone-width) * 0.08);
   --seeker-ornament-size: clamp(220px, 30vh, 320px); /* scales a little with the screen */
   --seeker-sprite-fade: 550ms; /* one expression dissolving into the next (index.js reads it) */
   --seeker-peek-fade: 250ms; /* the random expression shown while the mouse is on the sprite */

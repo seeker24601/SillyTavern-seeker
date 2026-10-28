@@ -218,6 +218,92 @@ body:has(#chat > .welcomePanel) #seeker-new-chat,
 body.seeker-nav-open #seeker-new-chat,
 body[data-generating] #seeker-new-chat { display: none; }
 
+/* Chats (index.js): to the left of New chat, lists the chats with the same character and
+   switches between them. Its panel hangs below the corner buttons. */
+#seeker-chats {
+  position: fixed;
+  top: var(--seeker-menu-top);
+  right: calc(12px + (var(--seeker-menu-size) + 8px) * 2);
+  z-index: var(--seeker-z-menu-button);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--seeker-menu-size);
+  height: var(--seeker-menu-size);
+  font-size: 15px;
+  color: var(--seeker-text-dim);
+  background: var(--seeker-surface);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 120ms;
+}
+#seeker-chats:hover,
+#seeker-chats[aria-expanded="true"] { color: var(--seeker-text); }
+body:has(#chat > .welcomePanel) :is(#seeker-chats, #seeker-chats-panel),
+body.seeker-nav-open :is(#seeker-chats, #seeker-chats-panel),
+body[data-generating] :is(#seeker-chats, #seeker-chats-panel) { display: none; }
+#seeker-chats-panel {
+  position: fixed;
+  top: calc(var(--seeker-menu-top) + var(--seeker-menu-size) + 8px);
+  right: 12px;
+  z-index: var(--seeker-z-menu-button);
+  width: min(360px, calc(100vw - 24px));
+  max-height: min(70vh, 560px);
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--seeker-menu-radius);
+  background:
+    linear-gradient(var(--seeker-surface-solid), var(--seeker-surface-solid)) padding-box,
+    var(--seeker-glass-edge-panel) border-box;
+  box-shadow: var(--seeker-shadow);
+}
+#seeker-chats-panel[hidden] { display: none !important; }
+.seeker-chats-list { overflow-y: auto; min-height: 0; display: flex; flex-direction: column; gap: 2px; }
+.seeker-chats-empty { padding: 10px; color: var(--seeker-text-faint); font-size: var(--seeker-fs-small, 13px); }
+.seeker-chats-row {
+  padding: 8px 10px;
+  border-radius: var(--seeker-menu-item-radius);
+  cursor: pointer;
+  transition: background 120ms;
+}
+.seeker-chats-row:hover, .seeker-chats-row:focus-visible { background: var(--seeker-fill-hover); outline: none; }
+.seeker-chats-row.seeker-current { background: rgba(var(--seeker-ink-rgb), 0.06); }
+.seeker-chats-row.seeker-current .seeker-chats-name::after {
+  content: "current";
+  margin-left: 8px;
+  color: var(--seeker-text-faint);
+  font-size: var(--seeker-fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.seeker-chats-name { color: var(--seeker-text); font-size: var(--seeker-fs-small, 13px); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seeker-chats-meta { color: var(--seeker-text-faint); font-size: var(--seeker-fs-meta); margin-top: 2px; }
+.seeker-chats-preview {
+  margin-top: 3px;
+  color: var(--seeker-text-dim);
+  font-size: var(--seeker-fs-small, 13px);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.seeker-chats-preview:empty { display: none; }
+.seeker-chats-manage {
+  flex: 0 0 auto;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border-top: 1px solid rgba(var(--seeker-ink-rgb), 0.08);
+  color: var(--seeker-text-dim);
+  font-size: var(--seeker-fs-small, 13px);
+  cursor: pointer;
+}
+.seeker-chats-manage:hover { color: var(--seeker-text); }
+
 #top-settings-holder {
   position: fixed !important;
   top: var(--seeker-below-menu) !important;
@@ -417,7 +503,7 @@ body:not(.movingUI)::after {
     border-width: 0 !important; /* full screen: no edge */
   }
   /* The panel's own close button takes the menu button's corner. */
-  body:has(#top-settings-holder .drawer-content.openDrawer, #movingDivs > .drawer-content.openDrawer, #character_popup[style*="display: flex"]) :is(#seeker-menu-button, #seeker-new-chat) { display: none; }
+  body:has(#top-settings-holder .drawer-content.openDrawer, #movingDivs > .drawer-content.openDrawer, #character_popup[style*="display: flex"]) :is(#seeker-menu-button, #seeker-new-chat, #seeker-chats, #seeker-chats-panel) { display: none; }
 }
 
 /* ---------- Messages: prose on the panel, no cards ---------- */
@@ -844,8 +930,9 @@ body:has(#chat > .welcomePanel) {
     & #bg1.stretch::before { background-size: 100% 100%; }
     & #bg1.center::before { background-size: auto; }
     /* The edge into the chat column: dots in the column's colour over the background,
-       growing until they merge into it. halftone.webp is the dot coverage as white on
-       black, read as a luminance mask, and spans the stage's height. Its last stretch is
+       growing until they merge into it. halftone.webp is the dot coverage in its alpha
+       channel (WebKit stretches a luminance mask over the whole box, ignoring mask-size)
+       and spans the stage's height. Its last stretch is
        almost but not quite solid, so it is shifted right by --seeker-halftone-shift and that
        stretch is cut off at the column. It stays put while the background drifts under it. */
     & #bg1::after {
@@ -853,11 +940,14 @@ body:has(#chat > .welcomePanel) {
       position: absolute;
       inset: 0;
       background-color: rgb(var(--seeker-panel-rgb));
+      -webkit-mask-image: url("halftone.webp");
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: calc(100% + var(--seeker-halftone-shift)) 0;
+      -webkit-mask-size: var(--seeker-halftone-width) 100%;
       mask-image: url("halftone.webp");
-      mask-mode: luminance;
       mask-repeat: no-repeat;
-      mask-position: right calc(-1 * var(--seeker-halftone-shift)) top 0;
-      mask-size: auto 100%;
+      mask-position: calc(100% + var(--seeker-halftone-shift)) 0;
+      mask-size: var(--seeker-halftone-width) 100%;
     }
 
     /* The group wrapper only while SillyTavern shows it: its expressions check reads the
@@ -1023,6 +1113,15 @@ body.waifuMode .expression-holder {
 /* ---------- Welcome stage (desktop) ----------
    index.js moves the logo, the name with its version and the links here; the recent chats
    stay in the chat column. */
+/* The stage is scenery, not text. A drag that starts on it would otherwise sweep a selection
+   over the background, the sprite, the name and the welcome stage, which WebKit paints as a
+   bright tint across the whole stage (Chromium only marks the text). */
+#bg1, #seeker-welcome-stage, #expression-wrapper, #visual-novel-wrapper, #expression-holder,
+#seeker-stage-name, #seeker-stage-spine, #seeker-stage-ornament, #seeker-stage-vignette {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 #seeker-welcome-stage { display: none; }
 @media (min-width: 1001px) {
   #seeker-welcome-stage:not(:empty) {
@@ -1116,11 +1215,14 @@ body:has(#chat > .welcomePanel) {
         z-index: 0;
         pointer-events: none;
         background-color: rgb(var(--seeker-panel-rgb));
+        -webkit-mask-image: url("halftone.webp");
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-position: calc(100% + var(--seeker-halftone-shift)) 0;
+        -webkit-mask-size: var(--seeker-halftone-width) 100%;
         mask-image: url("halftone.webp");
-        mask-mode: luminance;
         mask-repeat: no-repeat;
-        mask-position: right calc(-1 * var(--seeker-halftone-shift)) top 0;
-        mask-size: auto 100%;
+        mask-position: calc(100% + var(--seeker-halftone-shift)) 0;
+        mask-size: var(--seeker-halftone-width) 100%;
       }
       & #bg1::before { left: 0; right: calc(50vw + var(--seeker-column-width) / 2); }
       & #bg1::after { left: calc(50vw + var(--seeker-column-width) / 2); right: 0; transform: scaleX(-1); }
@@ -1135,22 +1237,8 @@ body:has(#chat > .welcomePanel) {
    adds the element. Over the background, which drifts under it, and under the sprite, which
    covers it where they overlap. Shown whenever the stage is: a sprite showing, or the
    welcome screen. */
-#seeker-stage-ornament, #seeker-stage-vignette, #seeker-stage-grain { display: none; }
+#seeker-stage-ornament, #seeker-stage-vignette { display: none; }
 @media (min-width: 1001px) {
-  /* Grain: fine monochrome noise blended over the stage, for the texture of print. It stays
-     still; moving grain would compete with the sprite. */
-  body.waifuMode:has(#expression-wrapper:not([style*="display: none"]) #expression-image[src]:not([src=""]),
-                     #visual-novel-wrapper:not([style*="display: none"]) .expression-holder:not(.hidden) img[src]:not([src=""])) #seeker-stage-grain,
-  body:has(#chat > .welcomePanel) #seeker-stage-grain {
-    position: fixed;
-    inset: 0 var(--seeker-chat-width) 0 0;
-    z-index: 0;
-    display: block;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E") 0 0 / 220px 220px;
-    opacity: 0.32;
-    mix-blend-mode: overlay;
-    pointer-events: none;
-  }
   /* The vignette: the stage darkens softly towards its corners and its foot, framing the
      sprite like a lit set. Over the background and halftone, under the ornament and sprite. */
   body.waifuMode:has(#expression-wrapper:not([style*="display: none"]) #expression-image[src]:not([src=""]),

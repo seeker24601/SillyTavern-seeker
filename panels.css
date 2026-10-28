@@ -131,12 +131,14 @@
 }
 @keyframes seeker-scroll-fade { to { --seeker-scroll-fade: 28px; } }
 :is(#rm_print_characters_block, #world_popup_entries_list, #form_create, #right-nav-panel > .scrollableInner, #left-nav-panel > .scrollableInner) {
+  -webkit-mask-image: linear-gradient(transparent, black var(--seeker-scroll-fade));
   mask-image: linear-gradient(transparent, black var(--seeker-scroll-fade));
   animation: seeker-scroll-fade linear both;
   animation-timeline: scroll(self);
   animation-range: 0 40px;
 }
 #Backgrounds .bg_tab_panel {
+  -webkit-mask-image: linear-gradient(transparent, black var(--seeker-scroll-fade), black calc(100% - 28px), transparent) !important;
   mask-image: linear-gradient(transparent, black var(--seeker-scroll-fade), black calc(100% - 28px), transparent) !important;
   animation: seeker-scroll-fade linear both;
   animation-timeline: scroll(self);
