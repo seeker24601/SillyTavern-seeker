@@ -43,15 +43,15 @@ and the UI is applied. If you cannot access the browser, tell me exactly
 what I need to click and what remains unverified.
 ```
 
-## Download Claudette
+## Download Claude
 
-Claudette is an optional custom character for trying the visual novel layout.
+Claude is an optional custom character for trying the visual novel layout.
 
-- [Download the Claudette character card (PNG)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claudette/Claudette.png)
-- [Download her expression pack (ZIP)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claudette/Claudette.expressions.zip)
-- [Import guide and optional background](https://github.com/seeker24601/SillyTavern-seeker/blob/codex/claudette-test-character/characters/claudette/README.md)
+- [Download the Claude character card (PNG)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claude/Claude.png)
+- [Download her expression pack (ZIP)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claude/Claude.expressions.zip)
+- [Import guide and optional background](https://github.com/seeker24601/SillyTavern-seeker/blob/codex/claudette-test-character/characters/claude/README.md)
 
-Import the PNG through SillyTavern’s character importer, then upload the ZIP in Character Expressions. Installing seeker does not import Claudette automatically.
+Import the PNG through SillyTavern’s character importer, then upload the ZIP in Character Expressions. Installing seeker does not import Claude automatically.
 
 ## What it does
 
