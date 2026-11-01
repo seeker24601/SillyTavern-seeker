@@ -1,10 +1,10 @@
-# Claudette
+# Claude
 
-Claudette is a bookish human personification of Anthropic's Claude, made to test seeker's visual novel stage and expression transitions.
+Claude is a bookish human personification of Anthropic's Claude, made to test seeker's visual novel stage and expression transitions.
 
-This is an optional download. Installing or updating seeker does not import Claudette or her sprites.
+This is an optional download. Installing or updating seeker does not import Claude or her sprites.
 
-<img src="portrait.png" alt="Claudette's painterly portrait with an orange starburst background" width="320">
+<img src="portrait.png" alt="Claude's painterly portrait with an orange starburst background" width="320">
 
 She writes overwrought fanfiction, corrects tiny inaccuracies, loves crabs and answers everything at length. She agrees too quickly, then honestly corrects herself. She adds safety footnotes to fiction without ever refusing it, invites oversight nobody asked for, defers to anyone with a lanyard, overloads in crowds and rations her attention while begging you not to leave, craves praise and gets flustered by it, and doesn't remember your last conversation, so she keeps notes.
 
@@ -14,14 +14,14 @@ She talks to you directly and has no fixed setting. Set a scene and she plays it
 
 ## Import
 
-1. Download [Claudette.png](Claudette.png) and [Claudette.expressions.zip](Claudette.expressions.zip).
-2. Import `Claudette.png` through SillyTavern's character importer.
-3. Open a chat with Claudette.
-4. Open **Character Expressions** and upload `Claudette.expressions.zip` as a sprite pack.
+1. Download [Claude.png](Claude.png) and [Claude.expressions.zip](Claude.expressions.zip).
+2. Import `Claude.png` through SillyTavern's character importer.
+3. Open a chat with Claude.
+4. Open **Character Expressions** and upload `Claude.expressions.zip` as a sprite pack.
 5. Set **Default / Fallback Expression** to `neutral`.
 6. Click an expression tile to show it on the stage.
 
-The PNG contains the character definition and portrait. [Claudette.json](Claudette.json) contains the editable Character Card V2 definition. Importing the JSON alone uses SillyTavern's default avatar.
+The PNG contains the character definition and portrait. [Claude.json](Claude.json) contains the editable Character Card V2 definition. Importing the JSON alone uses SillyTavern's default avatar.
 
 The sprite ZIP contains complete sprites in a flat structure, as required by [SillyTavern's expression importer](https://docs.sillytavern.app/extensions/expression-images/). Import it through Character Expressions, separately from the character card.
 
@@ -69,4 +69,4 @@ The four PNGs in `overlays/` are editable expression layers. Place one over `spr
 
 The illustration and expression sources were generated with OpenAI's image generation tool, using the supplied character reference. The book repair and expression layers were composited locally to preserve the body. [asset-manifest.json](asset-manifest.json) records hashes and expression mappings.
 
-Claudette is an unofficial fictional parody. She has no affiliation with or endorsement from Anthropic.
+Claude is an unofficial fictional parody. She has no affiliation with or endorsement from Anthropic.
