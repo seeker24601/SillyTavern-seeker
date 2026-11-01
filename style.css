@@ -304,6 +304,92 @@ body[data-generating] :is(#seeker-chats, #seeker-chats-panel) { display: none; }
 }
 .seeker-chats-manage:hover { color: var(--seeker-text); }
 
+/* Model (index.js): a pill before Send naming the current model; it lists the connected
+   provider's models and switches between them. Its panel opens above the composer. */
+#rightSendForm > #seeker-model {
+  width: auto !important;
+  max-width: min(220px, 34vw);
+  padding: 0 6px 0 8px;
+  border-radius: 17px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--seeker-fs-meta) !important;
+  color: var(--seeker-text-faint);
+  background: none !important;
+  cursor: pointer;
+}
+#rightSendForm > #seeker-model:hover,
+#rightSendForm > #seeker-model[aria-expanded="true"] { color: var(--seeker-text-dim); }
+#rightSendForm > #seeker-model.seeker-model-none { display: none; }
+.seeker-model-label { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seeker-model-chevron { flex: 0 0 auto; font-size: 9px; opacity: 0.8; transition: transform 120ms; }
+#rightSendForm > #seeker-model[aria-expanded="true"] .seeker-model-chevron { transform: rotate(180deg); }
+@media (max-width: 1000px) { #rightSendForm > #seeker-model { max-width: 28vw; } }
+#seeker-model-panel {
+  position: fixed;
+  right: var(--seeker-model-panel-right, 12px);
+  top: var(--seeker-model-panel-top, 50vh);
+  transform: translateY(-100%);
+  z-index: var(--seeker-z-menu-button);
+  width: min(380px, calc(100vw - 24px));
+  max-height: min(520px, var(--seeker-model-panel-max, 60vh));
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px;
+  border: 1px solid transparent;
+  border-radius: var(--seeker-menu-radius);
+  background:
+    linear-gradient(var(--seeker-surface-solid), var(--seeker-surface-solid)) padding-box,
+    var(--seeker-glass-edge-panel) border-box;
+  box-shadow: var(--seeker-shadow);
+}
+#seeker-model-panel[hidden] { display: none !important; }
+#seeker-model-panel .seeker-popover-title {
+  padding: 6px 10px 2px;
+  color: var(--seeker-text-faint);
+  font-size: var(--seeker-fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+#seeker-model-panel .seeker-model-search {
+  flex: 0 0 auto;
+  margin: 0 4px 2px !important;
+  width: auto !important;
+}
+.seeker-model-list { overflow-y: auto; min-height: 0; display: flex; flex-direction: column; gap: 1px; }
+.seeker-model-group {
+  padding: 8px 10px 3px;
+  color: var(--seeker-text-faint);
+  font-size: var(--seeker-fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.seeker-model-empty { padding: 10px; color: var(--seeker-text-faint); font-size: var(--seeker-fs-small, 13px); }
+.seeker-model-row {
+  padding: 7px 10px;
+  border-radius: var(--seeker-menu-item-radius);
+  cursor: pointer;
+  transition: background 120ms;
+}
+.seeker-model-row:hover, .seeker-model-row:focus-visible { background: var(--seeker-fill-hover); outline: none; }
+.seeker-model-row.seeker-current { background: rgba(var(--seeker-ink-rgb), 0.06); }
+.seeker-model-row.seeker-current .seeker-model-name::after {
+  content: "current";
+  margin-left: 8px;
+  color: var(--seeker-text-faint);
+  font-size: var(--seeker-fs-meta);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.seeker-model-name { color: var(--seeker-text); font-size: var(--seeker-fs-small, 13px); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seeker-model-id { color: var(--seeker-text-faint); font-size: var(--seeker-fs-meta); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seeker-model-id:empty { display: none; }
+
 #top-settings-holder {
   position: fixed !important;
   top: var(--seeker-below-menu) !important;
@@ -503,7 +589,7 @@ body:not(.movingUI)::after {
     border-width: 0 !important; /* full screen: no edge */
   }
   /* The panel's own close button takes the menu button's corner. */
-  body:has(#top-settings-holder .drawer-content.openDrawer, #movingDivs > .drawer-content.openDrawer, #character_popup[style*="display: flex"]) :is(#seeker-menu-button, #seeker-new-chat, #seeker-chats, #seeker-chats-panel) { display: none; }
+  body:has(#top-settings-holder .drawer-content.openDrawer, #movingDivs > .drawer-content.openDrawer, #character_popup[style*="display: flex"]) :is(#seeker-menu-button, #seeker-new-chat, #seeker-chats, #seeker-chats-panel, #seeker-model-panel) { display: none; }
 }
 
 /* ---------- Messages: prose on the panel, no cards ---------- */

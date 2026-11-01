@@ -1603,3 +1603,243 @@ for (const [view, closeId] of [['completion_prompt_manager_popup_edit', 'complet
     const { eventSource, eventTypes } = SillyTavern.getContext();
     eventSource?.on(eventTypes.CHAT_CHANGED, close);
 }
+
+// Model: a pill before Send that names the current model, lists the models the connected provider offers and
+// switches between them. It reads SillyTavern's own model control for the current API (the
+// same one the /model command uses) and changes it the way the API settings drawer would,
+// so the choice is saved and the connection follows it.
+{
+    const MODEL_CONTROLS = [
+        ['textgenerationwebui', 'generic', 'generic_model_textgenerationwebui'],
+        ['textgenerationwebui', 'ooba', 'custom_model_textgenerationwebui'],
+        ['textgenerationwebui', 'togetherai', 'model_togetherai_select'],
+        ['textgenerationwebui', 'openrouter', 'openrouter_model'],
+        ['textgenerationwebui', 'infermaticai', 'model_infermaticai_select'],
+        ['textgenerationwebui', 'dreamgen', 'model_dreamgen_select'],
+        ['textgenerationwebui', 'mancer', 'mancer_model'],
+        ['textgenerationwebui', 'vllm', 'vllm_model'],
+        ['textgenerationwebui', 'aphrodite', 'aphrodite_model'],
+        ['textgenerationwebui', 'ollama', 'ollama_model'],
+        ['textgenerationwebui', 'tabby', 'tabby_model'],
+        ['textgenerationwebui', 'llamacpp', 'llamacpp_model'],
+        ['textgenerationwebui', 'featherless', 'featherless_model'],
+        ['openai', 'openai', 'model_openai_select'],
+        ['openai', 'claude', 'model_claude_select'],
+        ['openai', 'openrouter', 'model_openrouter_select'],
+        ['openai', 'ai21', 'model_ai21_select'],
+        ['openai', 'makersuite', 'model_google_select'],
+        ['openai', 'vertexai', 'model_vertexai_select'],
+        ['openai', 'mistralai', 'model_mistralai_select'],
+        ['openai', 'custom', 'custom_model_id'],
+        ['openai', 'cohere', 'model_cohere_select'],
+        ['openai', 'perplexity', 'model_perplexity_select'],
+        ['openai', 'groq', 'model_groq_select'],
+        ['openai', 'chutes', 'model_chutes_select'],
+        ['openai', 'siliconflow', 'model_siliconflow_select'],
+        ['openai', 'minimax', 'model_minimax_select'],
+        ['openai', 'electronhub', 'model_electronhub_select'],
+        ['openai', 'nanogpt', 'model_nanogpt_select'],
+        ['openai', 'deepseek', 'model_deepseek_select'],
+        ['openai', 'aimlapi', 'model_aimlapi_select'],
+        ['openai', 'xai', 'model_xai_select'],
+        ['openai', 'pollinations', 'model_pollinations_select'],
+        ['openai', 'moonshot', 'model_moonshot_select'],
+        ['openai', 'fireworks', 'model_fireworks_select'],
+        ['openai', 'cometapi', 'model_cometapi_select'],
+        ['openai', 'zai', 'model_zai_select'],
+        ['openai', 'workers_ai', 'model_workers_ai_select'],
+        ['novel', null, 'model_novel_select'],
+        ['koboldhorde', null, 'horde_model'],
+    ];
+
+    // The control for the connected API, or null when the API has no model to pick.
+    const modelControl = () => {
+        const ctx = SillyTavern.getContext();
+        const api = ctx.mainApi;
+        const sub = api === 'openai' ? ctx.chatCompletionSettings?.chat_completion_source
+            : api === 'textgenerationwebui' ? ctx.textCompletionSettings?.type : null;
+        const id = MODEL_CONTROLS.find(([a, s]) => a === api && s === sub)?.[2];
+        return id ? document.getElementById(id) : null;
+    };
+    const currentModel = () => {
+        const control = modelControl();
+        if (!control) return '';
+        if (control instanceof HTMLSelectElement) return control.selectedOptions[0]?.text || control.value || '';
+        return control.value || '';
+    };
+
+    const button = document.createElement('div');
+    button.id = 'seeker-model';
+    button.className = 'interactable';
+    button.setAttribute('role', 'button');
+    button.setAttribute('tabindex', '0');
+    button.setAttribute('aria-expanded', 'false');
+    const send = document.getElementById('send_but');
+    if (send?.parentElement) send.parentElement.insertBefore(button, send);
+    else document.body.append(button);
+
+    const panel = document.createElement('div');
+    panel.id = 'seeker-model-panel';
+    panel.hidden = true;
+    document.body.append(panel);
+
+    const label = document.createElement('span');
+    label.className = 'seeker-model-label';
+    const chevron = document.createElement('i');
+    chevron.className = 'fa-solid fa-chevron-down seeker-model-chevron';
+    chevron.setAttribute('aria-hidden', 'true');
+    button.append(label, chevron);
+    // Providers prefix their models ("Anthropic: Claude Sonnet 4.5"); the bar shows the model.
+    const shortName = model => model.replace(/^[^:]{1,40}:\s+/, '');
+    const refreshTitle = () => {
+        const model = currentModel();
+        label.textContent = model ? shortName(model) : 'Model';
+        button.title = model ? `Model: ${model}` : 'Model';
+        button.classList.toggle('seeker-model-none', !modelControl());
+    };
+
+    const render = () => {
+        const control = modelControl();
+        panel.innerHTML = '';
+        const title = document.createElement('div');
+        title.className = 'seeker-popover-title';
+        title.textContent = 'Model';
+        panel.append(title);
+
+        if (!control) {
+            const empty = document.createElement('div');
+            empty.className = 'seeker-model-empty';
+            empty.textContent = 'This API has no model to choose.';
+            panel.append(empty);
+            return;
+        }
+
+        // A text field (custom endpoints, text completion backends that take a name).
+        if (!(control instanceof HTMLSelectElement)) {
+            const field = document.createElement('input');
+            field.type = 'text';
+            field.className = 'seeker-model-search text_pole';
+            field.placeholder = 'Model name';
+            field.value = control.value;
+            const apply = () => { control.value = field.value.trim(); $(control).trigger('input'); refreshTitle(); };
+            field.addEventListener('change', apply);
+            field.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); apply(); close(); } });
+            panel.append(field);
+            setTimeout(() => field.focus());
+            return;
+        }
+
+        const options = [...control.options].filter(o => !o.disabled && o.value !== '');
+        if (!options.length) {
+            const empty = document.createElement('div');
+            empty.className = 'seeker-model-empty';
+            empty.textContent = 'No models loaded. Connect in API settings first.';
+            panel.append(empty);
+            return;
+        }
+
+        const search = document.createElement('input');
+        search.type = 'search';
+        search.className = 'seeker-model-search text_pole';
+        search.placeholder = `Filter ${options.length} models`;
+        search.setAttribute('autocomplete', 'off');
+        panel.append(search);
+
+        const list = document.createElement('div');
+        list.className = 'seeker-model-list';
+        panel.append(list);
+
+        const build = filter => {
+            list.innerHTML = '';
+            const words = filter.toLowerCase().split(/\s+/).filter(Boolean);
+            let group = null;
+            let shown = 0;
+            for (const option of options) {
+                const hay = `${option.text} ${option.value}`.toLowerCase();
+                if (!words.every(w => hay.includes(w))) continue;
+                const label = option.parentElement instanceof HTMLOptGroupElement ? option.parentElement.label : null;
+                if (label && label !== group) {
+                    group = label;
+                    const head = document.createElement('div');
+                    head.className = 'seeker-model-group';
+                    head.textContent = label;
+                    list.append(head);
+                }
+                const row = document.createElement('div');
+                row.className = 'seeker-model-row interactable';
+                row.setAttribute('role', 'option');
+                row.setAttribute('tabindex', '0');
+                if (option.value === control.value) row.classList.add('seeker-current');
+                row.innerHTML = '<div class="seeker-model-name"></div><div class="seeker-model-id"></div>';
+                row.querySelector('.seeker-model-name').textContent = option.text;
+                row.querySelector('.seeker-model-id').textContent = option.value !== option.text ? option.value : '';
+                const pick = () => {
+                    close();
+                    if (option.value === control.value) return;
+                    control.value = option.value;
+                    $(control).trigger('change');
+                    refreshTitle();
+                };
+                row.addEventListener('click', pick);
+                row.addEventListener('keydown', event => {
+                    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); pick(); }
+                });
+                list.append(row);
+                shown++;
+            }
+            if (!shown) {
+                const empty = document.createElement('div');
+                empty.className = 'seeker-model-empty';
+                empty.textContent = 'No match';
+                list.append(empty);
+            }
+        };
+        build('');
+        search.addEventListener('input', () => build(search.value));
+        search.addEventListener('keydown', event => {
+            if (event.key === 'ArrowDown') { event.preventDefault(); list.querySelector('.seeker-model-row')?.focus(); }
+            if (event.key === 'Enter') {
+                const first = list.querySelector('.seeker-model-row');
+                if (first) { event.preventDefault(); first.click(); }
+            }
+        });
+        setTimeout(() => {
+            list.querySelector('.seeker-current')?.scrollIntoView({ block: 'center' });
+            search.focus();
+        });
+    };
+
+    const close = () => { panel.hidden = true; button.setAttribute('aria-expanded', 'false'); };
+    const place = () => {
+        const form = document.getElementById('send_form')?.getBoundingClientRect();
+        if (form) {
+            // Anchored by its top edge and shifted up by its own height: on phones SillyTavern
+            // transforms <html>, which is 0px tall, so a fixed `bottom` would resolve against that.
+            panel.style.setProperty('--seeker-model-panel-right', `${Math.max(12, window.innerWidth - form.right)}px`);
+            panel.style.setProperty('--seeker-model-panel-top', `${Math.max(20, form.top - 8)}px`);
+            panel.style.setProperty('--seeker-model-panel-max', `${Math.max(120, form.top - 20)}px`);
+        }
+    };
+    const toggle = () => {
+        if (!panel.hidden) return close();
+        place();
+        panel.hidden = false;
+        button.setAttribute('aria-expanded', 'true');
+        render();
+    };
+    button.addEventListener('click', event => { event.stopPropagation(); toggle(); });
+    button.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); }
+    });
+    document.addEventListener('click', event => {
+        if (!panel.hidden && !event.target.closest('#seeker-model, #seeker-model-panel')) close();
+    });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && !panel.hidden) close(); }, true);
+    window.addEventListener('resize', () => { if (!panel.hidden) place(); });
+
+    const { eventSource, eventTypes } = SillyTavern.getContext();
+    for (const name of ['CHAT_CHANGED', 'CHATCOMPLETION_SOURCE_CHANGED', 'CHATCOMPLETION_MODEL_CHANGED', 'ONLINE_STATUS_CHANGED', 'SETTINGS_UPDATED']) {
+        if (eventTypes?.[name]) eventSource?.on(eventTypes[name], () => { refreshTitle(); if (name === 'CHAT_CHANGED') close(); });
+    }
+    refreshTitle();
+}
