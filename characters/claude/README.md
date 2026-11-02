@@ -14,22 +14,20 @@ She talks to you directly and has no fixed setting. Set a scene and she plays it
 
 ## Import
 
-1. Download [Claude.png](Claude.png) and [Claude.expressions.zip](Claude.expressions.zip).
-2. Import `Claude.png` through SillyTavern's character importer.
+1. Download [Claude.charx](Claude.charx).
+2. Import it through SillyTavern's character importer. The character, portrait, expressions and background import together.
 3. Open a chat with Claude.
-4. Open **Character Expressions** and upload `Claude.expressions.zip` as a sprite pack.
-5. Set **Default / Fallback Expression** to `neutral`.
-6. Click an expression tile to show it on the stage.
+4. In **Character Expressions**, set **Default / Fallback Expression** to `neutral`.
 
-The PNG contains the character definition and portrait. [Claude.json](Claude.json) contains the editable Character Card V2 definition. Importing the JSON alone uses SillyTavern's default avatar.
+Requires SillyTavern 1.19 or later. The package imports the assets without changing your expression classification settings or selecting a background.
 
-The sprite ZIP contains complete sprites in a flat structure, as required by [SillyTavern's expression importer](https://docs.sillytavern.app/extensions/expression-images/). Import it through Character Expressions, separately from the character card.
+For separate imports, [Claude.png](Claude.png) contains the character and portrait. Upload [Claude.expressions.zip](Claude.expressions.zip) through Character Expressions. [Claude.json](Claude.json) contains the editable Character Card V2 definition.
 
 ## Optional scene background
 
 Download [background.png](background.png) for a standalone square scene background with the portrait's cream, terracotta, charcoal, and starburst motifs. The opaque PNG measures 1254 × 1254 pixels.
 
-Upload it as a SillyTavern background, then select it for your scene. The card and expression ZIP do not import or select this background automatically.
+The CharX package includes this background in Claude's character assets. To add it to your global background picker, upload the separate PNG and select it for your scene.
 
 ## Expressions
 
@@ -70,3 +68,7 @@ The four PNGs in `overlays/` are editable expression layers. Place one over `spr
 The illustration and expression sources were generated with OpenAI's image generation tool, using the supplied character reference. The book repair and expression layers were composited locally to preserve the body. [asset-manifest.json](asset-manifest.json) records hashes and expression mappings.
 
 Claude is an unofficial fictional parody. She has no affiliation with or endorsement from Anthropic.
+
+## Rebuild the package
+
+Run `npm ci`, then `npm run build:claude` from the repository root. The builder reads `Claude.json` and the assets listed in `asset-manifest.json` and writes `Claude.charx`.

@@ -6,10 +6,12 @@
   "author": "seeker",
   "type": "module",
   "scripts": {
-    "build:icons": "node scripts/build-icons.mjs"
+    "build:icons": "node scripts/build-icons.mjs",
+    "build:claude": "node characters/claude/build-bundle.mjs"
   },
   "devDependencies": {
     "@fontsource-variable/bodoni-moda": "^5.3.0",
+    "fflate": "0.8.3",
     "lucide-static": "^1.57.0"
   }
 }
