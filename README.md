@@ -46,11 +46,10 @@ and the UI is applied.
 
 Download Claude, the character shown in the example screenshot.
 
-- [Download the Claude character card (PNG)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claude/Claude.png)
-- [Download her expression pack (ZIP)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claude/Claude.expressions.zip)
-- [Import guide and optional background](https://github.com/seeker24601/SillyTavern-seeker/blob/codex/claudette-test-character/characters/claude/README.md)
+- [Download Claude with her portrait, expressions and background (CharX)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claude/Claude.charx)
+- [Import guide and separate downloads](https://github.com/seeker24601/SillyTavern-seeker/blob/codex/claudette-test-character/characters/claude/README.md)
 
-Import the PNG through SillyTavern’s character importer, then upload the ZIP in Character Expressions. Installing seeker does not import Claude automatically.
+Import `Claude.charx` through SillyTavern’s character importer. The character and assets import together. In Character Expressions, choose `neutral` as the fallback. Installing the theme does not import Claude automatically.
 
 ## What it does
 
