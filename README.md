@@ -47,7 +47,6 @@ and the UI is applied.
 Download Claude, the character shown in the example screenshot.
 
 - [Download Claude with her portrait, expressions and background (CharX)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claude/Claude.charx)
-- [Import guide and separate downloads](https://github.com/seeker24601/SillyTavern-seeker/blob/codex/claudette-test-character/characters/claude/README.md)
 
 Import `Claude.charx` through SillyTavern’s character importer. The character and assets import together. In Character Expressions, choose `neutral` as the fallback. Installing the theme does not import Claude automatically.
 
