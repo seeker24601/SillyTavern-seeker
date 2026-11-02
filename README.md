@@ -45,7 +45,7 @@ what I need to click and what remains unverified.
 
 ## Download Claude
 
-Claude is an optional custom character for trying the visual novel layout.
+Download Claude, the character shown in the example screenshot, using the links below.
 
 - [Download the Claude character card (PNG)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claude/Claude.png)
 - [Download her expression pack (ZIP)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claude/Claude.expressions.zip)
