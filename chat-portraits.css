@@ -1,0 +1,52 @@
+/* The portrait: a 2:3 card at the top of the message, level with the name, with the
+   message number under it. */
+#chat .mes .mesAvatarWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--seeker-space-2);
+  width: var(--seeker-portrait-width);
+  margin-right: var(--seeker-space-3);
+  padding: 0 !important;
+}
+#chat .mes .avatar {
+  position: relative;
+  isolation: isolate;
+  overflow: visible !important;
+  width: var(--seeker-portrait-width) !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+#chat .mes .avatar img {
+  width: var(--seeker-portrait-width) !important;
+  height: calc(var(--seeker-portrait-width) * 1.5) !important;
+  object-fit: cover;
+  object-position: center top;
+  border: none !important;
+  border-radius: var(--seeker-radius-sm) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+#chat .mes .mesAvatarWrapper > :not(.avatar) { width: 100%; margin: 0 !important; text-align: center; }
+/* Small system messages (the welcome screen's buttons) have no portrait. */
+#chat .mes.smallSysMes .mesAvatarWrapper { display: none; }
+
+/* Keep the ink layer behind the clipped portrait and out of the pointer hit area. */
+#chat .mes .avatar::before {
+  content: '';
+  position: absolute;
+  inset: -28%;
+  z-index: -1;
+  pointer-events: none;
+  background-color: var(--seeker-accent);
+  -webkit-mask: url("portrait-halftone-shadow.png") center / 100% 100% no-repeat;
+  mask: url("portrait-halftone-shadow.png") center / 100% 100% no-repeat;
+  mask-mode: alpha;
+  transform: translate(-7px, -2px);
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+#chat .mes .avatar:is(:hover, :focus-within)::before { opacity: 0.8; }
+@media (prefers-reduced-motion: reduce) {
+  #chat .mes .avatar::before { transition: none; }
+}

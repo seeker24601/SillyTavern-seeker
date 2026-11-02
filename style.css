@@ -26,6 +26,9 @@
 @import url("characters.css");
 /* The character editor and its sprites. */
 @import url("character-editor.css");
+@import url("chat-navigation.css");
+@import url("chat-portraits.css");
+@import url("stage-spine.css");
 
 /* Bodoni Moda (OFL, see fonts/OFL.txt) for headings. Variable in weight and optical
    size, so small headings get sturdier hairlines automatically. */
@@ -194,30 +197,6 @@ body, textarea, input, select, button { font-family: var(--mainFontFamily); }
 }
 #seeker-menu-button:hover,
 body.seeker-nav-open #seeker-menu-button { color: var(--seeker-text); }
-/* New chat (index.js), to the menu button's left, only while a chat is open. */
-#seeker-new-chat {
-  position: fixed;
-  top: var(--seeker-menu-top);
-  right: calc(12px + var(--seeker-menu-size) + 8px);
-  z-index: var(--seeker-z-menu-button);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--seeker-menu-size);
-  height: var(--seeker-menu-size);
-  font-size: 16px;
-  color: var(--seeker-text-dim);
-  background: var(--seeker-surface);
-  border: 1px solid transparent;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: color 120ms;
-}
-#seeker-new-chat:hover { color: var(--seeker-text); }
-body:has(#chat > .welcomePanel) #seeker-new-chat,
-body.seeker-nav-open #seeker-new-chat,
-body[data-generating] #seeker-new-chat { display: none; }
-
 /* Chats (index.js): to the left of New chat, lists the chats with the same character and
    switches between them. Its panel hangs below the corner buttons. */
 #seeker-chats {
@@ -589,7 +568,7 @@ body:not(.movingUI)::after {
     border-width: 0 !important; /* full screen: no edge */
   }
   /* The panel's own close button takes the menu button's corner. */
-  body:has(#top-settings-holder .drawer-content.openDrawer, #movingDivs > .drawer-content.openDrawer, #character_popup[style*="display: flex"]) :is(#seeker-menu-button, #seeker-new-chat, #seeker-chats, #seeker-chats-panel, #seeker-model-panel) { display: none; }
+  body:has(#top-settings-holder .drawer-content.openDrawer, #movingDivs > .drawer-content.openDrawer, #character_popup[style*="display: flex"]) :is(#seeker-menu-button, #seeker-new-chat, #seeker-home, #seeker-chats, #seeker-chats-panel, #seeker-model-panel) { display: none; }
 }
 
 /* ---------- Messages: prose on the panel, no cards ---------- */
@@ -602,35 +581,6 @@ body:not(.movingUI)::after {
   border-bottom: 1px solid rgba(var(--seeker-ink-rgb), 0.06) !important;
 }
 #chat .mes:last-child { border-bottom: none !important; }
-/* The portrait: a 2:3 card at the top of the message, level with the name, with the
-   message number under it. */
-#chat .mes .mesAvatarWrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--seeker-space-2);
-  width: var(--seeker-portrait-width);
-  margin-right: var(--seeker-space-3);
-  padding: 0 !important;
-}
-#chat .mes .avatar {
-  width: var(--seeker-portrait-width) !important;
-  height: auto !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-#chat .mes .avatar img {
-  width: var(--seeker-portrait-width) !important;
-  height: calc(var(--seeker-portrait-width) * 1.5) !important;
-  object-fit: cover;
-  object-position: center top;
-  border: none !important;
-  border-radius: var(--seeker-radius-sm) !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
-}
-#chat .mes .mesAvatarWrapper > :not(.avatar) { width: 100%; margin: 0 !important; text-align: center; }
-/* Small system messages (the welcome screen's buttons) have no portrait. */
-#chat .mes.smallSysMes .mesAvatarWrapper { display: none; }
 /* Chat colours follow the UI theme's Theme Colors (User settings), so the pickers work:
    main text for narration, italics for actions, quote colour for spoken dialogue. */
 #chat .mes_text { color: var(--SmartThemeBodyColor); }
@@ -1009,7 +959,7 @@ body:has(#chat > .welcomePanel) {
         translate(calc(var(--seeker-bg-x, 0) * var(--seeker-bg-shift)), calc(var(--seeker-bg-y, 0) * var(--seeker-bg-shift)))
         scale(var(--seeker-bg-zoom));
       /* Slow: the picture follows the pointer like something heavy on water. */
-      transition: transform 3600ms cubic-bezier(0.22, 0.61, 0.36, 1);
+      transition: transform 5600ms cubic-bezier(0.22, 0.61, 0.36, 1);
     }
     /* SillyTavern's background fitting options (Backgrounds panel). */
     & #bg1.contain::before { background-size: contain; }
@@ -1153,47 +1103,6 @@ body.waifuMode .expression-holder {
     pointer-events: none;
     user-select: none;
   }
-}
-
-/* ---------- Spine (desktop) ----------
-   A hairline the stage's full height just right of the name, like the spine of a book, with
-   the card's creator and version set along it near the foot in italic small caps (index.js
-   fills them in; with neither, it is the line alone). Shown with the name. */
-#seeker-stage-spine { display: none; }
-@media (min-width: 1001px) {
-  body:has(#expression-wrapper:not([style*="display: none"]) #expression-image[src]:not([src=""]),
-           #visual-novel-wrapper:not([style*="display: none"]) .expression-holder:not(.hidden) img[src]:not([src=""])):not(:has(#chat > .welcomePanel)):has(#seeker-stage-name:not(:empty)) #seeker-stage-spine {
-    position: fixed;
-    top: var(--seeker-space-6);
-    bottom: var(--seeker-space-6);
-    right: calc(var(--seeker-chat-width) + var(--seeker-space-3));
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    pointer-events: none;
-    user-select: none;
-  }
-  #seeker-stage-spine::before,
-  #seeker-stage-spine::after {
-    content: "";
-    width: 1px;
-    background: rgba(255, 255, 255, 0.28);
-  }
-  #seeker-stage-spine::before { flex: 1 1 auto; }
-  #seeker-stage-spine::after { flex: 0 0 56px; }
-  #seeker-stage-spine > span {
-    writing-mode: vertical-rl;
-    padding: var(--seeker-space-3) 0;
-    color: rgba(255, 255, 255, 0.55);
-    font-family: var(--seeker-display-font);
-    font-optical-sizing: auto;
-    font-size: 12px;
-    font-style: italic;
-    letter-spacing: 0.08em;
-    white-space: nowrap;
-  }
-  #seeker-stage-spine > span:empty { padding: 0; }
 }
 
 /* ---------- Welcome stage (desktop) ----------

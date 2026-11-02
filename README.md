@@ -60,6 +60,7 @@ Import the PNG through SillyTavern’s character importer, then upload the ZIP i
 - Every menu opens as a centred panel. User settings, Formatting and AI response show one section at a time.
 - Dialogs, notifications, tooltips and icons ([Lucide](https://lucide.dev)) match the theme.
 - **Mobile layout:** the top bar folds into a menu button and the chat fades up over the sprite.
+- Drag the spine to resize the desktop chat. The width is saved in Chat Width.
 
 ## Customize
 
@@ -72,7 +73,7 @@ Every colour, font, size, spacing step, corner radius and layer is a variable in
 }
 ```
 
-The accent is the Underlined Text colour in User settings > Theme Colors, and the chat's narration, actions and dialogue follow Main Text, Italics Text and Quote Text.
+Choose Accent color in User settings > UI Theme. The chat's narration, actions and dialogue follow Main Text, Italics Text and Quote Text under Theme Colors.
 
 ## Feedback
 

@@ -152,7 +152,7 @@ body:not(:has(#chat > .welcomePanel)) #chat .mes[mesid="0"] .mes_text > p:first-
    dialogs, pagination, the character cards' version and author, the sprite count, and the
    creator and version along the stage spine. */
 #chat .mes :is(.timestamp, .mesIDDisplay, .mes_timer, .tokenCounterDisplay, .swipes-counter),
-.welcomePanel :is(.chatDate, .chatStats, .chatStats small),
+.welcomePanel :is(.chatName > span, .chatDate, .chatStats, .chatStats small),
 :where(.drawer-content, .popup, #character_popup)
   :where(.extension_token_counter, [id$="token_count"], [id$="_tokens"], [id^="result_info"], [id^="result_info"] *, .tokenCounterDisplay, .paginationjs-nav):not([class*="fa-"]),
 #rm_print_characters_block :is(.seeker-card-byline, .seeker-card-meta, .character_version),
@@ -185,10 +185,15 @@ body:not(:has(#chat > .welcomePanel)) #chat .mes[mesid="0"] .mes_text > p:first-
   line-height: var(--seeker-lh-hint) !important;
   color: var(--seeker-text-dim);
 }
-.welcomePanel :is(.chatDate, .chatStats, .chatStats small) {
-  font-size: var(--seeker-fs-meta) !important;
-  font-weight: 500;
-  color: var(--seeker-text-faint);
+.welcomePanel :is(.chatName > span, .chatDate, .chatStats, .chatStats small),
+body:has(#chat > .welcomePanel) #chat .mes :is(.timestamp, .mesIDDisplay, .mes_timer, .tokenCounterDisplay, .swipes-counter),
+:is(.welcomePanel, #seeker-welcome-stage) .seeker-welcome-version {
+  color: rgba(var(--seeker-ink-rgb), 0.56) !important;
+  opacity: 1 !important;
+}
+:is(.welcomePanel, #seeker-welcome-stage) .seeker-welcome-version {
+  font-family: var(--seeker-mono-font);
+  font-variant-numeric: tabular-nums;
 }
 /* Welcome stage (desktop): the name is the display heading and the version its subtitle. */
 #seeker-welcome-stage .seeker-welcome-name {
@@ -196,15 +201,14 @@ body:not(:has(#chat > .welcomePanel)) #chat .mes[mesid="0"] .mes_text > p:first-
   font-optical-sizing: auto;
   font-size: var(--seeker-fs-display);
   font-weight: 700;
-  letter-spacing: 0.12em; /* small caps read better tracked out */
-  margin-right: -0.12em; /* the last letter's tracking would push the name off centre */
+  letter-spacing: 0.04em;
+  margin-right: -0.04em; /* the last letter's tracking would push the name off centre */
   line-height: var(--seeker-lh-display);
   color: var(--seeker-text);
 }
 #seeker-welcome-stage .seeker-welcome-version {
   font-size: var(--seeker-fs-body);
   line-height: var(--seeker-lh-ui);
-  color: var(--seeker-text-dim);
 }
 :is(.welcomePanel, #seeker-welcome-stage, #chat .mes[type="welcome_prompt"]) .menu_button:not([class*="fa-"]) {
   font-size: var(--seeker-fs-body) !important;

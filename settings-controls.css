@@ -1,0 +1,130 @@
+/* ---------- Rows ---------- */
+#user-settings-block-content {
+  --seeker-row-pad: 10px;
+  --seeker-control-width: min(260px, 48%);
+}
+#seeker-accent-setting {
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--seeker-space-3);
+  padding: var(--seeker-row-pad) 0;
+  border-bottom: 1px solid var(--seeker-divider);
+}
+#seeker-accent-setting toolcool-color-picker { order: 1; }
+/* Checkboxes: the label, then a switch at the end of the row. */
+#user-settings-block-content label.checkbox_label {
+  align-items: center;
+  gap: var(--seeker-space-2);
+  margin: 0 !important;
+  padding: var(--seeker-row-pad) 0;
+  border-bottom: 1px solid var(--seeker-divider);
+}
+#user-settings-block-content label.checkbox_label > input[type="checkbox"] {
+  order: 99;
+  margin-left: auto !important;
+}
+/* Paired switches (Swipes and Gestures) are a row each. */
+#user-settings-block-content .checkbox-container { flex-direction: column; align-items: stretch; gap: 0 !important; }
+/* A switch with a button beside it (MovingUI and Reset): the switch row, then the button. */
+#user-settings-block-content .flex-container:has(> label.checkbox_label + .menu_button) {
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--seeker-space-3);
+  border-bottom: 1px solid var(--seeker-divider);
+}
+#user-settings-block-content .flex-container:has(> label.checkbox_label + .menu_button) > label.checkbox_label { flex: 1; border-bottom: none; }
+#user-settings-block-content .flex-container:has(> label.checkbox_label + .menu_button) > .menu_button { margin: 0 !important; }
+/* MovingUI preset: its label wraps both the title and the dropdown. */
+#MovingUI-presets-block {
+  flex-wrap: nowrap;
+  gap: var(--seeker-space-2);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--seeker-divider);
+}
+#MovingUI-presets-block > .flex-container { flex: 1; }
+#MovingUI-presets-block label {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--seeker-space-3);
+}
+#MovingUI-presets-block label > .flex-container { width: calc(var(--seeker-control-width) - 44px); }
+#MovingUI-presets-block select { width: 100% !important; }
+/* Its dropdown sits in a wrapper of its own, which is not a row: no divider, and the dropdown fills it. */
+#user-settings-block-content #MovingUI-presets-block label > .flex-container { padding: 0 !important; border-bottom: none !important; }
+#user-settings-block-content #MovingUI-presets-block label > .flex-container > select { flex: 1 1 auto !important; width: 100% !important; font-weight: 400 !important; }
+
+/* Dropdowns and their labels: label on the left, a fixed-width control on the right. */
+#user-settings-block-content :is(.flex-container, div):has(> select):not(:has(> select ~ .menu_button, > .menu_button ~ select)) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--seeker-space-3);
+  padding: 6px 0;
+  border-bottom: 1px solid var(--seeker-divider);
+}
+#user-settings-block-content :is(.flex-container, div):has(> select) > select {
+  flex: 0 0 var(--seeker-control-width) !important;
+  width: var(--seeker-control-width) !important;
+  margin: 0 !important;
+}
+/* Sliders: the title on the left; the slider and its number on the right. SillyTavern
+   writes these as a column of title, slider and number (some as .range-block). */
+#user-settings-block-content :is(.flex-container, .range-block):has(> .neo-range-slider) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) calc(var(--seeker-control-width) - 76px) 64px;
+  grid-template-areas: "title slider number";
+  align-items: center;
+  column-gap: var(--seeker-space-3);
+  width: 100% !important;
+  flex: none !important;
+  margin: 0 !important;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--seeker-divider);
+}
+#user-settings-block-content :is(.flex-container, .range-block):has(> .neo-range-slider) > :first-child {
+  grid-area: title;
+  justify-content: flex-start !important;
+  justify-self: start;
+  text-align: left !important;
+}
+#user-settings-block-content :is(.flex-container, .range-block):has(> .neo-range-slider) > .neo-range-slider { grid-area: slider; width: 100% !important; margin: 0 !important; }
+#user-settings-block-content :is(.flex-container, .range-block):has(> .neo-range-slider) > .neo-range-input { grid-area: number; width: 100% !important; margin: 0 !important; }
+/* Rows of sliders stack. */
+#user-settings-block-content .flex-container:has(> :is(.flex-container, .range-block) > .neo-range-slider) {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0 !important;
+}
+/* Dividers between groups: the rows' own lines do that now. */
+#user-settings-block-content hr { display: none; }
+
+/* ---------- Switches ---------- */
+#user-settings-block-content input[type="checkbox"] {
+  position: relative;
+  width: 34px !important;
+  height: 20px !important;
+  border-radius: var(--seeker-radius-sm) !important;
+  background-color: var(--seeker-fill-strong) !important;
+  transform: none;
+  transition: background-color 150ms;
+}
+#user-settings-block-content input[type="checkbox"]::before {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  clip-path: none;
+  box-shadow: none;
+  background-color: var(--seeker-text);
+  transform: none;
+  transition: transform 150ms;
+}
+#user-settings-block-content input[type="checkbox"]:checked { background-color: var(--seeker-selected) !important; }
+#user-settings-block-content input[type="checkbox"]:checked::before {
+  transform: translateX(14px);
+  background-color: var(--seeker-selected-ink);
+}

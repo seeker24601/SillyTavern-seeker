@@ -1,0 +1,34 @@
+/* Chat navigation shares the corner controls and closes chats through SillyTavern. */
+#seeker-new-chat {
+  position: fixed;
+  top: var(--seeker-menu-top);
+  right: calc(12px + var(--seeker-menu-size) + 8px);
+}
+#seeker-home {
+  position: absolute;
+  top: var(--seeker-menu-top);
+  left: 12px;
+}
+:is(#seeker-new-chat, #seeker-home) {
+  z-index: var(--seeker-z-menu-button);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--seeker-menu-size);
+  height: var(--seeker-menu-size);
+  font-size: 16px;
+  color: var(--seeker-text-dim);
+  background: var(--seeker-surface);
+  border: 1px solid transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 120ms;
+}
+:is(#seeker-new-chat, #seeker-home):hover { color: var(--seeker-text); }
+body:has(#chat > .welcomePanel) :is(#seeker-new-chat, #seeker-home),
+body.seeker-nav-open :is(#seeker-new-chat, #seeker-home),
+body[data-generating] :is(#seeker-new-chat, #seeker-home) { display: none; }
+
+@media (max-width: 1000px) {
+  #seeker-home { position: fixed; }
+}

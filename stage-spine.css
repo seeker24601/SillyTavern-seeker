@@ -1,0 +1,53 @@
+/* ---------- Spine (desktop) ----------
+   A hairline the stage's full height just right of the name, like the spine of a book, with
+   the card's creator and version set along it near the foot in italic small caps (index.js
+   fills them in; with neither, it is the line alone). Shown with the name. */
+#seeker-stage-spine { display: none; }
+@media (min-width: 1001px) {
+  body:has(#expression-wrapper:not([style*="display: none"]) #expression-image[src]:not([src=""]),
+           #visual-novel-wrapper:not([style*="display: none"]) .expression-holder:not(.hidden) img[src]:not([src=""])):not(:has(#chat > .welcomePanel)):has(#seeker-stage-name:not(:empty)) #seeker-stage-spine {
+    position: fixed;
+    top: var(--seeker-space-6);
+    bottom: var(--seeker-space-6);
+    right: calc(var(--seeker-chat-width) + var(--seeker-space-3));
+    z-index: 3;
+    min-width: 20px;
+    margin-right: -10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: auto;
+    cursor: col-resize;
+    touch-action: none;
+    user-select: none;
+  }
+  #seeker-stage-spine::before,
+  #seeker-stage-spine::after {
+    content: "";
+    width: 1px;
+    background: rgba(255, 255, 255, 0.28);
+  }
+  #seeker-stage-spine::before { flex: 1 1 auto; }
+  #seeker-stage-spine::after { flex: 0 0 56px; }
+  #seeker-stage-spine > span {
+    writing-mode: vertical-rl;
+    padding: var(--seeker-space-3) 0;
+    color: rgba(255, 255, 255, 0.55);
+    font-family: var(--seeker-display-font);
+    font-optical-sizing: auto;
+    font-size: 12px;
+    font-style: italic;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  #seeker-stage-spine > span:empty { padding: 0; }
+}
+
+@media (min-width: 1001px) {
+  #seeker-stage-spine:is(:hover, :focus-visible)::before,
+  #seeker-stage-spine:is(:hover, :focus-visible)::after,
+  body.seeker-resizing-chat #seeker-stage-spine::before,
+  body.seeker-resizing-chat #seeker-stage-spine::after { background: var(--seeker-accent); }
+  #seeker-stage-spine:focus-visible { outline: none; }
+  body.seeker-resizing-chat, body.seeker-resizing-chat * { cursor: col-resize !important; user-select: none !important; }
+}

@@ -1,3 +1,7 @@
+import { mountStageLayout } from './stage-layout.js';
+import { mountThemeSettings } from './theme-settings.js';
+import { mountChatNavigation } from './chat-navigation.js';
+
 /*
  * seeker, a SillyTavern theme by seeker.
  *
@@ -368,7 +372,7 @@ if (settingsBlock && settingsContent) {
         ':is(.flex-container, div):has(> select)',
         ':is(.flex-container, .range-block):has(> .neo-range-slider)',
         '.flex-container:has(> label.checkbox_label + .menu_button)',
-        '#MovingUI-presets-block',
+        '#MovingUI-presets-block, #seeker-accent-setting',
         '.inline-drawer',
         '.flex-container:has(> .menu_button):not(:has(select))',
     ].join(', ');
@@ -670,61 +674,7 @@ for (const id of ['seeker-stage-vignette', 'seeker-stage-ornament']) {
     document.body.append(element);
 }
 
-// Desktop stage: the character's name, set large and vertical along the stage's right
-// edge, over the halftone (style.css). Solo chats only; a group has no one name.
-{
-    const { eventSource, eventTypes } = SillyTavern.getContext();
-    const stageName = document.createElement('div');
-    stageName.id = 'seeker-stage-name';
-    stageName.setAttribute('aria-hidden', 'true'); // the name is in the chat already
-    // The spine: a hairline beside the name, carrying the card's creator and version.
-    const spine = document.createElement('div');
-    spine.id = 'seeker-stage-spine';
-    spine.setAttribute('aria-hidden', 'true');
-    const spineText = document.createElement('span');
-    spine.append(spineText);
-    document.body.append(stageName, spine);
-    const updateStageName = () => {
-        const context = SillyTavern.getContext();
-        const solo = !context.groupId && context.characterId !== undefined;
-        stageName.textContent = solo ? context.name2 ?? '' : '';
-        const card = solo ? context.characters[context.characterId]?.data : undefined;
-        const version = card?.character_version?.trim();
-        spineText.textContent = [card?.creator?.trim(), version && `v${version.replace(/^v/i, '')}`].filter(Boolean).join(' · ');
-        // style.css sizes the name from the screen height and this length, so long names
-        // shrink to fit in one column.
-        stageName.style.setProperty('--seeker-stage-name-length', String(Math.max(stageName.textContent.length, 1)));
-    };
-    // Parallax: the name starts centred and rises at a third of the chat's scroll speed,
-    // stopping when it reaches the top margin, so a long chat shows it pinned at the top.
-    const chat = document.getElementById('chat');
-    const PARALLAX = 0.35;
-    const TOP_MARGIN = 32;
-    let parallaxFrame = 0;
-    const updateParallax = () => {
-        parallaxFrame = 0;
-        if (!chat || !stageName.textContent || getComputedStyle(stageName).display === 'none') return;
-        // Where the name's text starts with no shift: centred in the screen's height.
-        const range = document.createRange();
-        range.selectNodeContents(stageName);
-        const restingTop = range.getBoundingClientRect().top + Number(stageName.style.getPropertyValue('--seeker-stage-name-shift').replace('px', '') || 0);
-        const travel = Math.max(restingTop - TOP_MARGIN, 0);
-        const shift = Math.min(chat.scrollTop * PARALLAX, travel);
-        stageName.style.setProperty('--seeker-stage-name-shift', `${shift.toFixed(1)}px`);
-    };
-    const queueParallax = () => { parallaxFrame ||= requestAnimationFrame(updateParallax); };
-    chat?.addEventListener('scroll', queueParallax, { passive: true });
-    window.addEventListener('resize', queueParallax);
-
-    for (const event of [eventTypes.CHAT_CHANGED, eventTypes.CHARACTER_EDITED, eventTypes.CHARACTER_RENAMED, eventTypes.APP_READY]) {
-        if (event) eventSource?.on(event, () => { updateStageName(); queueParallax(); });
-    }
-    // New messages lengthen the chat and SillyTavern scrolls to them.
-    for (const event of [eventTypes.MESSAGE_RECEIVED, eventTypes.MESSAGE_SENT, eventTypes.MORE_MESSAGES_LOADED]) {
-        if (event) eventSource?.on(event, queueParallax);
-    }
-    updateStageName();
-}
+mountStageLayout();
 
 // Characters: a "Characters" back button beside the open character's name. SillyTavern's
 // own way back is an unlabelled list icon above it, which the theme hides.
@@ -997,40 +947,7 @@ for (const id of ['seeker-stage-vignette', 'seeker-stage-ornament']) {
     pinToHeader(byId('right-nav-panel'), [byId('CharListButtonAndHotSwaps'), byId('rm_PinAndTabs')]);
 }
 
-// Install: adds the seeker and seeker gilt UI themes through SillyTavern's own theme import,
-// and the first time switches to seeker. After that the choice is yours.
-{
-    const { eventSource, eventTypes, extensionSettings, saveSettingsDebounced } = SillyTavern.getContext();
-    const presets = [['seeker', 'seeker.json'], ['seeker gilt', 'seeker-gilt.json']];
-    let running = false;
-    const install = async () => {
-        const select = document.getElementById('themes');
-        const input = document.getElementById('ui_preset_import_file');
-        if (running || !select || !input || !select.options.length) return;
-        running = true;
-        const has = name => [...select.options].some(option => option.value === name);
-        for (const [name, file] of presets) {
-            if (has(name)) continue;
-            const response = await fetch(new URL(`theme/${file}`, import.meta.url));
-            if (!response.ok) continue;
-            const transfer = new DataTransfer();
-            transfer.items.add(new File([await response.text()], file, { type: 'application/json' }));
-            input.files = transfer.files;
-            input.dispatchEvent(new Event('change', { bubbles: true }));
-            for (let i = 0; i < 50 && !has(name); i++) await new Promise(resolve => setTimeout(resolve, 100));
-        }
-        const settings = extensionSettings.seeker ??= {};
-        if (!settings.themeApplied && has('seeker')) {
-            settings.themeApplied = true;
-            saveSettingsDebounced();
-            if (select.value !== 'seeker') $(select).val('seeker').trigger('change');
-        }
-        running = false;
-    };
-    // Only once SillyTavern has loaded the user's settings, or the first run would repeat.
-    // APP_READY also fires for listeners added after it.
-    eventSource.on(eventTypes.APP_READY, install);
-}
+mountThemeSettings();
 
 // Character editor: personality and scenario sit under the description, and the example
 // messages under the first message, instead of behind Advanced definitions. They carry most
@@ -1459,26 +1376,7 @@ for (const [view, closeId] of [['completion_prompt_manager_popup_edit', 'complet
     restore();
 }
 
-// New chat: a button beside the menu button, shown while a chat is open. It presses
-// SillyTavern's own "Start new chat" (in the composer's options menu), which asks first and
-// offers to delete the current chat, so a reset is one click away instead of two menus deep.
-{
-    const newChat = document.createElement('div');
-    newChat.id = 'seeker-new-chat';
-    newChat.className = 'fa-solid fa-square-pen interactable';
-    newChat.setAttribute('role', 'button');
-    newChat.setAttribute('tabindex', '0');
-    newChat.setAttribute('title', 'New chat');
-    const start = () => document.getElementById('option_start_new_chat')?.click();
-    newChat.addEventListener('click', start);
-    newChat.addEventListener('keydown', event => {
-        if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault();
-            start();
-        }
-    });
-    document.body.append(newChat);
-}
+mountChatNavigation();
 
 // Chats: a button beside New chat that lists the other chats with the same character (or
 // group) and switches to one. The list is fetched fresh each time it opens, from the same

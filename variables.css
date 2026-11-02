@@ -2,8 +2,8 @@
 
    To change one, copy it into User settings > Custom CSS inside a :root { } block. That
    survives updates, which replace this file, and it wins because these values sit in
-   :where(:root), which carries no weight. Two colours are also in User settings > Theme
-   Colors: Underlined Text sets the accent, and Main Text, Italics Text and Quote Text set
+   :where(:root), which carries no weight. In User settings > UI Theme, Accent color sets
+   the accent. Main Text, Italics Text and Quote Text under Theme Colors set
    the chat's narration, actions and dialogue.
 
    The second block sets SillyTavern's own variables, and changing those changes SillyTavern
@@ -11,8 +11,8 @@
 
 :where(:root) {
   /* ---------- Colour ----------
-     Everything is neutral grey except the accent, which is the Underlined Text colour in
-     User settings > Theme Colors. Fills, rings, the sheen and selected states mix from it. */
+     Everything is neutral grey except Accent color in User settings > UI Theme.
+     Fills, rings, the sheen and selected states mix from it. */
   --seeker-accent: var(--SmartThemeUnderlineColor, #10b981);
   --seeker-accent-bright: color-mix(in srgb, var(--seeker-accent) 70%, white);
   --seeker-accent-ink: #0b0b0b; /* text and icons on the accent */
@@ -154,8 +154,8 @@
   /* ---------- Stage ---------- */
   /* The background is drawn this much larger than the stage, and drifts up to
      --seeker-bg-shift towards the pointer; the shift must stay under (zoom - 1) / 2. */
-  --seeker-bg-zoom: 1.08;
-  --seeker-bg-shift: 3.5%;
+  --seeker-bg-zoom: 1.04;
+  --seeker-bg-shift: 1.25%;
   /* How far halftone.webp hangs past the stage's edge to cut off the edge artifact.
      The image is 482 x 1125 and spans the stage's height. */
   --seeker-halftone-width: calc(100vh * 482 / 1125);
