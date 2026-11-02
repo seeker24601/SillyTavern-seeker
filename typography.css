@@ -188,7 +188,7 @@ body:not(:has(#chat > .welcomePanel)) #chat .mes[mesid="0"] .mes_text > p:first-
 .welcomePanel :is(.chatName > span, .chatDate, .chatStats, .chatStats small),
 body:has(#chat > .welcomePanel) #chat .mes :is(.timestamp, .mesIDDisplay, .mes_timer, .tokenCounterDisplay, .swipes-counter),
 :is(.welcomePanel, #seeker-welcome-stage) .seeker-welcome-version {
-  color: rgba(var(--seeker-ink-rgb), 0.56) !important;
+  color: color-mix(in srgb, var(--seeker-text-dim) 78%, transparent) !important;
   opacity: 1 !important;
 }
 :is(.welcomePanel, #seeker-welcome-stage) .seeker-welcome-version {
