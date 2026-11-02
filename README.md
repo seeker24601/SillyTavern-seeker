@@ -45,7 +45,7 @@ what I need to click and what remains unverified.
 
 ## Download Claude
 
-Download Claude, the character shown in the example screenshot, using the links below.
+Download Claude, the character shown in the example screenshot.
 
 - [Download the Claude character card (PNG)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claude/Claude.png)
 - [Download her expression pack (ZIP)](https://raw.githubusercontent.com/seeker24601/SillyTavern-seeker/refs/heads/codex/claudette-test-character/characters/claude/Claude.expressions.zip)
