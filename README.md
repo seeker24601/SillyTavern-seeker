@@ -77,7 +77,7 @@ Choose Accent color in User settings > UI Theme. The chat's narration, actions a
 
 ## Feedback
 
-[Report a bug or request a change](https://github.com/seeker24601/SillyTavern-seeker/issues). For layout problems, include your SillyTavern version, browser, screen size and a screenshot with private chats or API keys hidden.
+[Report a bug or request a change on Discord](https://discord.com/channels/1553000313705857116/1566718828204007495).
 
 ## Develop
 
