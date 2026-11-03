@@ -194,6 +194,10 @@ body:has(#chat > .welcomePanel) #chat .mes :is(.timestamp, .mesIDDisplay, .mes_t
 :is(.welcomePanel, #seeker-welcome-stage) .seeker-welcome-version {
   font-family: var(--seeker-mono-font);
   font-variant-numeric: tabular-nums;
+  /* A caption under the name: the heading row it sits in would otherwise make it heading-sized. */
+  font-size: var(--seeker-fs-small) !important;
+  font-weight: 400 !important;
+  line-height: var(--seeker-lh-ui);
 }
 /* Welcome stage (desktop): the name is the display heading and the version its subtitle. */
 #seeker-welcome-stage .seeker-welcome-name {
@@ -205,10 +209,6 @@ body:has(#chat > .welcomePanel) #chat .mes :is(.timestamp, .mesIDDisplay, .mes_t
   margin-right: -0.04em; /* the last letter's tracking would push the name off centre */
   line-height: var(--seeker-lh-display);
   color: var(--seeker-text);
-}
-#seeker-welcome-stage .seeker-welcome-version {
-  font-size: var(--seeker-fs-body);
-  line-height: var(--seeker-lh-ui);
 }
 :is(.welcomePanel, #seeker-welcome-stage, #chat .mes[type="welcome_prompt"]) .menu_button:not([class*="fa-"]) {
   font-size: var(--seeker-fs-body) !important;

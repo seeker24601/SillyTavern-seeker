@@ -473,3 +473,163 @@ body:not(.charListGrid) #rm_print_characters_block .seeker-card-meta { display: 
 /* The open character's name and back button only with a character open. */
 #right-nav-panel:has(#rm_characters_block:not([style*="display: none"])) #rm_PinAndTabs { display: none !important; }
 #right-nav-panel .seeker-panel-shared #rm_PinAndTabs { min-height: 0; }
+
+/* ---------- One scroll for the whole list ----------
+   SillyTavern scrolls the character list in its own box under the toolbar, and each card's
+   back scrolled too, so the wheel did nothing over the toolbar and got caught by whichever
+   card it passed over. Here the panel scrolls as a whole, the toolbar stays pinned at the top
+   with the content fading out under it, and card backs fit their text to the card. */
+#right-nav-panel:has(#rm_characters_block:not([style*="display: none"])) {
+  & > .scrollableInner {
+    -webkit-mask-image: none;
+    mask-image: none;
+    animation: none;
+  }
+  & #rm_characters_block { height: auto !important; overflow: visible !important; }
+  & #rm_print_characters_block {
+    flex: none !important;
+    height: auto !important;
+    overflow: visible !important;
+    -webkit-mask-image: none;
+    mask-image: none;
+    animation: none;
+  }
+  & #charListFixedTop {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    margin-top: calc(-1 * var(--seeker-space-1));
+    padding-top: var(--seeker-space-1) !important;
+    background: var(--seeker-surface-solid);
+  }
+  & #charListFixedTop::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: linear-gradient(var(--seeker-surface-solid), transparent);
+    pointer-events: none;
+  }
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) > :is(.character_select_container, .group_select_container) {
+  overflow: hidden;
+  /* A hidden overflow is still a scroll container, and "contain" would stop the wheel here. */
+  overscroll-behavior: auto;
+}
+body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) .ch_description {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(black calc(100% - 2.5em), transparent);
+  mask-image: linear-gradient(black calc(100% - 2.5em), transparent);
+}
+body:not(.charListGrid) #rm_print_characters_block .seeker-card-actions { position: static; }
+
+/* ---------- Group editor ----------
+   index.js puts the members first and adds a labelled Create button, pinned to the editor's
+   foot so it is in reach however long the member list is. */
+/* The editor is set to scroll but never does; that would hold the button in place. */
+#rm_group_chats_block { overflow: visible !important; }
+#rm_group_chats_block .seeker-group-create {
+  position: sticky;
+  bottom: 0;
+  z-index: 5;
+  width: 100%;
+  min-height: 40px;
+  margin: var(--seeker-space-3) 0 0 !important;
+  background-color: var(--seeker-selected) !important;
+  color: var(--seeker-selected-ink) !important;
+  font-weight: 600;
+  box-shadow: 0 -12px 16px var(--seeker-surface-solid) !important;
+}
+#rm_group_chats_block .seeker-group-create:not(:disabled):hover { background-color: var(--seeker-selected-hover) !important; }
+#rm_group_chats_block .seeker-group-create:disabled {
+  background-color: color-mix(in srgb, var(--seeker-selected) 18%, var(--seeker-surface-solid)) !important;
+  color: var(--seeker-text-dim) !important;
+  cursor: not-allowed;
+}
+#rm_group_chats_block .seeker-group-create[hidden] { display: none !important; }
+
+/* ---------- Group chats (group-chat.js) ----------
+   Group chat in the toolbar turns the cards into a picker: a tick on each chosen
+   character, groups and folders set aside, and a tray at the foot with Start. */
+.seeker-group-chat-button[aria-pressed="true"] {
+  background-color: var(--seeker-selected) !important;
+  color: var(--seeker-selected-ink) !important;
+}
+#right-nav-panel.seeker-picking #rm_print_characters_block :is(.group_select, .bogus_folder_select) {
+  opacity: 0.3;
+  pointer-events: none;
+}
+/* Picking is choosing, not browsing: the cards stay face up. */
+#right-nav-panel.seeker-picking #rm_print_characters_block .character_select > .avatar { transform: none !important; }
+#right-nav-panel.seeker-picking #rm_print_characters_block .character_select > .character_select_container { visibility: hidden; }
+#right-nav-panel.seeker-picking #rm_print_characters_block .character_select { cursor: pointer; }
+#right-nav-panel.seeker-picking #rm_print_characters_block .character_select > .avatar::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--seeker-radius-pill);
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+#right-nav-panel.seeker-picking #rm_print_characters_block .character_select.seeker-picked > .avatar {
+  box-shadow: 0 0 0 3px var(--seeker-selected), var(--seeker-shadow);
+}
+#right-nav-panel.seeker-picking #rm_print_characters_block .character_select.seeker-picked > .avatar::after {
+  border-color: var(--seeker-selected);
+  background: var(--seeker-selected) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230b0b0b' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E") center / 16px no-repeat;
+}
+.seeker-pick-tray {
+  position: sticky;
+  bottom: 0;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: var(--seeker-space-2);
+  margin-top: var(--seeker-space-3);
+  padding: var(--seeker-space-3) 0 var(--seeker-space-1);
+  background: var(--seeker-surface-solid);
+  box-shadow: 0 -16px 16px -4px var(--seeker-surface-solid);
+}
+.seeker-pick-tray[hidden] { display: none !important; }
+.seeker-pick-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--seeker-text-dim);
+  font-size: var(--seeker-fs-body);
+}
+.seeker-pick-tray .menu_button { flex: none; margin: 0 !important; min-height: 36px; padding: 6px 14px !important; white-space: nowrap; }
+.seeker-pick-tray .seeker-pick-start {
+  background-color: var(--seeker-selected) !important;
+  color: var(--seeker-selected-ink) !important;
+  font-weight: 600;
+}
+.seeker-pick-tray .seeker-pick-start:disabled {
+  background-color: color-mix(in srgb, var(--seeker-selected) 18%, var(--seeker-surface-solid)) !important;
+  color: var(--seeker-text-dim) !important;
+  cursor: not-allowed;
+}
+/* Group cards say so on their face. */
+body:not(.charListGrid) #rm_print_characters_block .group_select > .avatar::before {
+  content: "Group";
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  padding: 3px 9px;
+  border-radius: var(--seeker-radius-pill);
+  background: rgba(var(--seeker-panel-rgb), 0.78);
+  color: var(--seeker-text);
+  font: 500 var(--seeker-fs-small) / 1.3 var(--mainFontFamily);
+  letter-spacing: 0.02em;
+}

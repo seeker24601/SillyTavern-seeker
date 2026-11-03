@@ -32,3 +32,42 @@ body[data-generating] :is(#seeker-new-chat, #seeker-home) { display: none; }
 @media (max-width: 1000px) {
   #seeker-home { position: fixed; }
 }
+
+/* A group chat's members, beside Home (group-chat.js): overlapping portraits that open the
+   group's editor. */
+#seeker-group-members {
+  position: absolute;
+  top: var(--seeker-menu-top);
+  left: calc(12px + var(--seeker-menu-size) + 8px);
+  z-index: var(--seeker-z-menu-button);
+  display: flex;
+  align-items: center;
+  height: var(--seeker-menu-size);
+  padding: 0 10px 0 4px;
+  border: 1px solid transparent;
+  border-radius: var(--seeker-radius-pill);
+  background: var(--seeker-surface);
+  cursor: pointer;
+}
+#seeker-group-members[hidden],
+body:has(#chat > .welcomePanel) #seeker-group-members,
+body.seeker-nav-open #seeker-group-members { display: none; }
+#seeker-group-members img {
+  width: 28px;
+  height: 28px;
+  margin-right: -8px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  box-shadow: 0 0 0 2px var(--seeker-surface-solid);
+}
+#seeker-group-members img.seeker-muted { filter: grayscale(1) brightness(0.6); }
+#seeker-group-members .seeker-more {
+  margin-left: 14px;
+  color: var(--seeker-text-dim);
+  font: 500 var(--seeker-fs-small) / 1 var(--mainFontFamily);
+}
+#seeker-group-members:hover { background: var(--seeker-fill-hover); }
+@media (max-width: 1000px) {
+  #seeker-group-members { position: fixed; }
+}

@@ -1,6 +1,7 @@
 import { mountStageLayout } from './stage-layout.js';
 import { mountThemeSettings } from './theme-settings.js';
 import { mountChatNavigation } from './chat-navigation.js';
+import { mountGroupChat } from './group-chat.js';
 
 /*
  * seeker, a SillyTavern theme by seeker.
@@ -872,7 +873,8 @@ mountStageLayout();
         const newButton = makeButton('seeker-new-button',
             icon('<path d="M12 5v14M5 12h14"/>') + '<span>New</span>' + icon('<path d="m6 9 6 6 6-6"/>'), 'New');
         const newPanel = makePanel('seeker-new-panel');
-        for (const id of ['rm_button_create', 'character_import_button', 'external_import_button', 'rm_button_group_chats', 'rm_buttons_container']) {
+        // Group chats second: among the imports they were hard to find.
+        for (const id of ['rm_button_create', 'rm_button_group_chats', 'character_import_button', 'external_import_button', 'rm_buttons_container']) {
             const el = document.getElementById(id);
             if (el) newPanel.append(el);
         }
@@ -914,6 +916,43 @@ mountStageLayout();
         };
         new MutationObserver(updateCount).observe(controls, { subtree: true, childList: true, attributes: true, attributeFilter: ['class'] });
         updateCount();
+    }
+}
+
+// Group editor: the members come first, since choosing who is in the chat is the step that
+// matters, and the group's settings follow. SillyTavern's Create is an unlabelled check icon
+// among the header buttons; a labelled button pinned to the foot of the editor stands in for
+// it, shown and enabled whenever SillyTavern's is.
+{
+    const editor = document.getElementById('rm_group_chats_block');
+    const submit = document.getElementById('rm_group_submit');
+    if (editor && submit) {
+        const section = id => document.getElementById(id)?.closest('#rm_group_chats_block > *');
+        const controls = section('rm_group_chat_name');
+        const current = section('rm_group_members');
+        const add = section('rm_group_add_members');
+        if (controls && current && add) editor.append(current, add, controls);
+
+        const create = document.createElement('button');
+        create.type = 'button';
+        create.className = 'menu_button seeker-group-create';
+        create.textContent = 'Create group chat';
+        create.addEventListener('click', () => submit.click());
+        editor.append(create);
+        const sync = () => {
+            create.hidden = getComputedStyle(submit).display === 'none';
+            create.disabled = submit.disabled;
+            create.title = submit.disabled ? 'Add at least one character first' : '';
+        };
+        // SillyTavern disables its button as a property (not an attribute) when the member list
+        // changes, so check again whenever anything in the editor changes.
+        let queued = false;
+        new MutationObserver(() => {
+            if (queued) return;
+            queued = true;
+            requestAnimationFrame(() => { queued = false; sync(); });
+        }).observe(editor, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
+        sync();
     }
 }
 
@@ -1377,6 +1416,7 @@ for (const [view, closeId] of [['completion_prompt_manager_popup_edit', 'complet
 }
 
 mountChatNavigation();
+mountGroupChat();
 
 // Chats: a button beside New chat that lists the other chats with the same character (or
 // group) and switches to one. The list is fetched fresh each time it opens, from the same

@@ -8,7 +8,9 @@ export function mountThemeSettings() {
         row.id = 'seeker-accent-setting';
         const label = row.querySelector('span');
         label.textContent = 'Accent color';
-        label.removeAttribute('data-i18n');
+        // Retarget the translation key rather than removing it: SillyTavern translates every
+        // data-i18n change, and a removed key makes it throw.
+        label.dataset.i18n = 'Accent color';
         label.id = 'seeker-accent-label';
         picker.setAttribute('aria-label', 'Accent color');
         picker.setAttribute('aria-labelledby', label.id);
