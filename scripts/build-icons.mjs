@@ -156,6 +156,10 @@ const ALIASES = {
     'xmark': 'x',
 };
 
+// Lucide icons the theme uses itself, with no Font Awesome glyph to stand in for. Each becomes
+// a --seeker-icon-NAME variable for style.css to set on its own controls.
+const THEME_ICONS = ['message-square-plus'];
+
 // Pseudo-elements in SillyTavern's own CSS that set a Font Awesome glyph code directly.
 const RAW_GLYPHS = [
     {selector: '.menu_button.toggleable.toggled::before', code: 'f00c'},
@@ -198,6 +202,9 @@ const dataUri = icon => {
 for (const icon of Object.values(ALIASES)) {
     if (!existsSync(join(lucideDir, `${icon}.svg`))) throw new Error(`Alias target lucide/${icon} does not exist.`);
 }
+for (const icon of THEME_ICONS) {
+    if (!existsSync(join(lucideDir, `${icon}.svg`))) throw new Error(`Theme icon lucide/${icon} does not exist.`);
+}
 
 const iconByCode = new Map();
 const classRules = [];
@@ -215,7 +222,7 @@ for (const [code, names] of groups) {
     mapped.push(...names);
 }
 
-const used = new Set(iconByCode.values());
+const used = new Set([...iconByCode.values(), ...THEME_ICONS]);
 const variables = [...used].sort().map(icon => `  --seeker-icon-${icon}:${dataUri(icon)};`);
 
 const paint = `content:""!important;display:inline-block;width:1em;height:1em;vertical-align:-0.125em;background-color:currentColor;-webkit-mask:var(--seeker-icon) center/contain no-repeat;mask:var(--seeker-icon) center/contain no-repeat`;

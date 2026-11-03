@@ -166,6 +166,7 @@ body:not(:has(#chat > .welcomePanel)) #chat .mes[mesid="0"] .mes_text > p:first-
   font-variant-numeric: tabular-nums;
   font-variant-ligatures: none;
   letter-spacing: 0.01em;
+  opacity: 1 !important; /* the faint colour is the dimming; SillyTavern's own opacity on top made it unreadable */
 }
 
 /* The stage spine reads like a book spine: capitals, opened up. */
@@ -199,10 +200,13 @@ body:has(#chat > .welcomePanel) #chat .mes :is(.timestamp, .mesIDDisplay, .mes_t
   font-weight: 400 !important;
   line-height: var(--seeker-lh-ui);
 }
-/* Welcome stage (desktop): the name is the display heading and the version its subtitle. */
-#seeker-welcome-stage .seeker-welcome-name {
+/* The SillyTavern name on the welcome screen, at every size: the small-caps cut. */
+.seeker-welcome-name {
   font-family: var(--seeker-display-font) !important;
   font-optical-sizing: auto;
+}
+/* Welcome stage (desktop): the name is the display heading and the version its subtitle. */
+#seeker-welcome-stage .seeker-welcome-name {
   font-size: var(--seeker-fs-display);
   font-weight: 700;
   letter-spacing: 0.04em;

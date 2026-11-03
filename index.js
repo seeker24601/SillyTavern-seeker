@@ -1005,6 +1005,48 @@ mountThemeSettings();
     }
 }
 
+// AI response: a preset file dropped on the panel imports as a preset. SillyTavern listens for
+// drops on the whole page and treats every file as a character; this catches drops on the
+// panel first and hands the file to the import input of the API in use.
+{
+    const panel = document.getElementById('left-nav-panel');
+    const importInput = () => {
+        const api = SillyTavern.getContext().mainApi;
+        if (api === 'openai') return document.getElementById('openai_preset_import_file');
+        const manager = api === 'koboldhorde' ? 'kobold' : api;
+        return panel.querySelector(`input[type="file"][data-preset-manager-file="${CSS.escape(manager)}"]`);
+    };
+    const hasFiles = event => [...(event.dataTransfer?.types || [])].includes('Files');
+    if (panel) {
+        panel.addEventListener('dragover', event => {
+            if (!hasFiles(event)) return;
+            event.preventDefault();
+            event.stopPropagation();
+            event.dataTransfer.dropEffect = 'copy';
+            panel.classList.add('seeker-dropping');
+        }, true);
+        panel.addEventListener('dragleave', event => {
+            if (!panel.contains(event.relatedTarget)) panel.classList.remove('seeker-dropping');
+        }, true);
+        panel.addEventListener('drop', event => {
+            if (!hasFiles(event)) return;
+            event.preventDefault();
+            event.stopPropagation();
+            panel.classList.remove('seeker-dropping');
+            const file = [...event.dataTransfer.files].find(f => /\.(json|settings|preset)$/i.test(f.name));
+            const input = importInput();
+            if (!file || !input) {
+                toastr.warning('Drop a preset file (.json) here to import it.', 'Not a preset');
+                return;
+            }
+            const transfer = new DataTransfer();
+            transfer.items.add(file);
+            input.files = transfer.files;
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+        }, true);
+    }
+}
+
 // Sprites: the Character Expressions section (the sprite grid and its settings) moves out
 // of Extensions and into the character editor, above the description, next to the
 // character it belongs to. It is SillyTavern's own drawer moved whole, so the extension's
@@ -1781,3 +1823,4 @@ mountGroupChat();
     }
     refreshTitle();
 }
+

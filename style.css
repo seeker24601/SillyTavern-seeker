@@ -724,6 +724,22 @@ body[data-generating] .seeker-mes-regen { display: none !important; }
   transition: background-color 120ms;
 }
 .welcomeRecent .recentChatList .recentChat:hover { background-color: var(--seeker-fill-hover) !important; }
+/* Pin, rename and delete show on the row under the pointer (or with focus in it), like the
+   message buttons. Pinned chats keep their own pin badge. Touch screens always show them. */
+.welcomeRecent .recentChat .chatActions { opacity: 0; transition: opacity 160ms ease; }
+.welcomeRecent .recentChat:is(:hover, :focus-within) .chatActions { opacity: 1; }
+@media (hover: none) { .welcomeRecent .recentChat .chatActions { opacity: 1; } }
+/* The message count and file size go under the preview, lined up with its text. */
+.welcomeRecent .recentChat .chatMessageContainer {
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: var(--seeker-space-1) !important;
+}
+.welcomeRecent .recentChat .chatStats {
+  display: flex;
+  align-items: center;
+  gap: var(--seeker-space-2);
+}
 .welcomeRecent .recentChat .avatar img { border-radius: var(--seeker-radius-xs) !important; }
 .welcomePanel .welcomeHeaderTitle .mes_button { color: var(--seeker-text-dim); opacity: 1; transition: color 120ms; }
 .welcomePanel .welcomeHeaderTitle .mes_button:hover { color: var(--seeker-text); }

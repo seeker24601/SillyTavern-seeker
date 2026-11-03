@@ -21,7 +21,7 @@
   --seeker-ink-rgb: 237, 237, 237;
   --seeker-text: rgb(var(--seeker-ink-rgb));
   --seeker-text-dim: rgba(var(--seeker-ink-rgb), 0.64);
-  --seeker-text-faint: rgba(var(--seeker-ink-rgb), 0.38);
+  --seeker-text-faint: rgba(var(--seeker-ink-rgb), 0.5); /* meta and hints: the faintest still readable (4.7:1 on the panels) */
   --seeker-divider: rgba(var(--seeker-ink-rgb), 0.08);
 
   /* Surfaces. The chat column is the panel colour; panels, menus and dialogs are solid. */

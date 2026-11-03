@@ -71,3 +71,6 @@ body.seeker-nav-open #seeker-group-members { display: none; }
 @media (max-width: 1000px) {
   #seeker-group-members { position: fixed; }
 }
+
+/* New chat: a speech bubble with a plus, so it reads as a new chat rather than an edit. */
+#seeker-new-chat::before { --seeker-icon: var(--seeker-icon-message-square-plus); }

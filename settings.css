@@ -141,6 +141,10 @@
 /* ---------- AI response ----------
    The panel scrolls inside .scrollableInner, so that box holds the list and the sections.
    For APIs other than Chat Completion (data-seeker-sections-off) SillyTavern's layout stays. */
+/* A preset file dragged over the panel: it outlines itself (index.js imports the drop). */
+#left-nav-panel.seeker-dropping {
+  box-shadow: var(--seeker-shadow), inset 0 0 0 2px rgba(var(--seeker-ink-rgb), 0.45) !important;
+}
 #left-nav-panel .scrollableInner.seeker-sectioned:not([data-seeker-sections-off]) {
   display: grid !important;
   grid-template-columns: 184px minmax(0, 1fr);

@@ -1,7 +1,7 @@
 export function mountChatNavigation() {
     const newChat = document.createElement('div');
     newChat.id = 'seeker-new-chat';
-    newChat.className = 'fa-solid fa-square-pen interactable';
+    newChat.className = 'fa-solid fa-comment interactable'; // drawn as message-square-plus: chat-navigation.css
     newChat.setAttribute('role', 'button');
     newChat.setAttribute('tabindex', '0');
     newChat.setAttribute('title', 'New chat');
