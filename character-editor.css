@@ -1,11 +1,12 @@
 /* seeker: the character editor, opened from the Characters panel, and its sprites. */
 
 /* ---------- Character editor ----------
-   A "Characters" back button and the name as a title across the top; the portrait large on
-   the left with the buttons, More and tags beside it. index.js adds the back button. */
+   A sticky row with a "Characters" back button and the character's actions; below it the
+   portrait large on the left with the name and token count beside it. index.js adds the back
+   button and moves the actions, name and count. */
 #rm_button_characters { display: none !important; } /* the back button replaces it */
 #CharListButtonAndHotSwaps:has(#HotSwapWrapper .hotswap:empty) { display: none !important; }
-#right-nav-panel-tabs { align-items: center !important; gap: var(--seeker-space-3); }
+#right-nav-panel-tabs { align-items: flex-start !important; gap: var(--seeker-space-3); }
 #rm_button_selected_ch { display: flex !important; align-items: center; gap: var(--seeker-space-3); min-width: 0; opacity: 1 !important; }
 #rm_button_selected_ch:not(:has(h2:not(:empty))) { display: none !important; }
 #rm_button_selected_ch h2 {
@@ -53,6 +54,7 @@
 #avatar-and-name-block #avatar_div_div {
   grid-column: 1;
   grid-row: 1 / span 3;
+  align-self: start !important;
   width: 120px !important;
   height: 180px !important;
   margin: 0 !important;
@@ -67,11 +69,115 @@
   border-radius: var(--seeker-radius-lg) !important;
   box-shadow: inset 0 0 0 1px rgba(var(--seeker-ink-rgb), 0.1), 0 8px 22px rgba(0, 0, 0, 0.45);
 }
-#avatar-and-name-block #avatar_controls { grid-column: 2; grid-row: 1; flex-direction: column; align-items: stretch !important; gap: var(--seeker-space-2) !important; margin: 0 !important; }
-#avatar-and-name-block .form_create_bottom_buttons_block { justify-content: flex-start !important; flex-wrap: wrap; gap: var(--seeker-space-1) !important; margin: 0 !important; padding: 0 !important; }
-#avatar-and-name-block .form_create_bottom_buttons_block .menu_button { margin: 0 !important; }
-#avatar-and-name-block #avatar_controls > label { height: auto !important; margin: 0 !important; }
-#avatar-and-name-block #tags_div { grid-column: 2; grid-row: 2; margin: 0 !important; }
+/* The character's actions, moved by index.js into the sticky row beside "Characters": round
+   buttons ending with More, at the far end. Only with a character open. */
+#avatar-and-name-block #avatar_controls { display: none !important; }
+.seeker-char-actions {
+  display: flex !important;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end !important;
+  align-items: center;
+  gap: var(--seeker-space-1) !important;
+  min-width: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.seeker-char-actions .menu_button { margin: 0 !important; }
+#right-nav-panel:not(:has(#rm_ch_create_block:not([style*="display: none"]))) .seeker-char-actions { display: none !important; }
+/* With a character open its name sits by the portrait; SillyTavern's copy in this row stays
+   for group chats. */
+#right-nav-panel:has(#rm_ch_create_block:not([style*="display: none"])) #rm_button_selected_ch { display: none !important; }
+/* The More menu: as wide as "More..." needs. */
+.seeker-char-actions > label.seeker-more { flex: none !important; width: auto !important; height: auto !important; margin: 0 !important; }
+.seeker-char-actions .seeker-more #char-management-dropdown { width: 8.5em !important; min-width: 0 !important; height: 32px !important; min-height: 32px !important; margin: 0 !important; }
+/* Beside the portrait: the name, which renames on click (a pencil shows on hover), and the
+   token count under it. */
+.seeker-char-identity {
+  grid-column: 2;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--seeker-space-1);
+  min-width: 0;
+}
+#form_create .seeker-char-name {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--seeker-space-2);
+  max-width: 100%;
+  margin: 0 !important;
+  font-family: var(--seeker-heading-font) !important;
+  font-size: 36px !important;
+  font-weight: 600 !important;
+  line-height: var(--seeker-lh-heading) !important;
+  color: var(--seeker-text) !important;
+  cursor: pointer;
+  border-radius: var(--seeker-radius-sm);
+}
+.seeker-char-name > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.seeker-char-rename { flex: none; color: var(--seeker-text-faint); font-size: 13px; opacity: 0; transition: opacity 120ms; }
+.seeker-char-name:is(:hover, :focus-visible) .seeker-char-rename { opacity: 1; }
+.seeker-char-name:focus-visible { outline: none; box-shadow: var(--seeker-focus); }
+#form_create[actiontype="createcharacter"] .seeker-char-name { display: none !important; }
+/* The token total at the far end of the Prompt heading (index.js), its right edge in line
+   with the section counts, which stop short of each section's chevron. */
+.seeker-section-group-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0 var(--seeker-space-3); }
+.seeker-section-group-head #result_info {
+  flex: none;
+  margin: 0 0 0 auto !important;
+  padding: 0 var(--seeker-section-token-inset, 38px) 0 0 !important;
+  color: var(--seeker-text-faint);
+}
+.seeker-section-group-head #result_info_text { text-align: right !important; }
+/* The metadata around the name (index.js): "by" the author and the version, the notes in a
+   few lines, and the tags. Each is a quiet button that scrolls to where it is edited. */
+.seeker-char-identity :is(.seeker-char-author, .seeker-char-version, .seeker-char-notes, .seeker-char-tag, .seeker-char-meta-empty) {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: color 120ms, background-color 120ms;
+}
+.seeker-char-identity :is(.seeker-char-author, .seeker-char-version, .seeker-char-notes, .seeker-char-tag, .seeker-char-meta-empty):focus-visible { box-shadow: var(--seeker-focus); border-radius: var(--seeker-radius-sm); }
+.seeker-char-identity [hidden] { display: none !important; }
+.seeker-char-identity .seeker-char-byline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--seeker-space-2); margin-top: -2px; color: var(--seeker-text-dim); font-size: var(--seeker-fs-body); }
+.seeker-char-identity .seeker-char-byline > button + button::before { content: "·"; margin-right: var(--seeker-space-2); color: var(--seeker-text-faint); }
+.seeker-char-identity .seeker-char-byline > button:hover { color: var(--seeker-text); }
+.seeker-char-identity .seeker-char-version { font-variant-numeric: tabular-nums; }
+.seeker-char-identity .seeker-char-notes {
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  max-width: 62ch;
+  margin-top: var(--seeker-space-2) !important;
+  color: var(--seeker-text-dim);
+  font-size: var(--seeker-fs-small);
+  line-height: var(--seeker-lh-hint);
+  white-space: pre-line;
+}
+.seeker-char-identity .seeker-char-notes:hover { color: var(--seeker-text); }
+.seeker-char-identity .seeker-char-tags { display: flex; flex-wrap: wrap; gap: var(--seeker-space-1); margin-top: var(--seeker-space-2); }
+.seeker-char-identity .seeker-char-tag {
+  padding: 3px 10px !important;
+  border-radius: var(--seeker-radius-pill);
+  background: var(--seeker-fill);
+  color: var(--seeker-text-dim);
+  font-size: var(--seeker-fs-small);
+  line-height: 1.3;
+}
+.seeker-char-identity .seeker-char-tag:hover { background: var(--seeker-fill-hover); color: var(--seeker-text); }
+.seeker-char-identity .seeker-char-meta-empty { margin-top: var(--seeker-space-2); color: var(--seeker-text-faint); font-size: var(--seeker-fs-small); text-decoration: underline dotted; text-underline-offset: 3px; }
+.seeker-char-identity .seeker-char-meta-empty:hover { color: var(--seeker-text); }
+@media (max-width: 1000px) {
+  #form_create .seeker-char-name { font-size: 28px !important; }
+  .seeker-char-identity .seeker-char-notes { -webkit-line-clamp: 4; }
+}
+
+/* The character's tags, moved into Creator's Notes and Metadata by index.js. */
+#form_create .seeker-tags-block #tags_div { margin: 0 !important; }
+#form_create .seeker-tags-block .tag_controls { display: flex; align-items: center; gap: var(--seeker-space-2); }
 @media (max-width: 1000px) {
   /* The back button is just its arrow, so the name has room. */
   .seeker-back-button { width: 32px; padding: 0; justify-content: center; }
@@ -80,9 +186,12 @@
   #avatar-and-name-block :is(#avatar_div_div, #avatar_load_preview) { width: 96px !important; height: 144px !important; }
 }
 
+/* The panel's token total on one line: "2944 Tokens (1225 Permanent)". */
+#result_info_text { display: flex !important; flex-direction: row !important; flex-wrap: nowrap; align-items: baseline; gap: 0.4em; white-space: nowrap; }
+
 /* ---------- Character editor: fields ---------- */
 /* Room between the portrait row and Creator's Notes. */
-#form_create #spoiler_free_desc { margin-top: var(--seeker-space-4) !important; }
+#form_create #spoiler_free_desc:not(.seeker-moved-away) { margin-top: var(--seeker-space-4) !important; }
 /* The first message opens tall enough to read a greeting without expanding it. */
 #firstmessage_textarea { min-height: 15em !important; }
 /* Field headers: the label and its help on the left; the field's buttons, ending with
@@ -95,10 +204,115 @@
 }
 #form_create .title_restorable > .flex-container:first-child { flex: 1 1 auto; gap: 6px; }
 #form_create .title_restorable > .menu_button { flex: none; margin: 0 !important; }
-/* Personality, scenario and examples (moved out of Advanced definitions by index.js) get the
-   same header: the label in the body face, its help beside it, expand on the right. */
-#form_create .seeker-editor-field { margin-top: var(--seeker-space-3); }
-#form_create .seeker-editor-field h4 {
+/* The card's fields in prompt order, each a folding section (built by index.js): a group
+   heading, then sections divided by a rule, each titled with its step number in a ring and a
+   (?) to the docs. Sprites, built by SillyTavern, is styled the same. */
+#seeker-character-sections { margin-top: var(--seeker-space-4); }
+.seeker-section-group { margin: var(--seeker-space-6) 0 var(--seeker-space-2); }
+.seeker-section-group:first-child { margin-top: var(--seeker-space-2); }
+#form_create .seeker-section-group h2 {
+  margin: 0 !important;
+  font-family: var(--seeker-heading-font) !important;
+  font-size: var(--seeker-fs-title) !important;
+  font-weight: 600 !important;
+}
+.seeker-section-group p {
+  margin: var(--seeker-space-1) 0 0 !important;
+  color: var(--seeker-text-faint);
+  font-size: var(--seeker-fs-small) !important;
+  line-height: var(--seeker-lh-hint) !important;
+}
+#form_create .seeker-character-section,
+#form_create + .seeker-character-section { margin: 0 !important; padding: 0 0 var(--seeker-space-2) !important; }
+/* A rule between one section and the next. */
+#form_create .seeker-character-section + .seeker-character-section { border-top: 1px solid var(--seeker-divider) !important; }
+.seeker-character-section > .inline-drawer-toggle.inline-drawer-header {
+  display: flex !important;
+  align-items: center !important;
+  gap: var(--seeker-space-3);
+  min-height: 48px;
+  padding-inline: var(--seeker-space-1) !important;
+  border-radius: var(--seeker-radius-md) !important;
+  background: none !important;
+}
+#form_create .seeker-character-section .seeker-section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--seeker-space-2);
+  margin: 0 !important;
+  font-family: var(--seeker-heading-font) !important;
+  font-size: var(--seeker-fs-subsection) !important;
+  font-weight: 600 !important;
+}
+.seeker-section-title :is(b, strong) { font: inherit !important; }
+/* The section's token count, beside the chevron (index.js); the field's own counter line goes. */
+.seeker-character-section > .inline-drawer-header > .seeker-section-title { flex: 1 1 auto; min-width: 0; }
+.seeker-section-tokens {
+  flex: none;
+  margin-left: auto;
+  color: var(--seeker-text-faint);
+  font-family: var(--monoFontFamily) !important;
+  font-size: var(--seeker-fs-meta) !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+#form_create .seeker-has-tokens > .inline-drawer-content .extension_token_counter { display: none !important; }
+/* The step number in a ring. */
+.seeker-section-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(var(--seeker-ink-rgb), 0.35);
+  border-radius: 50%;
+  color: var(--seeker-text-dim);
+  font-family: var(--mainFontFamily);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+  line-height: 1;
+}
+/* The (?) beside the title: the field's own help link inside the section gives way to it. */
+.seeker-section-help {
+  display: inline-flex;
+  color: var(--seeker-text-faint) !important;
+  font-size: 13px;
+  text-decoration: none !important;
+  transition: color 120ms;
+}
+.seeker-section-help:hover { color: var(--seeker-text) !important; }
+.seeker-section-help:focus-visible { outline: none; box-shadow: var(--seeker-focus); border-radius: 50%; }
+#form_create .seeker-character-section > .inline-drawer-content .notes-link { display: none !important; }
+/* Hints: quiet text at the start of the row that holds the field's buttons and expand. */
+.seeker-section-hint {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0 !important;
+  color: var(--seeker-text-faint) !important;
+  font-family: var(--mainFontFamily) !important;
+  font-size: var(--seeker-fs-small) !important;
+  font-weight: 400 !important;
+  line-height: var(--seeker-lh-hint) !important;
+}
+.seeker-section-row {
+  display: flex;
+  align-items: center;
+  gap: var(--seeker-space-2);
+  min-height: 32px;
+  margin-bottom: var(--seeker-space-2);
+}
+.seeker-section-row .menu_button { margin: 0 !important; }
+#form_create .title_restorable.seeker-has-hint > .flex-container:first-child { min-width: 0; }
+/* A field's own label repeats its section's title. */
+#form_create .seeker-character-section .seeker-section-label { display: none !important; }
+/* Creator's notes are edited in their section (index.js), so the rendered copy at the top goes. */
+#form_create #spoiler_free_desc.seeker-moved-away { display: none !important; }
+/* Spoiler-free mode hides the description and first message; their sections go with them. */
+.seeker-character-section:has(> .inline-drawer-content > :is(#descriptionWrapper, #firstMessageWrapper)[style*="display: none"]) { display: none !important; }
+/* A field's header row: the hint on the left, the buttons and expand on the right. */
+#form_create .seeker-character-section h4 {
   display: flex !important;
   align-items: center !important;
   gap: 6px;
@@ -111,7 +325,21 @@
   letter-spacing: normal;
   line-height: var(--seeker-lh-ui) !important;
 }
-#form_create .seeker-editor-field h4 .editor_maximize { order: 1; margin-left: auto !important; }
+#form_create .seeker-character-section h4 .editor_maximize { order: 1; margin-left: auto !important; }
+/* Advanced definitions has nothing left in it (index.js moves its fields onto this page),
+   so its button goes. */
+#advanced_div { display: none !important; }
+/* SillyTavern's own hint lines (writing style for the examples, "in group chats" for
+   talkativeness) are quiet hints, not bold or red headings. */
+#form_create .seeker-character-section h5 {
+  margin: 0 0 var(--seeker-space-2) !important;
+  color: var(--seeker-text-faint) !important;
+  font-family: var(--mainFontFamily) !important;
+  font-size: var(--seeker-fs-small) !important;
+  font-weight: 400 !important;
+  line-height: var(--seeker-lh-hint) !important;
+}
+#form_create .seeker-character-section h5 .warning { color: inherit !important; }
 /* Expand, everywhere: a small square button in the same family as the theme's other icon
    buttons, instead of a bare glyph. */
 .editor_maximize {
@@ -170,10 +398,8 @@
 /* ---------- Sprites ----------
    The Character Expressions drawer, moved into the editor by index.js: a bar with the set's
    name and Upload ZIP, a grid of tiles, and the folder and settings folded below. */
-#form_create .seeker-sprites,
-#form_create + .seeker-sprites { margin: var(--seeker-space-4) 0 !important; }
-.seeker-sprites > .inline-drawer-toggle.inline-drawer-header { min-height: 44px; border-radius: var(--seeker-radius-md) !important; }
-.seeker-sprites > .inline-drawer-toggle.inline-drawer-header :is(b, strong) { font-family: var(--seeker-heading-font) !important; font-size: var(--seeker-fs-subsection) !important; font-weight: 600 !important; }
+#form_create .seeker-sprites:not(.seeker-character-section),
+#form_create + .seeker-sprites:not(.seeker-character-section) { margin: var(--seeker-space-4) 0 !important; }
 /* The grid: small tiles, the name along the bottom of each. A sprite fills its tile; a slot
    with no sprite is a quiet dark square with just the name (the "no image" placeholder is hidden). */
 .seeker-sprites #image_list { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--seeker-space-2); margin: var(--seeker-space-2) 0 0 !important; padding: 0 !important; }

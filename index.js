@@ -988,20 +988,419 @@ mountStageLayout();
 
 mountThemeSettings();
 
-// Character editor: personality and scenario sit under the description, and the example
-// messages under the first message, instead of behind Advanced definitions. They carry most
-// of a card's prompt. SillyTavern's own blocks move whole: their textareas belong to the
-// form through form="form_create" and keep their save and token-count listeners.
+// Character editor sections: shared by the editor below and by Sprites, which arrives later.
+// A section is SillyTavern's folding drawer markup, so its own toggle handler opens and closes
+// it. The heading carries the step number (its place in the prompt) and a (?) to the docs.
+// Folded sections are remembered.
+const SECTIONS_KEY = 'seeker-character-sections';
+const DOCS = 'https://docs.sillytavern.app/';
+const readFolded = () => { try { return JSON.parse(localStorage.getItem(SECTIONS_KEY)) || {}; } catch { return {}; } };
+
+function sectionHeading(step, title, help) {
+    const heading = document.createElement('h3');
+    heading.className = 'seeker-section-title';
+    if (step) {
+        const number = document.createElement('span');
+        number.className = 'seeker-section-step';
+        number.textContent = step;
+        heading.append(number);
+    }
+    heading.append(title);
+    if (help) {
+        const link = document.createElement('a');
+        link.className = 'seeker-section-help';
+        link.href = DOCS + help;
+        link.target = '_blank';
+        link.rel = 'noopener';
+        link.title = 'Help';
+        link.innerHTML = '<span class="fa-solid fa-circle-question" aria-hidden="true"></span>';
+        // The link sits in the header, which folds the section on click.
+        link.addEventListener('click', event => event.stopPropagation());
+        heading.append(link);
+    }
+    return heading;
+}
+
+// Opens or folds a section as last left, and remembers each toggle. SillyTavern flips the icon
+// before it announces the toggle, so the icon says which way the section is going.
+function rememberFold(el, key, closedByDefault = false) {
+    el.dataset.section = key;
+    const icon = el.querySelector(':scope > .inline-drawer-header .inline-drawer-icon');
+    const content = el.querySelector(':scope > .inline-drawer-content');
+    if (!icon || !content) return;
+    const open = !(readFolded()[key] ?? closedByDefault);
+    icon.classList.remove('fa-circle-chevron-up', 'fa-circle-chevron-down', 'up', 'down');
+    icon.classList.add(open ? 'fa-circle-chevron-up' : 'fa-circle-chevron-down', open ? 'up' : 'down');
+    // SillyTavern hides drawer content by default and opens it with an inline style.
+    content.style.display = open ? 'block' : 'none';
+    window.jQuery?.(el).on('inline-drawer-toggle', event => {
+        if (event.target !== el) return;
+        const folded = readFolded();
+        folded[key] = icon.classList.contains('down');
+        try { localStorage.setItem(SECTIONS_KEY, JSON.stringify(folded)); } catch { }
+    });
+}
+
+// Character editor: every field of the card on one page, in the order SillyTavern's default
+// prompt sends them, each in its own section. Main Prompt; description, personality and
+// scenario; example dialogue; then the chat history, which opens with the first message and
+// takes the Character's Note at its depth; then Post-History Instructions. Under "Not sent to
+// the model": Sprites (placed by the Sprites code), Talkativeness, and the creator's notes
+// with the rest of the creator's metadata.
+//
+// A field's own label repeats its section's title, so it is hidden, and its help link gives way
+// to the (?) by the heading. A hint shares the row with the field's buttons (Ext. Media, Alt.
+// Greetings, expand). The fields from Advanced definitions move here too. SillyTavern's own
+// blocks move whole: their fields belong to the form through form="form_create" and keep their
+// save listeners, and the panel's input listener keeps the token count. The popup stays, empty
+// and closed, so SillyTavern's checks that it is closed (arrow-key swipes, Escape) still pass;
+// its button is hidden in character-editor.css.
 {
-    const description = document.getElementById('descriptionWrapper');
-    const firstMessage = document.getElementById('firstMessageWrapper');
-    const personality = document.getElementById('personality_div');
-    const scenario = document.getElementById('scenario_div');
-    const examples = document.getElementById('mes_example_div');
-    if (description && firstMessage && personality && scenario && examples) {
-        for (const block of [personality, scenario, examples]) block.classList.add('seeker-editor-field');
-        description.after(personality, scenario);
-        firstMessage.after(examples);
+    const byId = id => document.getElementById(id);
+    const description = byId('descriptionWrapper');
+    const firstMessage = byId('firstMessageWrapper');
+    const popup = byId('character_popup');
+    const mainPrompt = byId('system_prompt_textarea')?.parentElement;
+    const postHistory = byId('post_history_instructions_textarea')?.parentElement;
+    const personality = byId('personality_div');
+    const scenario = byId('scenario_div');
+    const examples = byId('mes_example_div');
+    const note = byId('depth_prompt_div');
+    const talkativeness = byId('talkativeness_div');
+    if (description && firstMessage && popup && mainPrompt && postHistory) {
+        const drawers = [...popup.querySelectorAll(':scope > .inline-drawer')];
+        const overrides = drawers.find(d => d.contains(mainPrompt));
+        const metadata = drawers.find(d => d.querySelector('#creator_textarea'));
+
+        const hintEl = text => {
+            const el = document.createElement('span');
+            el.className = 'seeker-section-hint';
+            el.textContent = text;
+            return el;
+        };
+        // The row a field's buttons sit on: its header line. Labelled rows keep the label
+        // (hidden) and help in a first group, which the hint joins.
+        const putHint = (row, hint) => {
+            if (!row || !hint) return;
+            const target = row.matches('.title_restorable') ? row.querySelector(':scope > .flex-container') ?? row : row;
+            target.prepend(hint);
+            row.classList.add('seeker-has-hint');
+        };
+
+        // A section's token count shows in its header, beside the chevron, so it reads while
+        // the section is folded. It mirrors SillyTavern's own counter for the field (which
+        // keeps counting while hidden); that counter's own line in the section goes.
+        const showTokens = (el, header, icon, content) => {
+            const counters = [...content.querySelectorAll('[data-token-counter]')];
+            if (!counters.length) return;
+            el.classList.add('seeker-has-tokens');
+            const badge = document.createElement('span');
+            badge.className = 'seeker-section-tokens';
+            badge.title = 'Tokens';
+            const update = () => {
+                const counts = counters.map(counter => Number(counter.textContent.trim()));
+                if (counts.some(Number.isNaN)) { badge.textContent = '…'; return; }
+                const total = counts.reduce((a, b) => a + b, 0);
+                badge.textContent = `${total} ${total === 1 ? 'token' : 'tokens'}`;
+            };
+            const observer = new MutationObserver(update);
+            for (const counter of counters) observer.observe(counter, { childList: true, characterData: true, subtree: true });
+            update();
+            header.insertBefore(badge, icon);
+        };
+
+        const section = ({ key, step = 0, title, help, blocks, row, hint, closedByDefault = false }) => {
+            const el = document.createElement('div');
+            el.className = 'inline-drawer seeker-character-section';
+            const header = document.createElement('div');
+            header.className = 'inline-drawer-toggle inline-drawer-header';
+            const icon = document.createElement('div');
+            icon.className = 'inline-drawer-icon fa-solid fa-circle-chevron-up up';
+            header.append(sectionHeading(step, title, help), icon);
+            const content = document.createElement('div');
+            content.className = 'inline-drawer-content';
+            content.append(...blocks.filter(Boolean));
+            if (hint) {
+                const hintNode = typeof hint === 'string' ? hintEl(hint) : hint;
+                if (row) putHint(row, hintNode);
+                else content.prepend(hintNode);
+            }
+            el.append(header, content);
+            showTokens(el, header, icon, content);
+            rememberFold(el, key, closedByDefault);
+            return el;
+        };
+
+        const group = (key, title, hint) => {
+            const el = document.createElement('div');
+            el.className = 'seeker-section-group';
+            el.dataset.group = key;
+            const heading = document.createElement('h2');
+            heading.textContent = title;
+            el.append(heading);
+            if (hint) {
+                const p = document.createElement('p');
+                p.textContent = hint;
+                el.append(p);
+            }
+            return el;
+        };
+
+        const labels = [
+            description.querySelector('#description_div .mdhotkey_location'),
+            firstMessage.querySelector('#first_message_div .mdhotkey_location'),
+            mainPrompt.querySelector(':scope > h4 > span'),
+            postHistory.querySelector(':scope > h4 > span'),
+            personality?.querySelector(':scope > h4 > span'),
+            scenario?.querySelector(':scope > h4 > span'),
+            examples?.querySelector('h4 > span'),
+            note?.querySelector('.flex1 > h4 > span'),
+            talkativeness?.querySelector(':scope > h4'),
+        ];
+        for (const label of labels) label?.classList.add('seeker-section-label');
+
+        // The examples' "Important to set the character's writing style" becomes their hint;
+        // its heading line, left with only a help link, goes.
+        const examplesHint = examples?.querySelector('h5 > span');
+        examplesHint?.classList.add('seeker-section-hint');
+        examples?.querySelector('h5')?.classList.add('seeker-section-label');
+
+        // Creator's notes and metadata: SillyTavern shows the notes, rendered, in a drawer at
+        // the top and edits them with the metadata. Here they are one section: the notes first,
+        // then who made the card, its version and tags. The two buttons from the notes drawer
+        // (global styles for the notes, and hiding the description and first message) join the
+        // section's top row; the rendered copy goes, since the notes are right there.
+        const notesDrawer = byId('spoiler_free_desc');
+        const metaContent = metadata?.querySelector('.inline-drawer-content');
+        const notesBlock = byId('creator_notes_textarea')?.parentElement;
+        const metaRow = document.createElement('div');
+        metaRow.className = 'seeker-section-row';
+        metaRow.append(...[byId('creators_note_styles_button'), byId('spoiler_free_desc_button')].filter(Boolean));
+        metaContent?.querySelector(':scope > small')?.classList.add('seeker-section-label');
+        const metaBlocks = metaContent ? [metaRow, notesBlock, ...metaContent.children] : [];
+        notesDrawer?.classList.add('seeker-moved-away');
+        // SillyTavern's own tags for the character (the tag box under the buttons) are optional
+        // metadata too: they sit here, before the tags embedded in the card.
+        const tags = byId('tags_div');
+        const embedTags = byId('tags_textarea')?.closest('.flex-container');
+        if (tags && embedTags && metaBlocks.length) {
+            const tagsBlock = document.createElement('div');
+            tagsBlock.className = 'seeker-tags-block';
+            const label = document.createElement('h4');
+            label.textContent = 'Tags';
+            tagsBlock.append(label, tags);
+            metaBlocks.splice(metaBlocks.indexOf(embedTags), 0, tagsBlock);
+        }
+        // The More menu joins the row of buttons above it, at its own width.
+        const more = byId('char-management-dropdown')?.closest('label');
+        const buttons = document.querySelector('#avatar_controls .form_create_bottom_buttons_block');
+        if (more && buttons) {
+            more.classList.add('seeker-more');
+            buttons.append(more);
+        }
+
+        const sections = document.createElement('div');
+        sections.id = 'seeker-character-sections';
+        description.before(sections);
+
+        const prompt = [
+            section({ key: 'main', step: 1, title: 'Main Prompt', help: 'usage/core-concepts/characterdesign/#prompt-overrides', blocks: [mainPrompt], row: mainPrompt.querySelector(':scope > h4'), hint: 'Replaces the preset\'s Main Prompt for this character. Empty keeps the preset\'s; {{original}} includes it.' }),
+            section({ key: 'description', step: 2, title: 'Description', help: 'usage/core-concepts/characterdesign/#character-description', blocks: [description] }),
+            section({ key: 'personality', step: 3, title: 'Personality', help: 'usage/core-concepts/characterdesign/#personality-summary', blocks: [personality] }),
+            section({ key: 'scenario', step: 4, title: 'Scenario', help: 'usage/core-concepts/characterdesign/#scenario', blocks: [scenario] }),
+            section({ key: 'examples', step: 5, title: 'Example dialogue', help: 'usage/core-concepts/characterdesign/#examples-of-dialogue', blocks: [examples], row: examples?.querySelector('h4'), hint: examplesHint }),
+            section({ key: 'first', step: 6, title: 'First message', help: 'usage/core-concepts/characterdesign/#first-message', blocks: [firstMessage], row: byId('first_message_div'), hint: 'Opens the chat history.' }),
+            section({ key: 'note', step: 7, title: 'Character\'s Note', help: 'usage/core-concepts/characterdesign/#characters-note', blocks: [note], row: note?.querySelector('.flex1 > h4'), hint: 'Inserted into the chat history, its depth in messages from the end.' }),
+            section({ key: 'post', step: 8, title: 'Post-History Instructions', help: 'usage/core-concepts/characterdesign/#prompt-overrides', blocks: [postHistory], row: postHistory.querySelector(':scope > h4'), hint: 'Sent after the chat history. Replaces the preset\'s; {{original}} includes it.' }),
+        ];
+        const notSent = [
+            section({ key: 'talkativeness', title: 'Talkativeness', help: 'usage/core-concepts/characterdesign/#talkativeness', blocks: [talkativeness] }),
+            section({ key: 'metadata', title: 'Creator\'s Notes and Metadata', help: 'usage/core-concepts/characterdesign/#creators-metadata', blocks: metaBlocks, row: metaRow, hint: 'Shown with the character. Optional.' }),
+        ];
+        sections.append(
+            group('prompt', 'Prompt', 'In the order SillyTavern\'s default prompt sends them. World Info and your persona go in between, and a preset can change the order.'),
+            ...prompt,
+            group('not-sent', 'Not sent to the model'),
+            ...notSent,
+        );
+        overrides?.remove();
+        metadata?.remove();
+
+        // Anything else in the popup (an extension's block, now or later) goes after the prompt
+        // sections, since the popup can no longer be opened. Its title, rules, close and OK stay.
+        const chrome = el => el.id === 'character_popup_text' || el.id === 'character_cross'
+            || el.id === 'character_popup_ok' || el.tagName === 'HR';
+        let last = prompt.at(-1);
+        const adopt = () => {
+            for (const el of [...popup.children]) {
+                if (chrome(el)) continue;
+                last.after(el);
+                last = el;
+            }
+        };
+        adopt();
+        new MutationObserver(adopt).observe(popup, { childList: true });
+    }
+}
+
+// Character header: the sticky row under the hot swaps holds the way back ("Characters") and
+// the character's actions, as round buttons ending with More: favourite, lore, connections,
+// export, duplicate, delete, then stats and the portrait toggle (SillyTavern's two small icons
+// by the token count, turned into round buttons). Beside the portrait, the character's name,
+// which renames the character when clicked, and the token count under it. SillyTavern's name
+// in the row stays for group chats; with a character open it is hidden (character-editor.css).
+// The button row leaves the form, so its two inputs (the favourite flag and Create's submit)
+// stay in it through form="form_create".
+{
+    const byId = id => document.getElementById(id);
+    const tabs = byId('right-nav-panel-tabs');
+    const buttons = document.querySelector('#avatar_controls .form_create_bottom_buttons_block');
+    const expander = document.querySelector('#avatar-and-name-block > .expander');
+    const selected = byId('rm_button_selected_ch')?.querySelector('h2');
+    const resultInfo = byId('result_info');
+    const dropdown = byId('char-management-dropdown');
+    if (tabs && buttons && expander && selected && resultInfo) {
+        for (const input of buttons.querySelectorAll('input')) input.setAttribute('form', 'form_create');
+        const more = buttons.querySelector('.seeker-more');
+        for (const icon of [resultInfo.querySelector('.rm_stats_button'), byId('hideCharPanelAvatarButton')].filter(Boolean)) {
+            icon.classList.remove('right_menu_button');
+            icon.classList.add('menu_button', 'seeker-icon-button');
+            buttons.insertBefore(icon, more);
+        }
+        buttons.classList.add('seeker-char-actions');
+        tabs.append(buttons);
+
+        const identity = document.createElement('div');
+        identity.className = 'seeker-char-identity';
+        const name = document.createElement('h2');
+        name.className = 'seeker-char-name';
+        name.tabIndex = 0;
+        name.setAttribute('role', 'button');
+        name.title = 'Rename';
+        const label = document.createElement('span');
+        const pencil = document.createElement('i');
+        pencil.className = 'fa-solid fa-pen seeker-char-rename';
+        pencil.setAttribute('aria-hidden', 'true');
+        name.append(label, pencil);
+        const syncName = () => { label.textContent = selected.textContent; };
+        new MutationObserver(syncName).observe(selected, { childList: true, characterData: true, subtree: true });
+        syncName();
+        // Rename is an item in More; picking it there runs SillyTavern's rename dialog.
+        const rename = () => {
+            const index = [...(dropdown?.options ?? [])].findIndex(option => option.id === 'renameCharButton');
+            if (index < 0) return;
+            dropdown.selectedIndex = index;
+            window.jQuery?.(dropdown).trigger('change');
+        };
+        name.addEventListener('click', rename);
+        name.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); rename(); }
+        });
+        // The card's metadata around the name: "by" its author and its version on the line
+        // under it, then the creator's notes (a few lines of plain text) and
+        // the tags (SillyTavern's and the card's own, once each). Each opens Creator's Notes and
+        // Metadata at the foot of the page, scrolls there and puts the cursor in its field.
+        // Nothing to show leaves a quiet link there instead.
+        const field = id => byId(id);
+        const byline = document.createElement('div');
+        byline.className = 'seeker-char-byline';
+        const notes = document.createElement('button');
+        notes.type = 'button';
+        notes.className = 'seeker-char-notes';
+        const tagRow = document.createElement('div');
+        tagRow.className = 'seeker-char-tags';
+        const empty = document.createElement('button');
+        empty.type = 'button';
+        empty.className = 'seeker-char-meta-empty';
+        empty.textContent = 'Add the author, notes and tags';
+
+        const openMetadata = focusId => {
+            const section = document.querySelector('.seeker-character-section[data-section="metadata"]');
+            if (!section) return;
+            // Folded (or folding) is what the chevron says: SillyTavern flips it as the toggle
+            // starts, before the slide finishes.
+            if (section.querySelector(':scope > .inline-drawer-header .inline-drawer-icon')?.classList.contains('down')) {
+                section.querySelector(':scope > .inline-drawer-toggle')?.click();
+            }
+            // Let the section open before measuring where it is. The scroll is smooth where the
+            // browser animates it; where it does not (reduced motion, some embedded views) it
+            // jumps there once the animation should have finished.
+            setTimeout(() => {
+                const scroller = byId('form_create');
+                if (!scroller) return;
+                const max = scroller.scrollHeight - scroller.clientHeight;
+                const top = Math.min(max, scroller.scrollTop + section.getBoundingClientRect().top - scroller.getBoundingClientRect().top - 8);
+                scroller.scrollTo({ top, behavior: 'smooth' });
+                setTimeout(() => {
+                    if (Math.abs(scroller.scrollTop - top) > 4) scroller.scrollTop = top;
+                    field(focusId)?.focus({ preventScroll: true });
+                }, 600);
+            }, 50);
+        };
+        const metaButton = (className, text, focusId, title) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = className;
+            button.textContent = text;
+            button.title = title;
+            button.addEventListener('click', () => openMetadata(focusId));
+            return button;
+        };
+        notes.title = 'Edit the creator\'s notes';
+        notes.addEventListener('click', () => openMetadata('creator_notes_textarea'));
+        empty.addEventListener('click', () => openMetadata('creator_textarea'));
+
+        const renderMeta = () => {
+            const author = String(field('creator_textarea')?.value ?? '').trim();
+            const version = String(field('character_version_textarea')?.value ?? '').trim();
+            const noteText = String(field('creator_notes_textarea')?.value ?? '').trim();
+            const tagNames = [];
+            const seen = new Set();
+            const addTag = (tag, focusId) => {
+                const key = tag.toLowerCase();
+                if (!tag || seen.has(key)) return;
+                seen.add(key);
+                tagNames.push([tag, focusId]);
+            };
+            for (const tag of byId('tagList')?.querySelectorAll('.tag .tag_name') ?? []) addTag(tag.textContent.trim(), 'tagInput');
+            for (const tag of String(field('tags_textarea')?.value ?? '').split(',')) addTag(tag.trim(), 'tags_textarea');
+
+            byline.replaceChildren(
+                ...(author ? [metaButton('seeker-char-author', `by ${author}`, 'creator_textarea', 'Edit the author')] : []),
+                ...(version ? [metaButton('seeker-char-version', /^v/i.test(version) ? version : `v${version}`, 'character_version_textarea', 'Edit the version')] : []),
+            );
+            byline.hidden = !author && !version;
+            // Blank lines would spend the preview's few lines on nothing.
+            notes.textContent = noteText.replace(/\n\s*\n+/g, '\n');
+            notes.hidden = !noteText;
+            tagRow.replaceChildren(...tagNames.map(([tag, focusId]) => metaButton('seeker-char-tag', tag, focusId, 'Edit the tags')));
+            tagRow.hidden = !tagNames.length;
+            empty.hidden = !!(author || version || noteText || tagNames.length);
+        };
+        // SillyTavern fills the fields when a character opens, in the same pass that sets the
+        // name, so the name's change is the cue; typing in a field and the tag list changing
+        // update it too.
+        new MutationObserver(renderMeta).observe(selected, { childList: true, characterData: true, subtree: true });
+        const tagList = byId('tagList');
+        if (tagList) new MutationObserver(renderMeta).observe(tagList, { childList: true, subtree: true });
+        for (const id of ['creator_textarea', 'character_version_textarea', 'creator_notes_textarea', 'tags_textarea']) field(id)?.addEventListener('input', renderMeta);
+        renderMeta();
+
+        identity.append(name, byline, notes, tagRow, empty);
+        expander.append(identity);
+
+        // The token total goes to the far end of the Prompt heading, in line with each
+        // section's count, so every token figure reads down one side.
+        const promptGroup = document.querySelector('#seeker-character-sections .seeker-section-group[data-group="prompt"]');
+        const promptHeading = promptGroup?.querySelector(':scope > h2');
+        if (promptHeading) {
+            const head = document.createElement('div');
+            head.className = 'seeker-section-group-head';
+            promptHeading.before(head);
+            head.append(promptHeading, resultInfo);
+        } else {
+            name.after(resultInfo);
+        }
     }
 }
 
@@ -1048,17 +1447,17 @@ mountThemeSettings();
 }
 
 // Sprites: the Character Expressions section (the sprite grid and its settings) moves out
-// of Extensions and into the character editor, above the description, next to the
-// character it belongs to. It is SillyTavern's own drawer moved whole, so the extension's
-// handlers keep working; only its title changes, to "Sprites". It goes inside the editor's
-// form only if none of its inputs are named, so a save never picks them up.
+// of Extensions and into the character editor, as the first section under "Not sent to the
+// model", titled "Sprites" with a (?) to the docs like the other sections. It is SillyTavern's
+// own drawer moved whole, so the extension's handlers keep working. Its named settings are
+// detached from the editor's form (form= an id that does not exist), so a character save never
+// picks them up; its upload inputs already sit in a form of their own.
 {
     const place = () => {
         const list = document.getElementById('image_list');
         const drawer = list?.closest('.inline-drawer');
-        const anchor = document.getElementById('descriptionWrapper');
         const form = document.getElementById('form_create');
-        if (!drawer || !anchor || !form || drawer.classList.contains('seeker-sprites')) return false;
+        if (!drawer || !form || drawer.classList.contains('seeker-sprites')) return false;
         drawer.classList.add('seeker-sprites');
         const title = drawer.querySelector('.inline-drawer-header b, .inline-drawer-header strong');
         if (title) {
@@ -1067,8 +1466,21 @@ mountThemeSettings();
             // every data-i18n change, and a removed key makes it throw.
             title.dataset.i18n = 'Sprites';
         }
-        const named = drawer.querySelector('input[name], select[name], textarea[name]');
-        if (named) form.after(drawer); else anchor.before(drawer);
+        for (const input of drawer.querySelectorAll('input[name], select[name], textarea[name]')) {
+            if (!input.closest('form') || input.closest('form') === form) input.setAttribute('form', 'seeker-detached');
+        }
+        const group = document.querySelector('#seeker-character-sections .seeker-section-group[data-group="not-sent"]');
+        if (group) {
+            drawer.classList.add('seeker-character-section');
+            const heading = sectionHeading(0, '', 'extensions/expression-images/');
+            if (title) heading.prepend(title);
+            drawer.querySelector(':scope > .inline-drawer-header')?.prepend(heading);
+            group.after(drawer);
+            rememberFold(drawer, 'sprites');
+        } else {
+            const anchor = document.getElementById('descriptionWrapper');
+            if (anchor) anchor.before(drawer); else form.after(drawer);
+        }
         arrange(drawer);
         return true;
     };
