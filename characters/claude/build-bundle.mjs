@@ -17,7 +17,8 @@ function addAsset(type, name, file) {
 
 addAsset('icon', 'main', manifest.portrait.file);
 for (const [label, expression] of Object.entries(manifest.expressions)) {
-    addAsset('emotion', label, expression.sprite);
+    // Ship the animated sprite when there is one; the PNG stays as the still source.
+    addAsset('emotion', label, expression.animation?.file ?? expression.sprite);
 }
 addAsset('background', 'claude', manifest.sceneBackground.file);
 
