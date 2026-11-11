@@ -283,11 +283,11 @@ body[data-generating] :is(#seeker-chats, #seeker-chats-panel) { display: none; }
 }
 .seeker-chats-manage:hover { color: var(--seeker-text); }
 
-/* Model (index.js): a pill before Send naming the current model; it lists the connected
+/* Model (index.js): a pill before Send, on the composer's bottom row, naming the current model; it lists the connected
    provider's models and switches between them. Its panel opens above the composer. */
 #rightSendForm > #seeker-model {
   width: auto !important;
-  max-width: min(220px, 34vw);
+  max-width: min(240px, 50vw);
   padding: 0 6px 0 8px;
   border-radius: 17px;
   display: flex;
@@ -304,7 +304,6 @@ body[data-generating] :is(#seeker-chats, #seeker-chats-panel) { display: none; }
 .seeker-model-label { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .seeker-model-chevron { flex: 0 0 auto; font-size: 9px; opacity: 0.8; transition: transform 120ms; }
 #rightSendForm > #seeker-model[aria-expanded="true"] .seeker-model-chevron { transform: rotate(180deg); }
-@media (max-width: 1000px) { #rightSendForm > #seeker-model { max-width: 28vw; } }
 #seeker-model-panel {
   position: fixed;
   right: var(--seeker-model-panel-right, 12px);
@@ -763,8 +762,7 @@ body:has(#chat > .welcomePanel) #form_sheld { display: none !important; }
   background:
     linear-gradient(var(--seeker-composer-fill), var(--seeker-composer-fill)) padding-box,
     conic-gradient(from var(--seeker-sheen-start), var(--seeker-sheen-idle-stops)) border-box !important;
-  /* Rounded ends: half the height of the one-line bar (46px row plus its border). */
-  border-radius: 24px !important;
+  border-radius: 22px !important;
   box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -780,13 +778,20 @@ body:has(#chat > .welcomePanel) #form_sheld { display: none !important; }
 @media (prefers-reduced-motion: reduce) {
   #send_form:has(#send_textarea:focus) { animation: none; --seeker-sheen-angle: var(--seeker-sheen-start); }
 }
+/* Two rows: the message across the top, the controls under it. The menu and extensions sit
+   bottom left; the model, the script and stop buttons and Send sit bottom right. */
 #nonQRFormItems {
-  align-items: flex-end;
-  column-gap: 4px;
-  padding: 6px;
-  min-height: 46px;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  row-gap: 2px;
+  padding: 8px 6px 6px;
   box-sizing: border-box;
 }
+#nonQRFormItems > #send_textarea { grid-column: 1 / -1; grid-row: 1; width: 100% !important; }
+#nonQRFormItems > #leftSendForm { grid-column: 1; grid-row: 2; }
+#nonQRFormItems > #rightSendForm { grid-column: 3; grid-row: 2; }
 #leftSendForm, #rightSendForm { padding: 0 !important; gap: 2px; align-items: center; flex-wrap: nowrap; }
 #options_button { margin-left: 0 !important; }
 #rightSendForm > div:not(.mes_stop),
@@ -812,7 +817,7 @@ body:has(#chat > .welcomePanel) #form_sheld { display: none !important; }
   min-height: 34px !important;
   height: 34px;
   /* The 3px top border is SillyTavern's script progress bar; it stays clipped until a script runs. */
-  padding: 3px 6px 5px !important;
+  padding: 3px 10px 5px !important;
   color: var(--seeker-text) !important;
   font-size: var(--seeker-fs-chat) !important;
   text-shadow: none !important;
