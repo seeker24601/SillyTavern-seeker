@@ -25,7 +25,8 @@
   object-position: center top;
   border: none !important;
   border-radius: var(--seeker-radius-sm) !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--seeker-shadow-sm);
+  border-image: var(--seeker-shadow-sm-image);
 }
 #chat .mes .mesAvatarWrapper > :not(.avatar) { width: 100%; margin: 0 !important; text-align: center; }
 /* Small system messages (the welcome screen's buttons) have no portrait. */
@@ -35,14 +36,15 @@
 #chat .mes .avatar::before {
   content: '';
   position: absolute;
-  inset: -28%;
+  inset: -5px; /* the reach of the mask (scripts/shadows.py, PORTRAIT_INK_REACH) */
   z-index: -1;
   pointer-events: none;
   background-color: var(--seeker-accent);
-  -webkit-mask: url("portrait-halftone-shadow.webp") center / 100% 100% no-repeat;
-  mask: url("portrait-halftone-shadow.webp") center / 100% 100% no-repeat;
+  /* The ink's texture follows the Stage edge style (shadows.css). */
+  -webkit-mask: var(--seeker-portrait-ink) center / 100% 100% no-repeat;
+  mask: var(--seeker-portrait-ink) center / 100% 100% no-repeat;
   mask-mode: alpha;
-  transform: translate(-7px, -2px);
+  transform: translate(3px, 4px); /* cast toward the bottom right, like a drop shadow */
   opacity: 0;
   transition: opacity 160ms ease;
 }

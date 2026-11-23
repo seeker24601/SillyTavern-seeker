@@ -528,3 +528,44 @@
 }
 /* SillyTavern sets the label and its note side by side with no space between them. */
 .seeker-sprites .seeker-sprites-settings > label[for="expression_override"] { margin-right: 6px; }
+
+/* Sprite size (sprite-scale.js), under the name and tags: a label, a slider and its readout. */
+.seeker-char-identity .seeker-sprite-scale {
+  display: flex;
+  align-items: center;
+  gap: var(--seeker-space-2);
+  width: min(100%, 320px);
+  margin-top: var(--seeker-space-1);
+  color: var(--seeker-text-dim);
+  font-size: var(--seeker-fs-meta);
+}
+.seeker-sprite-scale label { margin: 0; white-space: nowrap; }
+/* The theme's slider (primitives.css): a 4px track, the thumb drawn there. */
+.seeker-sprite-scale input[type="range"] {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 4px;
+  margin: 0;
+  border: 0;
+  border-radius: var(--seeker-radius-pill);
+  background: var(--seeker-fill-strong);
+  cursor: pointer;
+}
+.seeker-sprite-scale output {
+  min-width: 4ch;
+  text-align: right;
+  font-family: var(--seeker-mono-font);
+  font-variant-numeric: tabular-nums;
+}
+.seeker-sprite-scale-reset {
+  all: unset;
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--seeker-radius-sm);
+  color: var(--seeker-text-faint);
+  cursor: pointer;
+}
+.seeker-sprite-scale-reset:hover { color: var(--seeker-text); background: var(--seeker-fill-hover); }
+.seeker-sprite-scale-reset:focus-visible { box-shadow: var(--seeker-focus); }

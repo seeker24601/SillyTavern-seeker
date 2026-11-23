@@ -864,9 +864,8 @@
     transform-origin: center bottom;
     transform: translateX(var(--ps-offset-x)) scale(var(--ps-scale));
     transition: transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
-    filter:
-        drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3))
-        drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5));
+    /* The stage edge's shadow style (seeker shadows.css), with the soft one if it is absent. */
+    filter: var(--seeker-sprite-shadow, drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3)) drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5)));
 }
 
 #ps-stage-holder img.ps-stage-image {
@@ -974,10 +973,7 @@
     }
     body.waifuMode.ps-emphasis.ps-stage-duo.ps-speaker-user #expression-holder {
         z-index: 2;
-        filter:
-            brightness(0.84)
-            drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3))
-            drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5)) !important;
+        filter: brightness(0.84) var(--seeker-sprite-shadow, drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5))) !important;
     }
     body.waifuMode.ps-emphasis.ps-stage-duo.ps-speaker-char #ps-stage-holder,
     body.waifuMode.ps-emphasis.ps-stage-group.ps-speaker-char #ps-stage-holder {
@@ -985,10 +981,7 @@
     }
     body.waifuMode.ps-emphasis.ps-stage-duo.ps-speaker-char #ps-stage-holder .ps-sprite-box,
     body.waifuMode.ps-emphasis.ps-stage-group.ps-speaker-char #ps-stage-holder .ps-sprite-box {
-        filter:
-            brightness(0.84)
-            drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3))
-            drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5));
+        filter: brightness(0.84) var(--seeker-sprite-shadow, drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5)));
     }
     body.waifuMode.ps-emphasis.ps-stage-duo.ps-speaker-char #expression-holder {
         z-index: 3;
@@ -1101,18 +1094,51 @@
         left: 0;
         right: 0;
     }
-    body.waifuMode.ps-stage-duo.ps-side-left #ps-stage-holder {
-        right: 36vw;
+    /* Duo scene on phones: both sprites in one frame, as tall as the character alone (from
+       10dvh to the bottom, feet under the chat), standing at about 30% and 70% of the width.
+       A phone is too narrow for two full figures side by side, so each is as tall as the frame
+       and may overlap the other in the middle rather than shrinking to fit its half. The
+       id is repeated on the character's holder to win over SillyTavern's own mobile rule. */
+    body.waifuMode.ps-stage-duo #ps-stage-holder {
+        /* An explicit height, as above: with top and bottom both set, the holder collapses
+           wherever the root element has a transform. */
+        top: 10dvh;
+        bottom: auto;
+        height: 90dvh;
+        overflow: visible;
     }
-    body.waifuMode.ps-stage-duo.ps-side-left #expression-holder {
-        left: 36vw !important;
+    body.waifuMode.ps-stage-duo #ps-stage-holder .ps-sprite-box {
+        max-width: none;
     }
-    body.waifuMode.ps-stage-duo.ps-side-right #ps-stage-holder {
-        left: 36vw;
+    body.waifuMode.ps-stage-duo #ps-stage-holder#ps-stage-holder :is(img.ps-stage-image, img.ps-sprite-ghost, img.ps-sprite-peek) {
+        width: auto;
+        max-width: none;
+        height: 100%;
     }
-    body.waifuMode.ps-stage-duo.ps-side-right #expression-holder {
-        right: 36vw !important;
+    body.waifuMode.ps-stage-duo #expression-holder#expression-holder#expression-holder#expression-holder {
+        top: 10dvh !important;
+        bottom: 0 !important;
+        width: auto !important;
+        height: auto !important;
+        max-width: none !important;
+        max-height: none !important;
+        overflow: visible !important;
+        justify-content: center !important;
+        align-items: flex-end !important;
     }
+    body.waifuMode.ps-stage-duo #expression-holder#expression-holder#expression-holder#expression-holder > img.expression {
+        flex: none !important;
+        width: auto !important;
+        max-width: none !important;
+        height: calc(100% * var(--seeker-sprite-scale, 1)) !important;
+        max-height: calc(100% * var(--seeker-sprite-scale, 1)) !important;
+        object-fit: contain !important;
+        object-position: bottom center !important;
+    }
+    body.waifuMode.ps-stage-duo.ps-side-left #ps-stage-holder { left: 0; right: 40vw; }
+    body.waifuMode.ps-stage-duo.ps-side-left #expression-holder#expression-holder#expression-holder#expression-holder { left: 40vw !important; right: 0 !important; }
+    body.waifuMode.ps-stage-duo.ps-side-right #ps-stage-holder { left: 40vw; right: 0; }
+    body.waifuMode.ps-stage-duo.ps-side-right #expression-holder#expression-holder#expression-holder#expression-holder { left: 0 !important; right: 40vw !important; }
     /* Solo-persona on phones: restore seeker's upper-stage fade over the sprite */
     body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) #sheld {
         top: 60dvh !important;
@@ -1169,3 +1195,13 @@ body:not(.waifuMode) #ps-stage-holder {
 #ps-hud.ps-embedded .ps-body { max-height: none; overflow: visible; padding-left: 0; padding-right: 0; }
 #ps-hud.ps-embedded .ps-persona-name { font-weight: 600; color: var(--ps-ink); }
 #ps-hud.ps-embedded .ps-grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); }
+
+/* Sprite size, in the panel's main column: the label, a slider filling the row, the readout. */
+#ps-hud .ps-scale-row label { margin: 0; color: var(--ps-dim); font-size: inherit; white-space: nowrap; }
+#ps-hud .ps-scale-row input[type="range"] {
+    flex: 1 1 auto;
+    height: 4px !important;
+    border-radius: var(--seeker-radius-pill, 999px);
+    background: var(--seeker-fill-strong, rgba(255, 255, 255, 0.14)) !important;
+    cursor: pointer;
+}

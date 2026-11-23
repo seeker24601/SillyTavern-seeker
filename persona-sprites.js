@@ -13,6 +13,7 @@
  */
 import { user_avatar, setUserAvatar } from '../../../personas.js';
 import { power_user } from '../../../power-user.js';
+import { SPRITE_SCALE_LIMIT, clampSpriteScale } from './sprite-scale.js';
 
 const MODULE = 'personaSprites';
 const ctx = () => SillyTavern.getContext();
@@ -614,7 +615,7 @@ function applyStageTransform(persona) {
     const holder = ensureStage();
     const cfg = personaCfg(persona.id);
     holder.style.setProperty('--ps-flip', cfg.flipX ? '-1' : '1');
-    holder.style.setProperty('--ps-scale', String((Number(cfg.scale) || 100) / 100));
+    holder.style.setProperty('--ps-scale', String(clampSpriteScale(cfg.scale) / 100));
     holder.style.setProperty('--ps-offset-x', `${Number(cfg.offsetX) || 0}%`);
 }
 
@@ -1211,11 +1212,6 @@ async function renderHud() {
             <div class="ps-tray-head">${esc(persona.name)} Framing</div>
             <div class="ps-row"><label><input type="checkbox" data-act="p-flip"${cfg.flipX ? ' checked' : ''}> Mirror horizontally (flip)</label></div>
             <div class="ps-row">
-                <span>Scale</span>
-                <input type="range" min="70" max="130" step="2" value="${Number(cfg.scale) || 100}" data-act="p-scale">
-                <span class="ps-range-val" data-val="scale">${Number(cfg.scale) || 100}%</span>
-            </div>
-            <div class="ps-row">
                 <span>Offset</span>
                 <input type="range" min="-25" max="25" step="1" value="${Number(cfg.offsetX) || 0}" data-act="p-offset">
                 <span class="ps-range-val" data-val="offset">${Number(cfg.offsetX) || 0}%</span>
@@ -1368,6 +1364,11 @@ async function renderHud() {
                     <span class="ps-expr-pill" title="Current persona expression">${esc(activeExprName)}</span>
                     ${inChat ? '<button type="button" data-act="reclassify" title="Classify expression from your last message"><i class="fa-solid fa-wand-magic-sparkles"></i></button>' : ''}
                     <button type="button" data-act="reset-sprite" title="Clear sprite from scene"><i class="fa-solid fa-rotate-left"></i></button>
+                </div>
+                <div class="ps-chat-row ps-scale-row" title="How large ${esc(persona.name)}'s sprites stand on the stage">
+                    <label for="ps-scale-input">Sprite size</label>
+                    <input type="range" id="ps-scale-input" min="${100 - SPRITE_SCALE_LIMIT}" max="${100 + SPRITE_SCALE_LIMIT}" step="1" value="${clampSpriteScale(cfg.scale)}" data-act="p-scale">
+                    <span class="ps-range-val" data-val="scale">${clampSpriteScale(cfg.scale)}%</span>
                 </div>` : ''}
             </div>
             ${spritesSectionHtml}
@@ -1609,7 +1610,7 @@ async function onHudChange(e) {
     }
 
     if (act === 'p-scale') {
-        personaCfg(persona.id).scale = Number(el.value) || 100;
+        personaCfg(persona.id).scale = clampSpriteScale(el.value);
         saveSettings();
         applyStageTransform(persona);
         return;
@@ -1647,7 +1648,7 @@ function onHudInput(e) {
     }
 
     if (act === 'p-scale') {
-        const val = Number(el.value) || 100;
+        const val = clampSpriteScale(el.value);
         const readout = document.querySelector('#ps-hud [data-val="scale"]');
         if (readout) readout.textContent = `${val}%`;
         const holder = ensureStage();

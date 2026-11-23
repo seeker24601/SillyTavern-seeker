@@ -87,6 +87,7 @@
     linear-gradient(var(--seeker-surface-solid), var(--seeker-surface-solid)) padding-box,
     var(--seeker-glass-edge-panel) border-box;
   box-shadow: var(--seeker-shadow);
+  border-image: var(--seeker-shadow-image);
 }
 .seeker-popover[hidden] { display: none !important; }
 .seeker-popover-title {

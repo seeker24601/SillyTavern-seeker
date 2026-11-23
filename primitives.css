@@ -64,6 +64,7 @@ select option:checked { background-color: color-mix(in srgb, white 14%, var(--se
       var(--seeker-glass-edge-panel) border-box;
     border-radius: var(--seeker-menu-radius);
     box-shadow: var(--seeker-shadow);
+    border-image: var(--seeker-shadow-image);
     color: var(--seeker-text);
   }
   select:not([multiple], [size]) option {
@@ -293,6 +294,7 @@ hr {
     var(--seeker-glass-edge-panel) border-box !important;
   border-radius: var(--seeker-menu-radius) !important;
   box-shadow: var(--seeker-shadow) !important;
+  border-image: var(--seeker-shadow-image) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
   text-shadow: none !important;

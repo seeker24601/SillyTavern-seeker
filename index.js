@@ -6,6 +6,7 @@ import { mountMiddleGround } from './middle-ground.js';
 import { mountEdgeStyle } from './edge-style.js';
 import { mountPersonaSprites } from './persona-sprites.js';
 import { mountPersonaAvatar } from './persona-avatar.js';
+import { mountSpriteScale } from './sprite-scale.js';
 
 /*
  * seeker, a SillyTavern theme by seeker.
@@ -685,6 +686,7 @@ mountStageLayout();
 mountMiddleGround();
 mountPersonaSprites();
 mountPersonaAvatar();
+mountSpriteScale();
 
 // Characters: a "Characters" back button beside the open character's name. SillyTavern's
 // own way back is an unlabelled list icon above it, which the theme hides.

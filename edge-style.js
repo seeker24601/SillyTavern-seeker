@@ -7,6 +7,8 @@
 // there is more than one ornament.
 // Fonts: a dropdown of font loadouts, each a heading, a body and a mono face (variables.css,
 // "Type", defines them from data-seeker-fonts).
+import { DITHER_MAP, HALFTONE_MAP } from './shadow-maps.js';
+
 const LOADOUTS = [
     ['didoni', 'Didoni'], // Bodoni Moda, Jost, DM Mono: the default, so it sets no attribute
     ['garalde', 'Garalde'], // Cormorant, Source Serif 4, IBM Plex Mono
@@ -20,7 +22,79 @@ const STYLES = [
     ['torn', 'Torn paper'],
 ];
 
+
+// Filters for the sprites and for small things of any shape (shadows.css names them).
+//
+// Sprites get a light rim, not a shadow: white soft-lit onto the figure just inside its outline
+// (so it lifts the sprite's own colours rather than painting over them), hardest right at the
+// edge and fading inward, brightest along the left and top, as if lit from the
+// upper left. The rim is the sprite's outline minus a blurred copy moved down and right, so it is
+// faint along the right and bottom edges, where a sprite cut off by the screen would otherwise
+// get a line. For dither and halftone its strength is inked against the pattern, so the texture
+// itself carries the fade; torn paper adds a hard line along the edge to the smooth fade.
+//
+// Round buttons and other small things of any shape get a small shadow cast below them, inked
+// the same way.
+//
+// Each pattern is one repeat, an SVG image of black squares, tiled over the filter region. The
+// image is given no x or y, so it sits at the region's top left: WebKit puts an explicit x and y
+// in page space, which left every element away from the page's top left (the second sprite in a
+// duo) without its filter. (A field of the pattern the size of the screen worked too, but
+// redrawing it on every repaint made the stage lag.)
+const tile = map => 'data:image/svg+xml,' + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${map.size}" height="${map.size}" shape-rendering="crispEdges">${map.squares}</svg>`);
+const TILES = { dither: DITHER_MAP, halftone: HALFTONE_MAP };
+
+function mountShadowFilters() {
+    const ink = (map, steps, table, k1, k2) => `
+            <feComponentTransfer result="soft"><feFuncA type="${steps}" tableValues="${table}" /></feComponentTransfer>
+            <feImage href="${tile(TILES[map])}" width="${TILES[map].size}" height="${TILES[map].size}" preserveAspectRatio="none" result="cell" />
+            <feTile in="cell" result="pattern" />
+            <feComposite in="soft" in2="pattern" operator="arithmetic" k2="60" k3="-60" result="inked" />
+            <feComposite in="inked" in2="soft" operator="arithmetic" k1="${k1}" k2="${k2}" result="mark" />`;
+    const smooth = (table, strength) => `
+            <feComponentTransfer result="mark"><feFuncA type="table" tableValues="${table.split(' ').map(v => +(v * strength).toFixed(3)).join(' ')}" /></feComponentTransfer>`;
+    const rimTable = '0 0.15 0.55 0.85 1 1';
+    // The torn rim adds a hard 2px line along the lit edges to the smooth fade.
+    const hardLine = `
+            <feOffset in="SourceAlpha" dx="2" dy="2" result="moved" />
+            <feComposite in="SourceAlpha" in2="moved" operator="out" />
+            <feComponentTransfer><feFuncA type="discrete" tableValues="0 0.8" /></feComponentTransfer>
+            <feComposite in2="mark" operator="arithmetic" k2="1" k3="1" result="mark" />`;
+    const rim = (id, marking, blur) => `
+        <filter id="${id}" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="${blur}" />
+            <feOffset dx="${blur}" dy="${blur * 0.75}" result="blurred" />
+            <feComposite in="SourceAlpha" in2="blurred" operator="arithmetic" k2="1" k3="-1" />${marking}
+            <feFlood flood-color="#fff" />
+            <feComposite in2="mark" operator="in" />
+            <feComposite in2="SourceAlpha" operator="in" result="rim" />
+            <feBlend in="rim" in2="SourceGraphic" mode="soft-light" />
+        </filter>`;
+    const shadow = (id, marking, blur, dy) => `
+        <filter id="${id}" x="-50%" y="-50%" width="200%" height="220%" color-interpolation-filters="sRGB">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="${blur}" />
+            <feOffset dy="${dy}" />${marking}
+            <feMerge><feMergeNode in="mark" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>`;
+    const ditherSteps = '0 0.03 0.125 0.25 0.41 0.6 0.75';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.id = 'seeker-shadow-filters';
+    svg.setAttribute('aria-hidden', 'true');
+    svg.setAttribute('width', '0');
+    svg.setAttribute('height', '0');
+    svg.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+    svg.innerHTML = rim('seeker-sprite-rim-dither', ink('dither', 'discrete', ditherSteps, 0.7, 0.25), 7)
+        + rim('seeker-sprite-rim-halftone', ink('halftone', 'table', '0 0.1 0.35 0.6 0.75 0.8', 0.6, 0.28), 7)
+        + rim('seeker-sprite-rim-soft', smooth(rimTable, 0.9), 6)
+        + rim('seeker-sprite-rim-torn', smooth(rimTable, 0.5) + hardLine, 6)
+        + shadow('seeker-small-shadow-dither', ink('dither', 'discrete', ditherSteps, 0.5, 0.12), 5, 5)
+        + shadow('seeker-small-shadow-halftone', ink('halftone', 'table', '0 0.05 0.2 0.4 0.6 0.72', 0.4, 0.14), 5, 5);
+    document.body.append(svg);
+}
+
 export function mountEdgeStyle() {
+    mountShadowFilters();
     const { eventSource, eventTypes, extensionSettings, saveSettingsDebounced } = SillyTavern.getContext();
     const root = document.documentElement;
     // The pictures, by their full address: a relative url() in a custom property is
