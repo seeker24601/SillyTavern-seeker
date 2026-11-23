@@ -3,6 +3,11 @@
 // gallery of the user's middle grounds: pick one, pick None, add more, delete. The pictures are
 // kept with the user's files; the gallery and the one in use are in the theme's settings.
 // backgrounds.css draws the gallery and the layer, style.css moves the layer with the pointer.
+// The theme ships samples: two middle grounds with an open sky, always in the gallery, and
+// three skies to go behind them, added to the user's backgrounds once.
+const SAMPLES = [['beach.avif', 'Beach'], ['street.avif', 'Street']]
+    .map(([file, label]) => ({ path: new URL(`samples/middle-ground/${file}`, import.meta.url).pathname, label }));
+const SAMPLE_SKIES = ['seeker sky day.webp', 'seeker sky sunset.webp', 'seeker sky night.webp'];
 export function mountMiddleGround() {
     const { eventSource, eventTypes, extensionSettings, saveSettingsDebounced, getRequestHeaders } = SillyTavern.getContext();
     const stage = document.getElementById('bg1');
@@ -54,7 +59,7 @@ export function mountMiddleGround() {
     const post = (url, body) => fetch(url, { method: 'POST', headers: getRequestHeaders(), body: JSON.stringify(body) });
     const save = () => { saveSettingsDebounced(); show(); };
 
-    const tile = (picture, label) => {
+    const tile = (picture, label, removable = true) => {
         const el = document.createElement('div');
         el.className = 'seeker-mg-tile';
         el.tabIndex = 0;
@@ -68,7 +73,7 @@ export function mountMiddleGround() {
         name.className = 'seeker-mg-name';
         name.textContent = label;
         el.append(image, name);
-        if (picture) {
+        if (picture && removable) {
             const remove = document.createElement('button');
             remove.type = 'button';
             remove.className = 'seeker-mg-delete';
@@ -81,10 +86,12 @@ export function mountMiddleGround() {
     };
     function show() {
         const list = ready ? gallery() : [];
-        const picture = ready && list.includes(settings().middleGround) ? settings().middleGround : '';
+        const chosen = ready ? settings().middleGround : '';
+        const picture = list.includes(chosen) || SAMPLES.some(sample => sample.path === chosen) ? chosen : '';
         layer.hidden = !picture;
         layer.style.backgroundImage = picture ? `url("${encodeURI(picture)}")` : '';
-        const tiles = [tile('', 'None'), ...list.map((path, i) => tile(path, `Middle ground ${i + 1}`))];
+        const tiles = [tile('', 'None'), ...SAMPLES.map(sample => tile(sample.path, sample.label, false)),
+            ...list.map((path, i) => tile(path, `Middle ground ${i + 1}`))];
         for (const el of tiles) el.classList.toggle('seeker-mg-selected', el.dataset.picture === picture);
         const add = document.createElement('div');
         add.className = 'seeker-mg-tile seeker-mg-add';
@@ -147,6 +154,24 @@ export function mountMiddleGround() {
         save();
     });
 
+    // The sample skies go into the user's own backgrounds, once: deleted ones stay deleted.
+    const addSampleSkies = async () => {
+        if (settings().sampleSkies) return;
+        settings().sampleSkies = true;
+        saveSettingsDebounced();
+        for (const name of SAMPLE_SKIES) {
+            try {
+                const file = await fetch(new URL(`samples/backgrounds/${encodeURIComponent(name)}`, import.meta.url));
+                if (!file.ok) continue;
+                const form = new FormData();
+                form.append('avatar', new File([await file.blob()], name, { type: 'image/webp' }));
+                await fetch('/api/backgrounds/upload', { method: 'POST', headers: getRequestHeaders({ omitContentType: true }), body: form });
+            } catch (error) { console.error('seeker: sample background not added', name, error); }
+        }
+        const { getBackgrounds } = await import('../../../backgrounds.js');
+        await getBackgrounds();
+    };
+
     // Only once SillyTavern has loaded the user's settings. APP_READY also fires for listeners
     // added after it.
     eventSource.on(eventTypes.APP_READY, () => {
@@ -160,6 +185,7 @@ export function mountMiddleGround() {
         }
         ready = true;
         show();
+        addSampleSkies();
     });
     show();
 }
