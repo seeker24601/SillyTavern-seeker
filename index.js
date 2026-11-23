@@ -2,6 +2,10 @@ import { mountStageLayout } from './stage-layout.js';
 import { mountThemeSettings } from './theme-settings.js';
 import { mountChatNavigation } from './chat-navigation.js';
 import { mountGroupChat } from './group-chat.js';
+import { mountMiddleGround } from './middle-ground.js';
+import { mountEdgeStyle } from './edge-style.js';
+import { mountPersonaSprites } from './persona-sprites.js';
+import { mountPersonaAvatar } from './persona-avatar.js';
 
 /*
  * seeker, a SillyTavern theme by seeker.
@@ -205,9 +209,11 @@ placeWelcome();
 // (style.css draws it oversized there) and settles back when the pointer leaves.
 const background = document.getElementById('bg1');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-const setDrift = (x, y) => {
+// --seeker-bg-near is 1 while the pointer is over the stage: the middle ground leans in on it.
+const setDrift = (x, y, near = 0) => {
     document.documentElement.style.setProperty('--seeker-bg-x', x.toFixed(3));
     document.documentElement.style.setProperty('--seeker-bg-y', y.toFixed(3));
+    document.documentElement.style.setProperty('--seeker-bg-near', String(near));
 };
 let driftFrame = 0;
 document.addEventListener('pointermove', event => {
@@ -219,7 +225,7 @@ document.addEventListener('pointermove', event => {
             && event.clientX >= box.left && event.clientX < box.right
             && event.clientY >= box.top && event.clientY < box.bottom;
         if (inside) {
-            setDrift((event.clientX - box.left) / box.width * 2 - 1, (event.clientY - box.top) / box.height * 2 - 1);
+            setDrift((event.clientX - box.left) / box.width * 2 - 1, (event.clientY - box.top) / box.height * 2 - 1, 1);
         } else {
             setDrift(0, 0);
         }
@@ -676,6 +682,9 @@ for (const id of ['seeker-stage-vignette', 'seeker-stage-ornament']) {
 }
 
 mountStageLayout();
+mountMiddleGround();
+mountPersonaSprites();
+mountPersonaAvatar();
 
 // Characters: a "Characters" back button beside the open character's name. SillyTavern's
 // own way back is an unlabelled list icon above it, which the theme hides.
@@ -987,6 +996,7 @@ mountStageLayout();
 }
 
 mountThemeSettings();
+mountEdgeStyle();
 
 // Character editor sections: shared by the editor below and by Sprites, which arrives later.
 // A section is SillyTavern's folding drawer markup, so its own toggle handler opens and closes
@@ -1870,6 +1880,41 @@ for (const [view, closeId] of [['completion_prompt_manager_popup_edit', 'complet
 }
 
 mountChatNavigation();
+mountComposerPersona();
+
+function mountComposerPersona() {
+    const row = document.getElementById('nonQRFormItems');
+    const left = document.getElementById('leftSendForm');
+    const right = document.getElementById('rightSendForm');
+    const menu = document.querySelector('#options .options-content');
+    const drawer = document.querySelector('#persona-management-button .drawer-icon');
+    if (!row || !left || !right || !menu || !drawer) return;
+
+    const action = document.createElement('button');
+    action.type = 'button';
+    action.id = 'seeker-change-persona';
+    action.title = 'Change player persona';
+    action.setAttribute('aria-label', action.title);
+    action.innerHTML = '<i class="fa-solid fa-face-smile" aria-hidden="true"></i><span>Change player persona</span>';
+    action.addEventListener('click', () => {
+        if (menu.contains(action)) document.getElementById('options_button').click();
+        if (!document.getElementById('PersonaManagement').classList.contains('openDrawer')) drawer.click();
+    });
+
+    const small = matchMedia('(max-width: 1000px)');
+    function place() {
+        const inline = action.parentElement === left;
+        const gap = right.getBoundingClientRect().left - left.getBoundingClientRect().right;
+        const buttonSpace = 34 + (parseFloat(getComputedStyle(left).columnGap) || 0);
+        const fits = gap >= (inline ? 4 : buttonSpace + 4);
+        const target = !small.matches && fits ? left : menu;
+        if (action.parentElement !== target) target.append(action);
+    }
+    const observer = new ResizeObserver(place);
+    for (const el of [row, left, right]) observer.observe(el);
+    small.addEventListener('change', place);
+    place();
+}
 mountGroupChat();
 
 // Chats: a button beside New chat that lists the other chats with the same character (or

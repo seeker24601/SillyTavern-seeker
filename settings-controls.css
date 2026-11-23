@@ -3,7 +3,7 @@
   --seeker-row-pad: 10px;
   --seeker-control-width: min(260px, 48%);
 }
-#seeker-accent-setting {
+#seeker-accent-setting, #seeker-edge-setting, #seeker-fonts-setting {
   align-items: center;
   justify-content: space-between;
   gap: var(--seeker-space-3);
@@ -11,6 +11,8 @@
   border-bottom: 1px solid var(--seeker-divider);
 }
 #seeker-accent-setting toolcool-color-picker { order: 1; }
+#seeker-edge-setting > select, #seeker-fonts-setting > select { width: var(--seeker-control-width); margin: 0; }
+#seeker-edge-setting > label, #seeker-fonts-setting > label { font-weight: inherit; }
 /* Checkboxes: the label, then a switch at the end of the row. */
 #user-settings-block-content label.checkbox_label {
   align-items: center;

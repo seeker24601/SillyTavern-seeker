@@ -39,8 +39,8 @@
   z-index: -1;
   pointer-events: none;
   background-color: var(--seeker-accent);
-  -webkit-mask: url("portrait-halftone-shadow.png") center / 100% 100% no-repeat;
-  mask: url("portrait-halftone-shadow.png") center / 100% 100% no-repeat;
+  -webkit-mask: url("portrait-halftone-shadow.webp") center / 100% 100% no-repeat;
+  mask: url("portrait-halftone-shadow.webp") center / 100% 100% no-repeat;
   mask-mode: alpha;
   transform: translate(-7px, -2px);
   opacity: 0;

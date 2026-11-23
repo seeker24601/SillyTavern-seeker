@@ -1,0 +1,81 @@
+# Fetches the extra font loadouts' faces from Google Fonts into fonts/ (Latin and Latin
+# Extended, WOFF2), with each family's OFL licence, and writes font-loadouts.css: their
+# @font-face rules, then the loadouts themselves (LOADOUTS below).
+# Usage: python3 scripts/fetch-fonts.py        (run from the theme's folder; needs network)
+import os, re, urllib.request
+UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36"
+FAMILIES = [  # name, css2 axis spec, folder in github.com/google/fonts/ofl
+    ("Cormorant", "ital,wght@0,300..700;1,300..700", "cormorant"),
+    ("Cormorant SC", "wght@500;600;700", "cormorantsc"),
+    ("Source Serif 4", "ital,wght@0,200..900;1,200..900", "sourceserif4"),
+    ("IBM Plex Mono", "ital,wght@0,300;0,400;0,500;1,400", "ibmplexmono"),
+    ("Boldonse", "", "boldonse"),
+    ("Inter", "ital,wght@0,100..900;1,100..900", "inter"),
+    ("JetBrains Mono", "ital,wght@0,100..800;1,100..800", "jetbrainsmono"),
+    ("Amatic SC", "wght@400;700", "amaticsc"),
+    ("Kalam", "wght@300;400;700", "kalam"),
+    ("Courier Prime", "ital,wght@0,400;0,700;1,400;1,700", "courierprime"),
+]
+# Faces that are drawn small for their size are scaled up to sit with the theme's sizes.
+ADJUST = {"Cormorant": "116%", "Cormorant SC": "112%", "Amatic SC": "135%", "Boldonse": "76%"}  # Boldonse is drawn large and wide: scaled down
+# Faces with one cut that stand in for every weight and for italic too, so the browser never
+# fakes a bold or a slant from them.
+ONE_CUT = {"Boldonse"}
+SANS = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+LOADOUTS = [  # key, note, heading, display (small caps), body, mono, then any other declarations
+    ("garalde", "Garalde: bookish, all serif.",
+     '"Cormorant", Garamond, "Times New Roman", serif', '"Cormorant SC", var(--seeker-heading-font)',
+     '"Source Serif 4", Georgia, "Times New Roman", serif', f'"IBM Plex Mono", {MONO}'),
+    ("grotesk", "Grotesk: wide, heavy capitals for headings, over a plain sans.",
+     f'"Boldonse", "Arial Black", {SANS}', "var(--seeker-heading-font)", f'"Inter", {SANS}', f'"JetBrains Mono", {MONO}',
+     "--seeker-heading-case: uppercase;"),
+    ("handwritten", "Handwritten: thin hand-drawn capitals for headings, a felt pen for text, a typewriter for meta.",
+     '"Amatic SC", "Bradley Hand", cursive', "var(--seeker-heading-font)",
+     f'"Kalam", "Bradley Hand", cursive, {SANS}', f'"Courier Prime", "Courier New", {MONO}'),
+]
+def get(url, binary=False):
+    with urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": UA}), timeout=60) as r:
+        data = r.read()
+    return data if binary else data.decode()
+slug = lambda name: name.lower().replace(" ", "-")
+out, total = [], 0
+for name, spec, folder in FAMILIES:
+    css = get(f"https://fonts.googleapis.com/css2?family={name.replace(' ', '+')}{':' + spec if spec else ''}&display=swap")
+    lic = f"fonts/OFL-{name.replace(' ', '-')}.txt"
+    if not os.path.exists(lic):
+        open(lic, "w").write(get(f"https://raw.githubusercontent.com/google/fonts/main/ofl/{folder}/OFL.txt"))
+    out.append(f"/* {name} (OFL, see {lic}, Google Fonts). */")
+    for subset, body in re.findall(r"/\* ([a-z-]+) \*/\s*@font-face \{(.*?)\}", css, re.S):
+        if subset not in ("latin", "latin-ext"): continue
+        prop = lambda k: re.search(rf"{k}:\s*([^;]+);", body).group(1).strip()
+        style, weight, url = prop("font-style"), prop("font-weight"), re.search(r"url\((.*?)\)", body).group(1)
+        path = f"fonts/{slug(name)}-{subset}-{weight.replace(' ', '-')}-{style}.woff2"
+        if not os.path.exists(path): open(path, "wb").write(get(url, True))
+        total += os.path.getsize(path)
+        fmt = "woff2-variations" if " " in weight else "woff2"
+        adjust = f"\n  size-adjust: {ADJUST[name]};" if name in ADJUST else ""
+        for style, weight in ([("normal", "100 900"), ("italic", "100 900")] if name in ONE_CUT else [(style, weight)]):
+          out.append(f"""@font-face {{
+  font-family: "{name}";
+  font-style: {style};
+  font-weight: {weight};
+  font-display: swap;{adjust}
+  src: url("{path}") format("{fmt}");
+  unicode-range: {prop("unicode-range")};
+}}""")
+out.append("""
+/* ---------- The loadouts ----------
+   User Settings, "Fonts" (edge-style.js sets data-seeker-fonts). The default, Didoni, is in
+   variables.css ("Type"). A face is only downloaded once something on the page uses it. */""")
+for key, note, heading, display, body, mono, *extra in LOADOUTS:
+    out.append(f"""/* {note} */
+:root[data-seeker-fonts="{key}"] {{
+  --seeker-heading-font: {heading};
+  --seeker-display-font: {display};
+  --seeker-body-font: {body};
+  --seeker-mono-font: {mono};{"".join(chr(10) + "  " + line for line in extra)}
+}}""")
+head = "/* Extra font loadouts: generated by scripts/fetch-fonts.py. Edit the lists there. */\n"
+open("font-loadouts.css", "w").write(head + "\n".join(out) + "\n")
+print(len([l for l in out if l.startswith("@font-face")]), "faces,", total // 1024, "KB of fonts")

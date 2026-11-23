@@ -15,6 +15,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-family: var(--seeker-heading-font) !important;
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-size: var(--seeker-fs-title) !important;
   font-weight: 600 !important;
   color: var(--seeker-text) !important;
@@ -109,6 +110,7 @@
   max-width: 100%;
   margin: 0 !important;
   font-family: var(--seeker-heading-font) !important;
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-size: 36px !important;
   font-weight: 600 !important;
   line-height: var(--seeker-lh-heading) !important;
@@ -213,6 +215,7 @@
 #form_create .seeker-section-group h2 {
   margin: 0 !important;
   font-family: var(--seeker-heading-font) !important;
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-size: var(--seeker-fs-title) !important;
   font-weight: 600 !important;
 }
@@ -241,6 +244,7 @@
   gap: var(--seeker-space-2);
   margin: 0 !important;
   font-family: var(--seeker-heading-font) !important;
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-size: var(--seeker-fs-subsection) !important;
   font-weight: 600 !important;
 }
@@ -375,6 +379,7 @@
 :is(.popup, #character_popup) .popup-content > h3.seeker-max-title {
   margin: 0 !important;
   font-family: var(--seeker-heading-font) !important;
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-size: var(--seeker-fs-title) !important;
   font-weight: 600;
   text-align: left;
@@ -433,6 +438,7 @@
 .seeker-sprites #image_list_header {
   margin: 0 !important;
   font-family: var(--seeker-heading-font) !important;
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-size: var(--seeker-fs-section) !important;
   font-weight: 600;
 }

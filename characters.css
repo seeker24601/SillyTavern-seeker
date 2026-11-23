@@ -369,6 +369,7 @@ body:not(.charListGrid) #rm_print_characters_block :is(.seeker-card-title, .seek
 }
 body:not(.charListGrid) #rm_print_characters_block .seeker-card-title {
   font-family: var(--seeker-heading-font);
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-size: var(--seeker-fs-title);
   font-weight: 600;
   line-height: 1.1;
@@ -392,6 +393,7 @@ body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group
 /* Back: the name as a heading, then the description in full, scrolling if it runs long. */
 body:not(.charListGrid) #rm_print_characters_block :is(.character_select, .group_select) .ch_name {
   font-family: var(--seeker-heading-font);
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-size: var(--seeker-fs-section) !important;
   white-space: normal;
 }

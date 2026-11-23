@@ -20,7 +20,7 @@ export function mountThemeSettings() {
         picker.setAttribute('popup-position', 'right');
         presetsBlock.after(row);
     };
-    const presets = [['seeker', 'seeker.json'], ['seeker gilt', 'seeker-gilt.json']];
+    const presets = [['seeker', 'seeker.json']];
     let running = false;
     const install = async () => {
         const select = document.getElementById('themes');

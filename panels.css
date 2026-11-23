@@ -43,6 +43,7 @@
 #persona_controls #your_name {
   margin: 0 !important;
   font-family: var(--seeker-heading-font) !important;
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-size: var(--seeker-fs-section) !important;
   font-weight: 600 !important;
   color: var(--seeker-text) !important;

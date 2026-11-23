@@ -1,0 +1,1160 @@
+/* Persona sprites (persona-sprites.js loads this, and only when it is active): the sprite
+   manager in the Persona panel (#ps-hud), and the persona's sprite on the stage
+   (#ps-stage-holder) solo, beside a character, or with a group. Ported from the standalone
+   Persona Sprites extension; the last section fits its floating menu into the panel. */
+
+/* ---------- 1. Collapsible Persona HUD ---------- */
+
+#ps-hud {
+    --ps-bg: rgba(6, 6, 8, 0.92);
+    --ps-line: rgba(255, 255, 255, 0.09);
+    --ps-ink: var(--seeker-text, rgba(255, 255, 255, 0.92));
+    --ps-dim: var(--seeker-text-dim, rgba(255, 255, 255, 0.56));
+    --ps-faint: rgba(255, 255, 255, 0.12);
+    --ps-fill: var(--seeker-fill, rgba(255, 255, 255, 0.06));
+    --ps-fill-hover: var(--seeker-fill-hover, rgba(255, 255, 255, 0.11));
+    --ps-accent: var(--seeker-accent, #10b981);
+    --ps-danger: var(--seeker-destructive, #e5484d);
+    position: fixed;
+    top: 120px; /* sits cleanly below Womb Tracker's default 64px collapsed tab */
+    left: 0;
+    z-index: 1000;
+    width: 244px;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100vh - 96px);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: var(--ps-ink);
+    background: var(--ps-bg);
+    -webkit-backdrop-filter: blur(14px) saturate(1.2);
+    backdrop-filter: blur(14px) saturate(1.2);
+    border: 1px solid var(--ps-line);
+    border-left: 0;
+    border-radius: 0 12px 12px 0;
+    box-shadow: 0 10px 32px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    font-family: inherit;
+    font-size: 11.5px;
+    line-height: 1.35;
+    text-shadow: none;
+    user-select: none;
+    transition: width 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+#ps-hud.ps-wide {
+    width: 326px;
+}
+
+#ps-hud[hidden] {
+    display: none !important;
+}
+
+#ps-hud img {
+    -webkit-user-drag: none;
+    user-drag: none;
+}
+
+/* Collapsed: half-round tab flush with the left edge, matching Womb Tracker. */
+#ps-hud.ps-collapsed {
+    width: auto !important;
+    padding: 0;
+    border-radius: 0 50% 50% 0;
+    overflow: visible;
+    display: block;
+}
+
+#ps-hud.ps-collapsed .ps-emblem {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    padding: 0 !important;
+    border-radius: 0 50% 50% 0 !important;
+    transform-origin: left center;
+    transition: transform 0.15s, background 0.15s;
+    touch-action: none;
+}
+
+#ps-hud.ps-collapsed .ps-emblem:hover {
+    transform: scale(1.08);
+    background: var(--ps-faint);
+}
+
+#ps-hud .ps-emblem-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+    box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.18);
+}
+
+#ps-hud .ps-emblem-fallback {
+    font-size: 15px;
+    color: var(--ps-ink);
+}
+
+/* Accent dot on collapsed tab when the active persona is currently showing in the scene. */
+#ps-hud .ps-emblem.ps-live::after {
+    content: "";
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ps-accent);
+    box-shadow: 0 0 6px var(--ps-accent);
+}
+
+#ps-hud.ps-dragging,
+#ps-hud.ps-dragging * {
+    cursor: ns-resize !important;
+}
+
+#ps-hud.ps-dragging .ps-emblem {
+    transform: none;
+}
+
+/* Buttons inside HUD */
+#ps-hud button {
+    display: inline-grid;
+    place-items: center;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    font: inherit;
+    font-size: 10.5px;
+    color: var(--ps-dim);
+    background: transparent;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 140ms, background 140ms, border-color 140ms;
+}
+
+#ps-hud button:hover {
+    color: var(--ps-ink);
+    background: var(--ps-faint);
+}
+
+#ps-hud button.ps-on {
+    color: var(--ps-accent);
+    background: color-mix(in srgb, var(--ps-accent) 18%, transparent);
+}
+
+/* Top bar (drag handle) */
+.ps-top {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 6px 6px 10px;
+    cursor: ns-resize;
+    touch-action: none;
+    flex: none;
+    border-bottom: 1px solid var(--ps-line);
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.ps-top button {
+    cursor: pointer;
+}
+
+.ps-title {
+    flex: 1;
+    min-width: 0;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ps-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ps-title-count {
+    font-family: var(--seeker-mono-font, ui-monospace, monospace);
+    font-weight: 500;
+    opacity: 0.72;
+    margin-left: 5px;
+    letter-spacing: 0;
+}
+
+/* Scrollable body inside expanded HUD */
+.ps-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+}
+
+.ps-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.ps-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: 99px;
+}
+
+/* Settings tray */
+.ps-tray {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--ps-line);
+    background: rgba(255, 255, 255, 0.02);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ps-tray-head {
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ps-dim);
+    margin-top: 2px;
+}
+
+.ps-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    color: var(--ps-dim);
+}
+
+.ps-row label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0;
+    cursor: pointer;
+    color: var(--ps-ink);
+    font-size: 11px;
+}
+
+.ps-range-val {
+    font-family: var(--seeker-mono-font, ui-monospace, monospace);
+    font-size: 10px;
+    color: var(--ps-dim);
+    min-width: 34px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Active persona card */
+.ps-card {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--ps-line);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ps-persona-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ps-avatar {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    object-fit: cover;
+    object-position: center top;
+    background: var(--ps-fill);
+    box-shadow: inset 0 0 0 1px var(--ps-line);
+}
+
+.ps-persona-picker {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ps-persona-meta {
+    font-size: 10px;
+    color: var(--ps-dim);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ps-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    flex: none;
+}
+
+.ps-dot.ps-dot-live {
+    background: var(--ps-accent);
+    box-shadow: 0 0 6px var(--ps-accent);
+}
+
+/* Primary "Show in scenes" toggle row */
+.ps-scene-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    background: var(--ps-fill);
+    cursor: pointer;
+    transition: background 140ms;
+}
+
+.ps-scene-toggle:hover {
+    background: var(--ps-fill-hover);
+}
+
+.ps-scene-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--ps-ink);
+    font-size: 11.5px;
+    font-weight: 500;
+}
+
+.ps-scene-toggle-label i {
+    font-size: 11px;
+    color: var(--ps-dim);
+}
+
+.ps-scene-toggle.ps-active .ps-scene-toggle-label i {
+    color: var(--ps-accent);
+}
+
+.ps-switch {
+    position: relative;
+    width: 30px;
+    height: 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    flex: none;
+    transition: background 160ms;
+}
+
+.ps-switch::after {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #fff;
+    transition: transform 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.ps-scene-toggle.ps-active .ps-switch {
+    background: var(--ps-accent);
+}
+
+.ps-scene-toggle.ps-active .ps-switch::after {
+    transform: translateX(14px);
+}
+
+/* Per-chat override segmented control */
+.ps-chat-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 10.5px;
+    color: var(--ps-dim);
+}
+
+.ps-seg {
+    display: inline-flex;
+    background: var(--ps-fill);
+    border-radius: 6px;
+    padding: 2px;
+    gap: 2px;
+}
+
+#ps-hud .ps-seg button {
+    height: 18px;
+    padding: 0 7px;
+    font-size: 10px;
+    border-radius: 4px;
+    color: var(--ps-dim);
+}
+
+#ps-hud .ps-seg button.ps-seg-on {
+    background: rgba(255, 255, 255, 0.18);
+    color: var(--ps-ink);
+    font-weight: 500;
+}
+
+#ps-hud .ps-seg button.ps-seg-on[data-mode="show"] {
+    background: color-mix(in srgb, var(--ps-accent) 28%, transparent);
+    color: #fff;
+}
+
+/* Active expression strip */
+.ps-expr-strip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10.5px;
+    color: var(--ps-dim);
+}
+
+.ps-expr-pill {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: var(--ps-fill);
+    color: var(--ps-ink);
+    font-family: var(--seeker-mono-font, ui-monospace, monospace);
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- 2. Sprites Drawer & Grid (matching seeker's Character Editor) ---------- */
+
+.ps-sprites-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.ps-sprites-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    cursor: pointer;
+    transition: background 140ms;
+}
+
+.ps-sprites-head:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.ps-sprites-head-title {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 0;
+}
+
+.ps-sprites-head-title strong {
+    font-family: var(--seeker-heading-font, inherit);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ps-ink);
+}
+
+.ps-sprites-count {
+    font-size: 10px;
+    color: var(--ps-dim);
+    white-space: nowrap;
+}
+
+.ps-chevron {
+    font-size: 10px;
+    color: var(--ps-dim);
+    transition: transform 150ms;
+}
+
+.ps-sprites-section.ps-open .ps-chevron {
+    transform: rotate(180deg);
+}
+
+.ps-sprites-body {
+    padding: 0 10px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    transition: background 150ms, box-shadow 150ms;
+}
+
+.ps-sprites-body.ps-dropping {
+    border-radius: 8px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.ps-sprites-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#ps-hud .ps-zip-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 24px;
+    padding: 0 8px;
+    background: var(--ps-fill);
+    color: var(--ps-ink);
+    border-radius: 6px;
+    font-size: 10.5px;
+    white-space: nowrap;
+}
+
+#ps-hud .ps-zip-btn:hover {
+    background: var(--ps-fill-hover);
+}
+
+.ps-sprites-hint {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.38;
+    color: var(--ps-dim);
+}
+
+.ps-suggest {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    padding: 6px 8px;
+    border-radius: 7px;
+    background: color-mix(in srgb, var(--ps-accent) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ps-accent) 32%, transparent);
+    font-size: 10.5px;
+    color: var(--ps-ink);
+}
+
+#ps-hud .ps-suggest button {
+    height: 22px;
+    padding: 0 8px;
+    background: var(--ps-accent);
+    color: #0b0b0b;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Sprite tiles grid */
+.ps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+}
+
+.ps-tile {
+    position: relative;
+    aspect-ratio: 3 / 4;
+    border-radius: var(--seeker-radius-xs, 5px);
+    background: var(--ps-fill);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 140ms, box-shadow 140ms, background-color 140ms;
+}
+
+.ps-tile:hover {
+    background: var(--ps-fill-hover);
+}
+
+.ps-tile.ps-tile-current {
+    box-shadow: inset 0 0 0 2px var(--ps-accent);
+}
+
+.ps-tile-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    display: block;
+}
+
+.ps-tile-label {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    padding: 14px 4px 5px;
+    font-size: 10px;
+    line-height: 1.2;
+    text-align: center;
+    color: var(--ps-ink);
+    background: linear-gradient(to top, rgba(4, 7, 6, 0.92), rgba(4, 7, 6, 0));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Empty slot: dashed outline + plus icon, matching seeker */
+.ps-tile[data-type="failure"] {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+    outline: 1px dashed rgba(255, 255, 255, 0.2);
+    outline-offset: -1px;
+    cursor: copy;
+}
+
+.ps-tile[data-type="failure"]::before {
+    content: "+";
+    position: absolute;
+    inset: 0 0 18px;
+    display: grid;
+    place-items: center;
+    color: var(--ps-dim);
+    font-size: 22px;
+    font-weight: 300;
+}
+
+.ps-tile[data-type="failure"] .ps-tile-label {
+    background: none;
+    color: var(--ps-dim);
+}
+
+.ps-tile[data-type="failure"]:hover {
+    background: var(--ps-fill);
+}
+
+.ps-tile.ps-drop-target {
+    box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.88) !important;
+    transform: scale(1.03);
+}
+
+.ps-tile-actions {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    z-index: 2;
+    display: flex;
+    gap: 2px;
+    opacity: 0;
+    transition: opacity 120ms;
+}
+
+.ps-tile:hover .ps-tile-actions,
+.ps-tile:focus-within .ps-tile-actions {
+    opacity: 1;
+}
+
+#ps-hud .ps-tile-actions button {
+    width: 21px;
+    min-width: 21px;
+    height: 21px;
+    padding: 0;
+    font-size: 10px;
+    border-radius: 5px;
+    background: rgba(10, 10, 12, 0.88);
+    color: var(--ps-ink);
+}
+
+#ps-hud .ps-tile-actions button:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+#ps-hud .ps-tile-actions button[data-act="del-sprite"]:hover {
+    background: var(--ps-danger);
+    color: #fff;
+}
+
+/* Folder & fallback details */
+.ps-details {
+    margin-top: 2px;
+    padding-top: 7px;
+    border-top: 1px solid var(--ps-line);
+}
+
+.ps-details > summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    list-style: none;
+    color: var(--ps-dim);
+    font-size: 11px;
+    padding: 2px 0;
+}
+
+.ps-details > summary::-webkit-details-marker {
+    display: none;
+}
+
+.ps-details > summary::before {
+    content: "";
+    width: 5px;
+    height: 5px;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    transform: rotate(-45deg);
+    transition: transform 140ms;
+}
+
+.ps-details[open] > summary::before {
+    transform: rotate(45deg);
+}
+
+.ps-details > summary:hover {
+    color: var(--ps-ink);
+}
+
+.ps-details-body {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 7px;
+}
+
+.ps-field-label {
+    font-size: 10px;
+    color: var(--ps-dim);
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.ps-inline-form {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+}
+
+.ps-folder-path {
+    font-family: var(--seeker-mono-font, ui-monospace, monospace);
+    font-size: 9.5px;
+    color: var(--ps-dim);
+    word-break: break-all;
+}
+
+/* Keep inputs & selects compact and dark despite SillyTavern global styles */
+#ps-hud select,
+#ps-hud input[type="text"],
+#ps-hud input[type="search"] {
+    width: auto !important;
+    min-width: 0 !important;
+    height: 24px !important;
+    min-height: 0 !important;
+    padding: 0 7px !important;
+    margin: 0 !important;
+    font: inherit !important;
+    font-size: 11px !important;
+    color: var(--ps-ink) !important;
+    background: var(--ps-fill) !important;
+    border: 1px solid var(--ps-line) !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    outline: none !important;
+    box-sizing: border-box !important;
+}
+
+#ps-hud select:focus,
+#ps-hud input[type="text"]:focus,
+#ps-hud input[type="search"]:focus {
+    border-color: rgba(255, 255, 255, 0.32) !important;
+}
+
+#ps-hud select option {
+    background: #121214;
+    color: #eee;
+}
+
+#ps-hud .ps-persona-select {
+    width: 100% !important;
+    font-weight: 600 !important;
+    font-size: 12px !important;
+}
+
+#ps-hud .ps-search-input {
+    flex: 1 1 auto;
+    width: 100% !important;
+}
+
+#ps-hud .ps-folder-input {
+    flex: 1 1 auto;
+    width: 100% !important;
+}
+
+#ps-hud input[type="checkbox"] {
+    width: 13px !important;
+    height: 13px !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    accent-color: var(--ps-accent);
+    cursor: pointer;
+}
+
+#ps-hud input[type="range"] {
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 16px !important;
+    margin: 0 !important;
+    accent-color: var(--ps-accent);
+    background: transparent !important;
+    border: 0 !important;
+}
+
+#ps-hud .ps-btn-filled {
+    height: 24px;
+    padding: 0 8px;
+    background: var(--ps-faint);
+    color: var(--ps-ink);
+    font-size: 10.5px;
+    white-space: nowrap;
+}
+
+#ps-hud .ps-btn-filled:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+@media (max-width: 600px) {
+    #ps-hud {
+        top: auto;
+        bottom: 142px;
+        left: 0;
+    }
+    #ps-hud.ps-wide {
+        width: calc(100vw - 16px);
+    }
+}
+
+/* ---------- 3. Visual Novel Stage: Persona Sprite Holder ---------- */
+
+#ps-stage-holder {
+    --ps-flip: 1;
+    --ps-scale: 1;
+    --ps-offset-x: 0%;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-select: none;
+    overflow: hidden;
+    transition: left 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                right 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                opacity 260ms ease,
+                filter 280ms ease;
+}
+
+#ps-stage-holder[hidden] {
+    display: none !important;
+}
+
+#ps-stage-holder .ps-sprite-box {
+    position: relative;
+    height: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    pointer-events: none;
+    transform-origin: center bottom;
+    transform: translateX(var(--ps-offset-x)) scale(var(--ps-scale));
+    transition: transform 240ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    filter:
+        drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3))
+        drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5));
+}
+
+#ps-stage-holder img.ps-stage-image {
+    height: 100%;
+    max-height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+    display: block;
+    pointer-events: auto;
+    transform: scaleX(var(--ps-flip));
+    transition: opacity 240ms ease;
+}
+
+#ps-stage-holder img.ps-sprite-ghost {
+    position: absolute;
+    inset: 0;
+    margin: auto auto 0;
+    height: 100%;
+    max-height: 100%;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+    pointer-events: none;
+    transform: scaleX(var(--ps-flip));
+    transition: opacity var(--seeker-sprite-fade, 550ms) cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+#ps-stage-holder img.ps-sprite-peek {
+    position: absolute;
+    object-fit: contain;
+    object-position: bottom center;
+    pointer-events: none;
+    opacity: 0;
+    transform: scaleX(var(--ps-flip));
+    transition: opacity var(--seeker-peek-fade, 250ms) ease;
+}
+
+#ps-stage-holder img.ps-sprite-peek.ps-shown {
+    opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    #ps-stage-holder,
+    #ps-stage-holder .ps-sprite-box,
+    #ps-stage-holder img.ps-sprite-ghost,
+    #ps-stage-holder img.ps-sprite-peek {
+        transition: none !important;
+    }
+}
+
+/* Desktop stage framing (matching SillyTavern-seeker's left stage beside chat column) */
+@media (min-width: 1001px) {
+    body.waifuMode #ps-stage-holder {
+        left: 0;
+        right: var(--seeker-chat-width, 0px);
+        top: 0;
+        bottom: 0;
+    }
+
+    /* Duo scene (solo chat with BOTH character sprite AND persona sprite visible):
+       compose them side-by-side harmoniously across the stage. */
+    body.waifuMode.ps-stage-duo.ps-side-left #ps-stage-holder {
+        left: 0;
+        right: calc(var(--seeker-chat-width, 0px) + (100vw - var(--seeker-chat-width, 0px)) * 0.34);
+    }
+    body.waifuMode.ps-stage-duo.ps-side-left #expression-holder {
+        left: calc((100vw - var(--seeker-chat-width, 0px)) * 0.34) !important;
+        right: var(--seeker-chat-width, 0px) !important;
+        transition: left 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                    right 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                    filter 280ms ease;
+    }
+
+    body.waifuMode.ps-stage-duo.ps-side-right #ps-stage-holder {
+        left: calc((100vw - var(--seeker-chat-width, 0px)) * 0.34);
+        right: var(--seeker-chat-width, 0px);
+    }
+    body.waifuMode.ps-stage-duo.ps-side-right #expression-holder {
+        left: 0 !important;
+        right: calc(var(--seeker-chat-width, 0px) + (100vw - var(--seeker-chat-width, 0px)) * 0.34) !important;
+        transition: left 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                    right 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
+                    filter 280ms ease;
+    }
+
+    /* Group scene (VN wrapper + persona sprite): persona anchors to chosen side. */
+    body.waifuMode.ps-stage-group.ps-side-left #ps-stage-holder {
+        justify-content: flex-start;
+        padding-left: 2vw;
+    }
+    body.waifuMode.ps-stage-group.ps-side-right #ps-stage-holder {
+        justify-content: flex-end;
+        padding-right: 2vw;
+    }
+
+    /* Active speaker depth & subtle emphasis in duo/group scenes */
+    body.waifuMode.ps-emphasis.ps-stage-duo.ps-speaker-user #ps-stage-holder,
+    body.waifuMode.ps-emphasis.ps-stage-group.ps-speaker-user #ps-stage-holder {
+        z-index: 3;
+    }
+    body.waifuMode.ps-emphasis.ps-stage-duo.ps-speaker-user #expression-holder {
+        z-index: 2;
+        filter:
+            brightness(0.84)
+            drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3))
+            drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5)) !important;
+    }
+    body.waifuMode.ps-emphasis.ps-stage-duo.ps-speaker-char #ps-stage-holder,
+    body.waifuMode.ps-emphasis.ps-stage-group.ps-speaker-char #ps-stage-holder {
+        z-index: 2;
+    }
+    body.waifuMode.ps-emphasis.ps-stage-duo.ps-speaker-char #ps-stage-holder .ps-sprite-box,
+    body.waifuMode.ps-emphasis.ps-stage-group.ps-speaker-char #ps-stage-holder .ps-sprite-box {
+        filter:
+            brightness(0.84)
+            drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3))
+            drop-shadow(0 24px 48px rgba(0, 0, 0, 0.5));
+    }
+    body.waifuMode.ps-emphasis.ps-stage-duo.ps-speaker-char #expression-holder {
+        z-index: 3;
+    }
+
+    /* ---------- Solo-persona stage activation for SillyTavern-seeker ----------
+       When the character has no sprite showing, seeker collapses to a centred
+       single column. When the user's persona IS showing on stage, restore
+       seeker's visual novel split stage cleanly without modifying seeker files. */
+    body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) {
+        background-color: rgb(var(--seeker-panel-rgb, 7, 7, 7)) !important;
+    }
+    body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) #sheld {
+        right: 0 !important;
+        left: auto !important;
+        margin: 0 !important;
+        width: var(--seeker-chat-width) !important;
+        max-width: var(--seeker-chat-width) !important;
+        background: rgb(var(--seeker-panel-rgb, 7, 7, 7)) !important;
+    }
+    body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) #bg1 {
+        position: fixed !important;
+        inset: 0 var(--seeker-chat-width) 0 0 !important;
+        width: auto !important;
+        height: auto !important;
+        overflow: hidden !important;
+        background-size: 0 0 !important;
+    }
+    body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) #bg1::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        left: 0;
+        right: 0;
+        z-index: 0;
+        background-color: transparent;
+        background-image: inherit;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: cover;
+        -webkit-mask-image: none;
+        mask-image: none;
+        transform:
+            translate(calc(var(--seeker-bg-x, 0) * var(--seeker-bg-shift, 1.25%)), calc(var(--seeker-bg-y, 0) * var(--seeker-bg-shift, 1.25%)))
+            scale(var(--seeker-bg-zoom, 1.04));
+        transition: transform 5600ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) #bg1::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        left: 0;
+        right: 0;
+        z-index: 0;
+        transform: none;
+        background-color: rgb(var(--seeker-panel-rgb, 7, 7, 7));
+        /* seeker's halftone: its mask layers are variables (seeker style.css, "The halftone"). */
+        -webkit-mask-image: var(--seeker-halftone-image);
+        -webkit-mask-position: var(--seeker-halftone-position);
+        -webkit-mask-size: var(--seeker-halftone-size);
+        -webkit-mask-repeat: var(--seeker-halftone-repeat);
+        mask-image: var(--seeker-halftone-image);
+        mask-position: var(--seeker-halftone-position);
+        mask-size: var(--seeker-halftone-size);
+        mask-repeat: var(--seeker-halftone-repeat);
+    }
+    body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) #seeker-stage-vignette {
+        position: fixed;
+        inset: 0 var(--seeker-chat-width) 0 0;
+        z-index: 0;
+        display: block;
+        background:
+            radial-gradient(ellipse 75% 70% at 50% 42%, transparent 55%, rgba(0, 0, 0, 0.42) 100%),
+            linear-gradient(to top, rgba(0, 0, 0, 0.28), transparent 32%);
+        pointer-events: none;
+    }
+    body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) #seeker-stage-ornament {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        transform: scaleY(-1);
+        z-index: 1;
+        display: block;
+        width: var(--seeker-ornament-size, 260px);
+        height: var(--seeker-ornament-size, 260px);
+        background: url("ornament.svg") 0 0 / contain no-repeat;
+        opacity: 0.5;
+        -webkit-mask-image: radial-gradient(circle at 0 0, #000 45%, transparent 100%);
+        mask-image: radial-gradient(circle at 0 0, #000 45%, transparent 100%);
+        filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.6));
+        pointer-events: none;
+    }
+}
+
+/* Mobile stage framing (matches seeker's upper-sprite + fading chat layout) */
+@media (max-width: 1000px) {
+    body.waifuMode #ps-stage-holder {
+        top: 0;
+        bottom: auto;
+        height: 62dvh;
+        left: 0;
+        right: 0;
+    }
+    body.waifuMode.ps-stage-duo.ps-side-left #ps-stage-holder {
+        right: 36vw;
+    }
+    body.waifuMode.ps-stage-duo.ps-side-left #expression-holder {
+        left: 36vw !important;
+    }
+    body.waifuMode.ps-stage-duo.ps-side-right #ps-stage-holder {
+        left: 36vw;
+    }
+    body.waifuMode.ps-stage-duo.ps-side-right #expression-holder {
+        right: 36vw !important;
+    }
+    /* Solo-persona on phones: restore seeker's upper-stage fade over the sprite */
+    body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) #sheld {
+        top: 60dvh !important;
+        bottom: 0 !important;
+        height: 40dvh !important;
+        background: transparent !important;
+        overflow: visible !important;
+    }
+    body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) #sheld::before {
+        content: "" !important;
+        position: absolute !important;
+        inset: calc(-1 * var(--seeker-fade, 300px)) 0 0 !important;
+        z-index: -1 !important;
+        pointer-events: none !important;
+        background: linear-gradient(to bottom, var(--seeker-fade-stops)) !important;
+    }
+}
+
+/* Non-waifuMode fallback: compact bottom-left corner sprite */
+body:not(.waifuMode) #ps-stage-holder {
+    top: auto;
+    bottom: 0;
+    left: 16px;
+    right: auto;
+    width: min(280px, 34vw);
+    height: min(420px, 55vh);
+}
+
+/* ---------- 4. In the Persona panel ----------
+   The manager was a floating glass menu at the screen's left edge. Here it is a section of the
+   panel: no box of its own, the panel's width, and as tall as its content. */
+#ps-hud.ps-embedded {
+    position: static;
+    z-index: auto;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    margin-top: var(--seeker-space-4);
+    padding-top: var(--seeker-space-3);
+    overflow: visible;
+    background: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    border: 0;
+    border-top: 1px solid var(--seeker-divider);
+    border-radius: 0;
+    box-shadow: none;
+    font-size: var(--seeker-fs-small);
+    user-select: auto;
+    transition: none;
+}
+#ps-hud.ps-embedded .ps-top { cursor: default; padding-left: 0; padding-right: 0; border: 0; background: none; }
+#ps-hud.ps-embedded .ps-title { font-family: var(--seeker-heading-font); text-transform: var(--seeker-heading-case); font-size: var(--seeker-fs-body, 15px); font-weight: 600; letter-spacing: 0; }
+#ps-hud.ps-embedded .ps-body { max-height: none; overflow: visible; padding-left: 0; padding-right: 0; }
+#ps-hud.ps-embedded .ps-persona-name { font-weight: 600; color: var(--ps-ink); }
+#ps-hud.ps-embedded .ps-grid { grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); }

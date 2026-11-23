@@ -18,6 +18,7 @@ h1, h2, h3, h4, h5,
 #chat .mes .name_text,
 .welcomePanel :is(.welcomeHeaderVersionDisplay, .recentChatsTitle, .characterName) {
   font-family: var(--seeker-heading-font) !important;
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-optical-sizing: auto;
   font-weight: 600 !important;
   letter-spacing: 0.01em;
@@ -86,6 +87,7 @@ h1, h2, h3, h4, h5,
 /* Names (characters and personas in lists) read like the speaker names in the chat. */
 :where(.drawer-content, .popup, #character_popup) .ch_name {
   font-family: var(--seeker-heading-font) !important;
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-optical-sizing: auto;
   font-size: var(--seeker-fs-subsection) !important;
   font-weight: 600 !important;
@@ -131,6 +133,7 @@ body:not(:has(#chat > .welcomePanel)) #chat .mes[mesid="0"] .mes_text > p:first-
   float: left;
   margin: 0.085em 0.08em 0 0;
   font-family: var(--seeker-heading-font);
+  text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
   font-optical-sizing: auto;
   font-size: 5.1em;
   font-style: normal;

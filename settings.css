@@ -163,6 +163,7 @@
   & #logit_bias_openai {
     margin: var(--seeker-space-5) 0 var(--seeker-space-2) !important;
     font-family: var(--seeker-heading-font) !important;
+    text-transform: var(--seeker-heading-case); /* a font loadout may set headings in capitals */
     font-size: var(--seeker-fs-section) !important;
     font-weight: 600 !important;
     line-height: var(--seeker-lh-display) !important;

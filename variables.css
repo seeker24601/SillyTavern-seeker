@@ -53,8 +53,15 @@
   /* ---------- Type ----------
      Headings are Bodoni Moda, weight 600. Meta (timestamps, message numbers, counters,
      token counts, versions, authors) and code are DM Mono, faint, with tabular figures.
-     Everything else is Jost. */
+     Everything else is Jost.
+     These three are a font loadout, "Didoni", the default: a heading face, a body face and a
+     mono face. User Settings, "Fonts" picks the loadout (edge-style.js sets data-seeker-fonts
+     on the page). To add one: load its faces with @font-face in style.css, redefine the four
+     variables under :root[data-seeker-fonts="<key>"] below this block, and list the key in
+     edge-style.js. A loadout may also set --seeker-heading-case (uppercase) and
+     --seeker-stage-name-weight; unset, headings keep their case and the stage name is 700. */
   --seeker-heading-font: "Bodoni Moda", "Bodoni 72", "Bodoni MT", Didot, serif;
+  --seeker-body-font: "Jost", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --seeker-display-font: "Bodoni Moda SC", var(--seeker-heading-font); /* small caps */
   --seeker-mono-font: "DM Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
@@ -156,10 +163,10 @@
      --seeker-bg-shift towards the pointer; the shift must stay under (zoom - 1) / 2. */
   --seeker-bg-zoom: 1.04;
   --seeker-bg-shift: 1.25%;
-  /* How far halftone.webp hangs past the stage's edge to cut off the edge artifact.
-     The image is 482 x 1125 and spans the stage's height. */
-  --seeker-halftone-width: calc(100vh * 482 / 1125);
-  --seeker-halftone-shift: calc(var(--seeker-halftone-width) * 0.08);
+  /* The halftone where the background dissolves into the chat column (style.css, "The halftone"):
+     the solid strip at the column, out past the spine so the spine stands on black. The dots
+     begin there. */
+  --seeker-halftone-solid: calc(var(--seeker-space-3) + 1.2vh);
   --seeker-ornament-size: clamp(220px, 30vh, 320px); /* scales a little with the screen */
   --seeker-sprite-fade: 550ms; /* one expression dissolving into the next (index.js reads it) */
   --seeker-peek-fade: 250ms; /* the random expression shown while the mouse is on the sprite */
@@ -185,7 +192,7 @@
 /* ---------- SillyTavern's variables ----------
    SillyTavern sets some of these inline from the UI theme; !important wins over that. */
 :root {
-  --mainFontFamily: "Jost", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mainFontFamily: var(--seeker-body-font);
   --monoFontFamily: var(--seeker-mono-font); /* its code blocks and monospace text */
   --topBarBlockSize: 0px !important; /* it places the chat and panels under its top bar, which is gone */
   --SmartThemeBorderColor: transparent !important; /* nearly all its borders: controls get fills instead */
