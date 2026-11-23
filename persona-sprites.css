@@ -930,13 +930,15 @@
     }
 
     /* Duo scene (solo chat with BOTH character sprite AND persona sprite visible):
-       compose them side-by-side harmoniously across the stage. */
+       compose them side-by-side harmoniously across the stage.
+       The id is repeated on the character's holder so these win over seeker's own stage rule,
+       which is three ids deep. */
     body.waifuMode.ps-stage-duo.ps-side-left #ps-stage-holder {
         left: 0;
-        right: calc(var(--seeker-chat-width, 0px) + (100vw - var(--seeker-chat-width, 0px)) * 0.34);
+        right: calc(var(--seeker-chat-width, 0px) + (100vw - var(--seeker-chat-width, 0px)) * 0.38);
     }
-    body.waifuMode.ps-stage-duo.ps-side-left #expression-holder {
-        left: calc((100vw - var(--seeker-chat-width, 0px)) * 0.34) !important;
+    body.waifuMode.ps-stage-duo.ps-side-left #expression-holder#expression-holder#expression-holder#expression-holder {
+        left: calc((100vw - var(--seeker-chat-width, 0px)) * 0.38) !important;
         right: var(--seeker-chat-width, 0px) !important;
         transition: left 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
                     right 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
@@ -944,12 +946,12 @@
     }
 
     body.waifuMode.ps-stage-duo.ps-side-right #ps-stage-holder {
-        left: calc((100vw - var(--seeker-chat-width, 0px)) * 0.34);
+        left: calc((100vw - var(--seeker-chat-width, 0px)) * 0.38);
         right: var(--seeker-chat-width, 0px);
     }
-    body.waifuMode.ps-stage-duo.ps-side-right #expression-holder {
+    body.waifuMode.ps-stage-duo.ps-side-right #expression-holder#expression-holder#expression-holder#expression-holder {
         left: 0 !important;
-        right: calc(var(--seeker-chat-width, 0px) + (100vw - var(--seeker-chat-width, 0px)) * 0.34) !important;
+        right: calc(var(--seeker-chat-width, 0px) + (100vw - var(--seeker-chat-width, 0px)) * 0.38) !important;
         transition: left 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
                     right 320ms cubic-bezier(0.22, 0.61, 0.36, 1),
                     filter 280ms ease;
