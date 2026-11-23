@@ -1034,6 +1034,15 @@
             scale(var(--seeker-bg-zoom, 1.04));
         transition: transform 5600ms cubic-bezier(0.22, 0.61, 0.36, 1);
     }
+    body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) #seeker-middle-ground {
+        /* The centred layout tucks the middle ground under its edges (z-index -1); here the
+           background is #bg1::before again, so it goes back over it, as on the character stage. */
+        z-index: 0 !important;
+        transform:
+            translate(calc(var(--seeker-bg-x, 0) * var(--seeker-bg-shift, 1.25%) * 0.5), calc(var(--seeker-bg-y, 0) * var(--seeker-bg-shift, 1.25%) * 0.5))
+            scale(calc(var(--seeker-bg-zoom, 1.04) + var(--seeker-bg-near, 0) * 0.035));
+        transition: transform 5600ms cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
     body.waifuMode.ps-stage-active.ps-stage-solo:has(#ps-stage-holder:not([hidden]) #ps-stage-image[src]:not([src=""])):not(:has(#chat > .welcomePanel)) #bg1::after {
         content: "";
         position: absolute;
